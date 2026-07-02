@@ -1,0 +1,49 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} — Detalle{% endblock %}
+
+{% block content %}
+<section class="product-page">
+  <div class="product-page-inner">
+    <div class="product-gallery">
+      <div class="product-gallery-main">
+        {% if product.image %}
+          <img src="{{ product.get_image_url }}" alt="{{ product.name }}">
+        {% else %}
+          <div class="product-gallery-placeholder" aria-hidden="true"></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="product-details">
+      <p class="product-eyebrow">{{ product.category.name|default:"Sin categoría" }}</p>
+      <h1 class="product-name">{{ product.name }}</h1>
+      <p class="product-price">{{ product.display_price }}</p>
+
+      <div class="product-meta">
+        <div class="product-meta-row">
+          <span class="product-meta-label">Tipo</span>
+          <span class="product-meta-value">{{ product.get_jewelry_type_display }}</span>
+        </div>
+        <div class="product-meta-row">
+          <span class="product-meta-label">Material</span>
+          <span class="product-meta-value">{{ product.get_material_display }}</span>
+        </div>
+        <div class="product-meta-row">
+          <span class="product-meta-label">Stock</span>
+          <span class="product-meta-value {% if product.stock <= 0 %}product-meta-value--danger{% endif %}">
+            {% if product.stock > 0 %}{{ product.stock }} unidades{% else %}Agotado{% endif %}
+          </span>
+        </div>
+      </div>
+
+      <p class="product-description">{{ product.description|linebreaks }}</p>
+
+      <div class="product-actions">
+        <a href="{% url 'products:product_list' %}" class="btn btn-secondary">Volver al catálogo</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

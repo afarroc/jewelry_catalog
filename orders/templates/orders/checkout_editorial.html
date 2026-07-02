@@ -1,0 +1,138 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<section class="checkout-page">
+  <div class="checkout-page-inner">
+    <header class="checkout-header">
+      <p class="checkout-eyebrow">Finalizar compra</p>
+      <h1 class="checkout-title">Checkout</h1>
+    </header>
+
+    {% if messages %}
+      <div class="checkout-messages">
+        {% for message in messages %}
+          <div class="checkout-message checkout-message--{{ message.tags }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if cart.total_items > 0 %}
+      <form method="POST" class="checkout-layout">
+        {% csrf_token %}
+
+        <div class="checkout-main">
+          <div class="checkout-section">
+            <h2 class="checkout-section-title">Envío</h2>
+            <div class="checkout-field">
+              <label class="checkout-label" for="{{ form.shipping_address.id_for_label }}">Dirección de envío</label>
+              {{ form.shipping_address }}
+            </div>
+          </div>
+
+          <div class="checkout-section">
+            <h2 class="checkout-section-title">Facturación</h2>
+            <div class="checkout-field">
+              <div class="checkout-radio-group">
+                {% for radio in form.billing_option %}
+                  <label class="checkout-radio">
+                    {{ radio.tag }}
+                    <span>{{ radio.choice_label }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="checkout-field">
+              <label class="checkout-label" for="{{ form.billing_address.id_for_label }}">Dirección de facturación</label>
+              {{ form.billing_address }}
+            </div>
+          </div>
+
+          <div class="checkout-section">
+            <h2 class="checkout-section-title">Pago</h2>
+            <div class="checkout-field">
+              <div class="checkout-radio-group">
+                <label class="checkout-radio">
+                  <input type="radio" name="payment_method" value="credit_card" checked>
+                  <span>Tarjeta de crédito</span>
+                </label>
+                <label class="checkout-radio">
+                  <input type="radio" name="payment_method" value="paypal">
+                  <span>PayPal</span>
+                </label>
+              </div>
+            </div>
+            <div class="checkout-field" id="stripe-payment-container">
+              <div id="payment-element"></div>
+            </div>
+          </div>
+
+          <div class="checkout-section">
+            <h2 class="checkout-section-title">Notas</h2>
+            <div class="checkout-field">
+              {{ form.notes }}
+            </div>
+          </div>
+
+          <div class="checkout-section">
+            <div class="checkout-terms">
+              <label class="checkout-checkbox">
+                <input type="checkbox" id="agree-terms" name="agree_terms" required>
+                <span>Acepto los <a href="{% url 'orders:terms' %}" target="_blank">Términos y condiciones</a></span>
+              </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Comprar</button>
+          </div>
+        </div>
+
+        <aside class="checkout-summary">
+          <div class="checkout-summary-card">
+            <h3 class="checkout-summary-title">Resumen</h3>
+            <div class="checkout-items">
+              {% for item in cart.items.all %}
+                <div class="checkout-item">
+                  <div>
+                    <p class="checkout-item-name">{{ item.product.name }}</p>
+                    <p class="checkout-item-meta">Cantidad: {{ item.quantity }}</p>
+                  </div>
+                  <p class="checkout-item-price">{{ item.total_price }}</p>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="checkout-totals">
+              <div class="checkout-total-row">
+                <span>Subtotal</span>
+                <span>{{ cart.subtotal }}</span>
+              </div>
+              <div class="checkout-total-row">
+                <span>Envío</span>
+                <span>{{ shipping_cost }}</span>
+              </div>
+              <div class="checkout-total-row">
+                <span>Impuesto (8%)</span>
+                <span>{{ tax }}</span>
+              </div>
+              <div class="checkout-total-row checkout-total-row--grand">
+                <span>Total</span>
+                <span>{{ total }}</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </form>
+    {% else %}
+      <div class="checkout-empty">
+        <div class="checkout-empty-card">
+          <h2 class="checkout-empty-title">Tu carrito está vacío</h2>
+          <p class="checkout-empty-text">Agrega productos antes de continuar con el checkout.</p>
+          <a href="{% url 'products:product_list' %}" class="btn btn-primary">Ver catálogo</a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

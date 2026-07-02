@@ -1,0 +1,49 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}Actualizar Perfil{% endblock %}
+
+{% block content %}
+<section class="profile-page">
+  <div class="profile-page-inner">
+    <header class="profile-header">
+      <p class="profile-eyebrow">Tu cuenta</p>
+      <h1 class="profile-title">Actualizar Perfil</h1>
+    </header>
+
+    {% if messages %}
+      <div class="profile-messages">
+        {% for message in messages %}
+          <div class="profile-message profile-message--{{ message.tags }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="POST" class="profile-form">
+      {% csrf_token %}
+
+      <div class="profile-form-grid">
+        {% for field in form %}
+          <div class="auth-field">
+            <label class="auth-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <p class="auth-field-error">{{ field.errors|striptags }}</p>
+            {% endif %}
+            {% if field.help_text %}
+              <p class="auth-field-help">{{ field.help_text|safe }}</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="profile-form-actions">
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <a href="{% url 'accounts:profile' %}" class="btn btn-ghost">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

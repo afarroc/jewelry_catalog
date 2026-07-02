@@ -1,0 +1,23 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}Cuenta{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+  <div class="auth-page-inner">
+    <header class="auth-header">
+      <p class="auth-eyebrow">{% block auth_eyebrow %}Cuenta{% endblock %}</p>
+      <h1 class="auth-title">{% block auth_title %}{% endblock %}</h1>
+    </header>
+
+    <div class="auth-card">
+      {% block auth_content %}{% endblock %}
+
+      <footer class="auth-footer">
+        {% block auth_footer %}{% endblock %}
+      </footer>
+    </div>
+  </div>
+</section>
+{% endblock %}

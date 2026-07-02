@@ -1,0 +1,52 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}Mi Perfil{% endblock %}
+
+{% block content %}
+<section class="profile-page">
+  <div class="profile-page-inner">
+    <header class="profile-header">
+      <p class="profile-eyebrow">Tu cuenta</p>
+      <h1 class="profile-title">Mi Perfil</h1>
+      <div class="profile-actions">
+        <a href="{% url 'orders:order_history' %}" class="btn btn-secondary">Historial de pedidos</a>
+        <a href="{% url 'accounts:profile_update' %}" class="btn btn-ghost">Editar perfil</a>
+      </div>
+    </header>
+
+    <div class="profile-layout">
+      <div class="profile-card">
+        <div class="profile-card-header">
+          <div class="profile-avatar">
+            <span>{{ user.username|first|upper }}</span>
+          </div>
+          <div>
+            <h2 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h2>
+            <p class="profile-username">@{{ user.username }}</p>
+          </div>
+        </div>
+
+        <dl class="profile-fields">
+          <div class="profile-field">
+            <dt>Email</dt>
+            <dd>{{ user.email }}</dd>
+          </div>
+          <div class="profile-field">
+            <dt>Teléfono</dt>
+            <dd>{{ user.phone_number|default:"—" }}</dd>
+          </div>
+          <div class="profile-field">
+            <dt>Dirección</dt>
+            <dd>{{ user.address|default:"—"|linebreaks }}</dd>
+          </div>
+          <div class="profile-field">
+            <dt>Dirección de facturación</dt>
+            <dd>{{ user.billing_address|default:"—"|linebreaks }}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
