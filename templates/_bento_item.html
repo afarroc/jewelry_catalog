@@ -13,12 +13,22 @@
         <p class="product-category">{{ product.category.name }}</p>
       {% endif %}
       <h3 class="product-title">{{ product.name }}</h3>
+      <p class="product-meta">{{ product.jewelry_type|title }} · {{ product.material|title }}</p>
       {% if product.description and product.bento_size in 'wide,tall,featured' %}
         <p class="product-desc">{{ product.description|truncatechars:100 }}</p>
       {% elif product.description %}
         <p class="product-desc">{{ product.description|truncatechars:60 }}</p>
       {% endif %}
       <p class="product-price">{{ product.display_price }}</p>
+      <div class="product-actions">
+        {% if product.stock > 0 %}
+          <span class="stock-badge stock-badge--in">Disponible</span>
+          <span class="stock-badge stock-badge--qty">{{ product.stock }} uds.</span>
+        {% else %}
+          <span class="stock-badge stock-badge--out">Agotado</span>
+        {% endif %}
+        <a class="btn btn-primary" href="{% url 'cart:cart_add' product.id %}">Agregar</a>
+      </div>
     </div>
   </a>
 </article>
