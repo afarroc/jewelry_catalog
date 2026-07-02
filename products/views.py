@@ -57,7 +57,7 @@ def product_list(request, category_slug=None):
 class ProductDetailView(DetailView):
     """Class-based view for displaying product details with caching."""
     model = Product
-    template_name = 'products/product_detail.html'
+    template_name = 'products/product_detail_editorial.html'
     context_object_name = 'product'
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
