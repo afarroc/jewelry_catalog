@@ -1,0 +1,95 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}Factura #{{ order.order_number }}{% endblock %}
+
+{% block content %}
+<section class="invoice-page">
+  <header class="invoice-header">
+    <div>
+      <div class="invoice-title">Miluxious accesorios</div>
+      <p>Colección de accesorios artesanales</p>
+    </div>
+    <div style="text-align:right;">
+      <h2 style="margin:0;">FACTURA</h2>
+      <p>#{{ order.order_number }}</p>
+      <p>{{ order.created_at|date:"F j, Y" }}</p>
+      <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+    </div>
+  </header>
+
+  <div class="order-body">
+    <div>
+      <h3>Miluxious accesorios</h3>
+      <p>Colección de accesorios artesanales</p>
+      <p>info@miluxious.com</p>
+    </div>
+    <div>
+      <h3>Facturar a</h3>
+      <p>{{ order.user.get_full_name|default:order.user.username }}</p>
+      <p>{{ order.user.email }}</p>
+      {% if order.billing_address %}
+      <p>{{ order.billing_address|linebreaks }}</p>
+      {% else %}
+      <p>{{ order.shipping_address|linebreaks }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <table class="invoice-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Precio</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in order.items.all %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>${{ item.price|floatformat:2 }}</td>
+        <td>${{ item.total_price|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+      <tr class="total-row">
+        <td colspan="4" style="text-align:right;">Subtotal</td>
+        <td>${{ order.subtotal|floatformat:2 }}</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="4" style="text-align:right;">Envío</td>
+        <td>${{ order.shipping_cost|floatformat:2 }}</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="4" style="text-align:right;">Impuesto</td>
+        <td>${{ order.tax|floatformat:2 }}</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="4" style="text-align:right;">Total</td>
+        <td><strong>${{ order.total|floatformat:2 }}</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="order-card">
+    <h3>Información de pago</h3>
+    <p>Método: {{ order.get_payment_method_display }}</p>
+    <p>{% if order.payment_status %}Pagado el {{ order.payment_date|date:"F j, Y" }}{% else %}Pendiente{% endif %}</p>
+  </div>
+
+  {% if order.notes %}
+  <div class="order-card">
+    <h3>Notas del pedido</h3>
+    <p>{{ order.notes|linebreaks }}</p>
+  </div>
+  {% endif %}
+
+  <footer style="text-align:center; padding-top:18px; border-top:1px solid var(--line);">
+    <p style="font-size:12px; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase;">&copy; {% now "Y" %} Miluxious accesorios. Todos los derechos reservados.</p>
+  </footer>
+</section>
+{% endblock %}

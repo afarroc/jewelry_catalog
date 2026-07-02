@@ -1,0 +1,86 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}{{ title|default:"Historial de pedidos" }}{% endblock %}
+
+{% block content %}
+<section class="order-page">
+  <header class="section-header">
+    <h1 class="section-title">Historial de pedidos</h1>
+  </header>
+
+  {% if messages %}
+  <div class="django-messages">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if page_obj.object_list %}
+  <div class="orders-list">
+    {% for order in page_obj.object_list %}
+    <article class="order-card">
+      <div class="order-header">
+        <div>
+          <h2 class="order-number">Pedido #{{ order.order_number }}</h2>
+          <p class="order-date">{{ order.created_at|date:"F j, Y" }}</p>
+        </div>
+        <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+      </div>
+
+      <div class="order-body">
+        <div class="order-products">
+          {% for item in order.items.all|slice:":3" %}
+          <div class="product">
+            {% if item.product.image %}
+            <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}">
+            {% endif %}
+            <span>{{ item.quantity }} × {{ item.product.name }}</span>
+          </div>
+          {% endfor %}
+          {% if order.items.count > 3 %}
+          <div class="product-more">+{{ order.items.count|add:"-3" }} productos más</div>
+          {% endif %}
+        </div>
+
+        <div class="order-total">
+          <span>Total</span>
+          <strong>${{ order.total|floatformat:2 }}</strong>
+        </div>
+      </div>
+
+      <div class="order-actions">
+        <a class="btn btn-secondary" href="{% url 'orders:order_detail' order.id %}">Ver detalle</a>
+        <a class="btn btn-secondary" href="{% url 'orders:order_invoice' order.id %}">Factura</a>
+        {% if order.status == 'pending' or order.status == 'processing' %}
+        <form method="POST" action="{% url 'orders:cancel_order' order.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-ghost">Cancelar pedido</button>
+        </form>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+
+  <nav class="pagination" aria-label="Paginación">
+    {% if page_obj.has_previous %}
+      <a href="?page=1">&laquo; Primero</a>
+      <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}">Último &raquo;</a>
+    {% endif %}
+  </nav>
+  {% else %}
+  <div class="order-card" style="text-align:center;">
+    <h3>Aún no tienes pedidos</h3>
+    <p>Cuando realices tu primera compra, aparecerá aquí.</p>
+    <a class="btn btn-primary" href="{% url 'products:product_list' %}">Ver catálogo</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

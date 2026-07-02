@@ -1,0 +1,23 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}Términos y condiciones{% endblock %}
+
+{% block content %}
+<section class="terms-content">
+  <h1>Términos y Condiciones</h1>
+  <p>Última actualización: {% now "F j, Y" %}</p>
+
+  <h2>1. Términos generales</h2>
+  <p>Contenido de términos generales aquí.</p>
+
+  <h2>2. Proceso de pedido</h2>
+  <p>Contenido sobre proceso de pedido aquí.</p>
+
+  <h2>3. Envíos y devoluciones</h2>
+  <p>Contenido sobre envíos y devoluciones aquí.</p>
+
+  <h2>4. Privacidad</h2>
+  <p>Contenido sobre privacidad aquí.</p>
+</section>
+{% endblock %}

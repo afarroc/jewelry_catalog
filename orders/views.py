@@ -277,7 +277,7 @@ def process_order(request, cart, form):
 class OrderConfirmationView(DetailView):
     """Class-based view for order confirmation page."""
     model = Order
-    template_name = 'orders/confirmation.html'
+    template_name = 'orders/confirmation_editorial.html'
     context_object_name = 'order'
 
     def get_queryset(self):
@@ -287,14 +287,14 @@ class OrderConfirmationView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         order = self.get_object()
-        context['title'] = f'Order Confirmation #{order.order_number}'
+        context['title'] = f'Confirmación #{order.order_number}'
         return context
 
 
 class OrderHistoryView(ListView):
     """Class-based view for order history."""
     model = Order
-    template_name = 'orders/history.html'
+    template_name = 'orders/history_editorial.html'
     context_object_name = 'page_obj'
     paginate_by = 10
 
@@ -304,14 +304,14 @@ class OrderHistoryView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Order History'
+        context['title'] = 'Historial de pedidos'
         return context
 
 
 class OrderDetailView(DetailView):
     """Class-based view for order details."""
     model = Order
-    template_name = 'orders/detail.html'
+    template_name = 'orders/detail_editorial.html'
     context_object_name = 'order'
 
     def get_queryset(self):
@@ -321,7 +321,7 @@ class OrderDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         order = self.get_object()
-        context['title'] = f'Order Details #{order.order_number}'
+        context['title'] = f'Pedido #{order.order_number}'
         context['active_statuses'] = ['processing', 'shipped', 'delivered']
         context['shipped_statuses'] = ['shipped', 'delivered']
         return context
@@ -330,7 +330,7 @@ class OrderDetailView(DetailView):
 class OrderInvoiceView(DetailView):
     """Class-based view for order invoice."""
     model = Order
-    template_name = 'orders/invoice.html'
+    template_name = 'orders/invoice_editorial.html'
     context_object_name = 'order'
 
     def get_queryset(self):
@@ -340,7 +340,17 @@ class OrderInvoiceView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         order = self.get_object()
-        context['title'] = f'Invoice #{order.order_number}'
+        context['title'] = f'Factura #{order.order_number}'
+        return context
+
+
+class TermsAndConditionsView(TemplateView):
+    """Class-based view for terms and conditions page."""
+    template_name = 'orders/legal/terms_editorial.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Términos y condiciones'
         return context
 
 
@@ -524,11 +534,11 @@ def send_order_cancellation(order):
     
 class TermsAndConditionsView(TemplateView):
     """Class-based view for terms and conditions page."""
-    template_name = 'orders/legal/terms.html'
+    template_name = 'orders/legal/terms_editorial.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Terms and Conditions'
+        context['title'] = 'Términos y condiciones'
         return context
 
 

@@ -1,0 +1,123 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}{{ title|default:"Pedido #"|add:order.order_number }}{% endblock %}
+
+{% block content %}
+<section class="order-page">
+  <header class="section-header">
+    <h1 class="section-title">Pedido #{{ order.order_number }}</h1>
+    <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+  </header>
+
+  {% if messages %}
+  <div class="django-messages">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <section class="order-card">
+    <h2 class="section-title">Estado del pedido</h2>
+    <div class="order-timeline">
+      <div class="timeline-step {% if order.status != 'cancelled' %}active{% endif %}">
+        <div class="timeline-icon"><i class="fas fa-shopping-cart"></i></div>
+        <div>
+          <h4>Pedido realizado</h4>
+          <p>{{ order.created_at|date:"F j, Y" }}</p>
+        </div>
+      </div>
+      <div class="timeline-step {% if order.status in active_statuses %}active{% endif %}">
+        <div class="timeline-icon"><i class="fas fa-cog"></i></div>
+        <div>
+          <h4>Procesando</h4>
+          {% if order.status in active_statuses %}<p>Preparando tu pedido</p>{% endif %}
+        </div>
+      </div>
+      <div class="timeline-step {% if order.status in shipped_statuses %}active{% endif %}">
+        <div class="timeline-icon"><i class="fas fa-truck"></i></div>
+        <div>
+          <h4>Enviado</h4>
+          {% if order.status == 'shipped' %}<p>Enviado el {{ order.updated_at|date:"F j, Y" }}</p>{% elif order.status == 'delivered' %}<p>Entregado</p>{% endif %}
+        </div>
+      </div>
+      <div class="timeline-step {% if order.status == 'delivered' %}active{% endif %}">
+        <div class="timeline-icon"><i class="fas fa-check-circle"></i></div>
+        <div>
+          <h4>Entregado</h4>
+          {% if order.status == 'delivered' %}<p>Entregado el {{ order.updated_at|date:"F j, Y" }}</p>{% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="order-card">
+    <div class="order-body">
+      <div>
+        <h3>Información de envío</h3>
+        <p>{{ order.shipping_address|linebreaks }}</p>
+        {% if order.tracking_number %}
+        <p><strong>Seguimiento:</strong> {{ order.tracking_number }}</p>
+        {% endif %}
+      </div>
+      <div>
+        <h3>Pago</h3>
+        <p>{{ order.get_payment_method_display }}</p>
+        <p>{% if order.payment_status %}Pagado el {{ order.payment_date|date:"F j, Y" }}{% else %}Pendiente{% endif %}</p>
+        {% if order.billing_address %}
+        <p><strong>Facturación:</strong></p>
+        <p>{{ order.billing_address|linebreaks }}</p>
+        {% else %}
+        <p>Misma dirección de envío</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <section class="order-card">
+    <h2 class="section-title">Productos</h2>
+    <div class="orders-list">
+      {% for item in order.items.all %}
+      <div class="order-item">
+        {% if item.product.image %}
+        <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}">
+        {% endif %}
+        <div>
+          <h4>{{ item.product.name }}</h4>
+          <p>{{ item.product.jewelry_type|title }} - {{ item.product.material|title }}</p>
+          <p>Cantidad: {{ item.quantity }}</p>
+        </div>
+        <div class="order-total">
+          <p>${{ item.price|floatformat:2 }}</p>
+          <strong>${{ item.total_price|floatformat:2 }}</strong>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="order-totals">
+      <div class="total-row"><span>Subtotal</span><span>${{ order.subtotal|floatformat:2 }}</span></div>
+      <div class="total-row"><span>Envío</span><span>${{ order.shipping_cost|floatformat:2 }}</span></div>
+      <div class="total-row"><span>Impuesto</span><span>${{ order.tax|floatformat:2 }}</span></div>
+      <div class="total-row grand-total"><span>Total</span><strong>${{ order.total|floatformat:2 }}</strong></div>
+    </div>
+  </section>
+
+  {% if order.notes %}
+  <section class="order-card">
+    <h2 class="section-title">Notas del pedido</h2>
+    <p>{{ order.notes|linebreaks }}</p>
+  </section>
+  {% endif %}
+
+  <div class="order-actions">
+    <a class="btn btn-secondary" href="{% url 'orders:order_history' %}">Volver al historial</a>
+    <a class="btn btn-secondary" href="{% url 'orders:order_invoice' order.id %}">Descargar factura</a>
+    {% if order.status == 'pending' or order.status == 'processing' %}
+    <form method="POST" action="{% url 'orders:cancel_order' order.id %}">{% csrf_token %}<button type="submit" class="btn btn-ghost">Cancelar pedido</button></form>
+    <form method="POST" action="{% url 'orders:delete_order' order.id %}">{% csrf_token %}<button type="submit" class="btn btn-ghost" onclick="return confirm('¿Eliminar este pedido permanentemente?');">Eliminar pedido</button></form>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

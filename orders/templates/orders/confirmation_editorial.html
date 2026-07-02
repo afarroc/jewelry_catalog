@@ -1,0 +1,58 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}{{ title|default:"Confirmación de pedido" }}{% endblock %}
+
+{% block content %}
+<section class="order-page">
+  <div class="confirmation-card">
+    <div class="confirmation-icon"><i class="fas fa-check-circle"></i></div>
+    <h1 class="section-title">¡Gracias por tu pedido!</h1>
+    <p class="order-number">Pedido #{{ order.order_number }}</p>
+
+    <div class="order-body">
+      <div>
+        <h3>Información de envío</h3>
+        <p>{{ order.shipping_address|linebreaks }}</p>
+      </div>
+      <div>
+        <h3>Pago</h3>
+        <p>{{ order.get_payment_method_display }}</p>
+        <p>{% if order.payment_status %}Pagado el {{ order.payment_date|date:"F j, Y" }}{% else %}Pendiente{% endif %}</p>
+      </div>
+    </div>
+
+    <section class="order-card">
+      <h2 class="section-title">Resumen</h2>
+      <div class="orders-list">
+        {% for item in order.items.all %}
+        <div class="order-item">
+          {% if item.product.image %}
+          <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}">
+          {% endif %}
+          <div>
+            <h4>{{ item.product.name }}</h4>
+            <p>{{ item.quantity }} × ${{ item.price|floatformat:2 }}</p>
+          </div>
+          <div class="order-total">
+            <strong>${{ item.total_price|floatformat:2 }}</strong>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="order-totals">
+        <div class="total-row"><span>Subtotal</span><span>${{ order.subtotal|floatformat:2 }}</span></div>
+        <div class="total-row"><span>Envío</span><span>${{ order.shipping_cost|floatformat:2 }}</span></div>
+        <div class="total-row"><span>Impuesto</span><span>${{ order.tax|floatformat:2 }}</span></div>
+        <div class="total-row grand-total"><span>Total</span><strong>${{ order.total|floatformat:2 }}</strong></div>
+      </div>
+    </section>
+
+    <div class="order-actions" style="justify-content:center;">
+      <a class="btn btn-primary" href="{% url 'products:product_list' %}">Seguir comprando</a>
+      <a class="btn btn-secondary" href="{% url 'orders:order_history' %}">Ver mis pedidos</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
