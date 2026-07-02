@@ -187,9 +187,9 @@ class BannerAdmin(admin.ModelAdmin):
     class Media:
         """Archivos CSS y JS personalizados para el admin"""
         css = {
-            'all': ('css/admin/banner.css',)
+            'all': ()
         }
-        js = ('js/admin/banner.js',)
+        js = ()
 
 
 @admin.register(SocialMedia)

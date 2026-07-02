@@ -64,10 +64,11 @@ class Banner(models.Model):
         help_text="Texto que aparecerá en el botón de acción"
     )
 
-    button_url = models.URLField(
+    button_url = models.CharField(
+        max_length=200,
         blank=True,
         verbose_name="URL del Botón",
-        help_text="URL a la que redirigirá el botón (opcional)"
+        help_text="URL a la que redirigirá el botón (puede ser absoluta o relativa, ej: /contacto o https://...)"
     )
 
     # Campos de fecha
