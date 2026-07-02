@@ -1,6 +1,7 @@
 # products/admin.py
 from django.contrib import admin
 from django.forms import ModelForm
+from django.utils.html import format_html
 from .models import Category, Product, ImageUpload
 import logging
 
@@ -30,7 +31,7 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name', 'description', 'slug')
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ('price', 'stock', 'available')
-    readonly_fields = ('created_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at', 'image_preview_large')
     ordering = ('-created_at',)
     list_per_page = 25
 
@@ -79,7 +80,7 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('jewelry_type', 'material', 'category')
         }),
         ('Imagen', {
-            'fields': ('image',),
+            'fields': ('image', 'image_preview_large'),
             'classes': ('collapse',)
         }),
         ('Inventario y Precio', {
@@ -95,17 +96,29 @@ class ProductAdmin(admin.ModelAdmin):
         """Show image preview in list view."""
         if obj.image:
             try:
-                return f'''
-                <div style="text-align: center;">
-                    <img src="{obj.image.url}" style="max-height: 50px; max-width: 50px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />
-                    <br><small style="color: #666;">{obj.name[:20]}...</small>
-                </div>
-                '''
-            except:
-                return '<span style="color: #dc3545;">Error loading image</span>'
-        return '<span style="color: #6c757d;">No image</span>'
+                return format_html(
+                    '<div style="text-align: center;">'
+                    '<img src="{}" style="max-height: 50px; max-width: 50px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />'
+                    '<br><small style="color: #666;">{}</small>'
+                    '</div>',
+                    obj.get_image_url,
+                    obj.name[:20]
+                )
+            except Exception:
+                return format_html('<span style="color: #dc3545;">Error loading image</span>')
+        return format_html('<span style="color: #6c757d;">No image</span>')
     image_preview.short_description = 'Image Preview'
-    image_preview.allow_tags = True
+
+    def image_preview_large(self, obj):
+        """Show image preview in edit form."""
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-width: 400px; max-height: 200px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px;" alt="{}">',
+                obj.get_image_url,
+                obj.name
+            )
+        return format_html('<p style="color: #666; font-style: italic;">No hay imagen configurada</p>')
+    image_preview_large.short_description = 'Vista Previa de Imagen'
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
@@ -135,17 +148,18 @@ class ImageUploadAdmin(admin.ModelAdmin):
         """Show image preview in list view."""
         if obj.image:
             try:
-                return f'''
-                <div style="text-align: center;">
-                    <img src="{obj.image.url}" style="max-height: 50px; max-width: 50px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />
-                    <br><small style="color: #666;">{obj.title[:20]}...</small>
-                </div>
-                '''
-            except:
-                return '<span style="color: #dc3545;">Error loading image</span>'
-        return '<span style="color: #6c757d;">No image</span>'
+                return format_html(
+                    '<div style="text-align: center;">'
+                    '<img src="{}" style="max-height: 50px; max-width: 50px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />'
+                    '<br><small style="color: #666;">{}</small>'
+                    '</div>',
+                    obj.image.url,
+                    obj.title[:20]
+                )
+            except Exception:
+                return format_html('<span style="color: #dc3545;">Error loading image</span>')
+        return format_html('<span style="color: #6c757d;">No image</span>')
     image_preview.short_description = 'Image Preview'
-    image_preview.allow_tags = True
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)

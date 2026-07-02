@@ -82,9 +82,25 @@ class Banner(models.Model):
     def __str__(self):
         return self.title
 
+    @property
     def get_image_url(self):
-        """Obtener la URL completa de la imagen"""
-        return f"/static/images/banners/{self.image_filename}"
+        """Obtener la URL completa de la imagen desde Cloudinary o ruta local."""
+        if not self.image_filename:
+            return '/static/images/placeholder-banner.jpg'
+
+        filename = self.image_filename.strip()
+
+        # Ya es URL absoluta
+        if filename.startswith('http://') or filename.startswith('https://'):
+            return filename
+
+        # Construir URL de Cloudinary a partir del nombre de archivo
+        cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
+        if cloud_name:
+            return f"https://res.cloudinary.com/{cloud_name}/image/upload/{filename}"
+
+        # Ruta local para desarrollo
+        return f"/static/images/banners/{filename}"
 
     def clean(self):
         """Validaciones personalizadas"""

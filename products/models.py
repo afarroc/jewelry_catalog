@@ -51,6 +51,13 @@ class Product(models.Model):
         ('other', 'Other'),
     ]
 
+    BENTO_SIZES = [
+        ('standard', 'Standard (1x1)'),
+        ('wide', 'Wide (2x1)'),
+        ('tall', 'Tall (1x2)'),
+        ('featured', 'Featured (2x2)'),
+    ]
+
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
     description = models.TextField()
@@ -85,6 +92,13 @@ class Product(models.Model):
         null=True,
         help_text='Cloudinary URL or image path'
     )
+    # Bento Grid size for e-commerce editorial layout
+    bento_size = models.CharField(
+        max_length=20,
+        choices=BENTO_SIZES,
+        default='standard',
+        help_text='Grid size: standard (1x1), wide (2x1), tall (1x2), featured (2x2)'
+    )
 
     class Meta:
         ordering = ['-created_at']
@@ -108,7 +122,7 @@ class Product(models.Model):
     def get_image_url(self):
         """Return image URL for display - supports Cloudinary URLs or local paths."""
         if not self.image:
-            return '/static/images/placeholder-product.jpg'
+            return ''
         return self.image
 
     @property

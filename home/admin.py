@@ -86,7 +86,7 @@ class BannerAdmin(admin.ModelAdmin):
         if obj.image_filename:
             return format_html(
                 '<img src="{}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;" alt="{}">',
-                obj.get_image_url(),
+                obj.get_image_url,
                 obj.title
             )
         return "Sin imagen"
@@ -97,7 +97,7 @@ class BannerAdmin(admin.ModelAdmin):
         if obj.image_filename:
             return format_html(
                 '<img src="{}" style="max-width: 400px; max-height: 200px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px;" alt="{}">',
-                obj.get_image_url(),
+                obj.get_image_url,
                 obj.title
             )
         return format_html('<p style="color: #666; font-style: italic;">No hay imagen configurada</p>')
