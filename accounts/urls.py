@@ -14,22 +14,22 @@ urlpatterns = [
     # Password reset views
     path('password-reset/',
          auth_views.PasswordResetView.as_view(
-             template_name='accounts/password_reset.html'
+             template_name='accounts/password_reset_editorial.html'
          ),
          name='password_reset'),
     path('password-reset/done/',
          auth_views.PasswordResetDoneView.as_view(
-             template_name='accounts/password_reset_done.html'
+             template_name='accounts/password_reset_done_editorial.html'
          ),
          name='password_reset_done'),
     path('password-reset-confirm/<uidb64>/<token>/',
          auth_views.PasswordResetConfirmView.as_view(
-             template_name='accounts/password_reset_confirm.html'
+             template_name='accounts/password_reset_confirm_editorial.html'
          ),
          name='password_reset_confirm'),
     path('password-reset-complete/',
          auth_views.PasswordResetCompleteView.as_view(
-             template_name='accounts/password_reset_complete.html'
+             template_name='accounts/password_reset_complete_editorial.html'
          ),
          name='password_reset_complete'),
 ]

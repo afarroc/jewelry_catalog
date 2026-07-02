@@ -1,35 +1,41 @@
-{% extends 'accounts/auth_base.html' %}
+{% extends 'home/base.html' %}
+{% load static %}
 
-{% block auth_title %}Login to Your Account{% endblock %}
+{% block title %}Ingresar{% endblock %}
 
-{% block auth_content %}
-<form method="POST">
-    {% csrf_token %}
+{% block content %}
+{% include 'header_editorial.html' %}
 
-    {% for field in form %}
-    {% if field.name != 'remember_me' %}
-    <div class="mb-3">
-        {{ field.label_tag }}
-        {{ field }}
-        {% if field.errors %}
-        <div class="text-danger small mt-1">
-            {{ field.errors }}
-        </div>
-        {% endif %}
-    </div>
-    {% endif %}
-    {% endfor %}
+<section class="lookbook">
+  <div class="bento-grid">
+    <article class="bento-item bento-item--featured">
+      <div class="bento-info bento-info--large">
+        <h2 class="product-title">Ingresar</h2>
+        <form method="POST">
+          {% csrf_token %}
+          {% for field in form %}
+            {% if field.name != 'remember_me' %}
+            <div class="mb-3">
+              {{ field.label_tag }}
+              {{ field }}
+              {% if field.errors %}
+              <div class="text-danger small mt-1">{{ field.errors }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+          <div class="mb-3 form-check">
+            {{ form.remember_me }}
+            {{ form.remember_me.label_tag }}
+          </div>
+          <button type="submit" class="btn">Ingresar</button>
+        </form>
+        <p style="margin-top:16px;">¿No tienes cuenta? <a href="{% url 'accounts:register' %}">Regístrate</a></p>
+        <p><a href="{% url 'accounts:password_reset' %}">¿Olvidaste tu contraseña?</a></p>
+      </div>
+    </article>
+  </div>
+</section>
 
-    <div class="mb-3 form-check">
-        {{ form.remember_me }}
-        {{ form.remember_me.label_tag }}
-    </div>
-
-    <button type="submit" class="btn btn-primary w-100">Login</button>
-</form>
-{% endblock %}
-
-{% block auth_links %}
-<p>Don't have an account? <a href="{% url 'accounts:register' %}">Register here</a></p>
-<p><a href="{% url 'accounts:password_reset' %}">Forgot your password?</a></p>
+{% include 'footer_editorial.html' %}
 {% endblock %}

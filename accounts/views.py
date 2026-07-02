@@ -29,7 +29,7 @@ def register(request):
         'title': 'Register',
         'form': form,
     }
-    return render(request, 'accounts/register.html', context)
+    return render(request, 'accounts/register_editorial.html', context)
 
 def login_view(request):
     """Handle user login."""
@@ -66,7 +66,7 @@ def login_view(request):
         'title': 'Login',
         'form': form,
     }
-    return render(request, 'accounts/login.html', context)
+    return render(request, 'accounts/login_editorial.html', context)
 
 @login_required
 def logout_view(request):
@@ -84,7 +84,7 @@ def profile(request):
         'title': 'My Profile',
         'user': request.user,
     }
-    return render(request, 'accounts/profile.html', context)
+    return render(request, 'accounts/profile_editorial.html', context)
 
 @login_required
 def profile_update(request):
@@ -103,4 +103,4 @@ def profile_update(request):
         'title': 'Update Profile',
         'form': form,
     }
-    return render(request, 'accounts/profile_update.html', context)
+    return render(request, 'accounts/profile_update_editorial.html', context)
