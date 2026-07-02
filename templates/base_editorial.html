@@ -18,14 +18,7 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    {% include 'header_editorial.html' %}
-
-    <!-- Main Content -->
-    <main id="main-content" class="main-content">
-        {% block content %}{% endblock %}
-    </main>
-
-    {% include 'footer_editorial.html' %}
+    {% block content %}{% endblock %}
 
     {% block extra_js %}{% endblock %}
 </body>

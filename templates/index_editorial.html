@@ -1,0 +1,91 @@
+{% extends 'base_editorial.html' %}
+{% load static %}
+
+{% block title %}Jewelry Catalog — Piezas destacadas{% endblock %}
+
+{% block content %}
+
+{% include 'header_editorial.html' %}
+
+<!-- Hero cinemático -->
+{% if banners and banners.0 %}
+<section class="hero">
+  <img class="hero-img" src="{{ banners.0.get_image_url }}" alt="{{ banners.0.title }}">
+  <div class="hero-overlay"></div>
+  <div class="hero-inner">
+    <div>
+      <p class="eyebrow">{% if banners.0.subtitle %}{{ banners.0.subtitle }}{% else %}Colección 2026{% endif %}</p>
+      <h1 class="hero-title">{{ banners.0.title|default:"Luz eternizada en metal"|safe }}</h1>
+    </div>
+    <div class="hero-meta">
+      <p class="hero-lead">{{ banners.0.description|default:"Piezas creadas para perdurar: diseño atemporal, materiales nobles y acabados a mano." }}</p>
+      <div class="hero-actions">
+        <a class="btn" href="{% url 'products:product_list' %}">Explorar colección</a>
+        {% if banners.0.has_button %}
+          <a class="btn outline" href="{{ banners.0.button_url }}">{{ banners.0.button_text }}</a>
+        {% else %}
+          <a class="btn outline" href="#contacto">Reservar cita</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Categorías tipográficas -->
+{% if categories %}
+<nav class="categories-bar" aria-label="Categorías">
+  <div class="categories-inner">
+    <span class="categories-label">Categorías</span>
+    <div class="categories-links">
+      {% for cat in categories %}
+        <a href="{% url 'products:product_list_by_category' cat.slug %}">{{ cat.name }}</a>
+        {% if not forloop.last %}<span class="separator">·</span>{% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</nav>
+{% endif %}
+
+<!-- Cover editorial -->
+{% if banners and banners.1 %}
+<section class="promo-cover">
+  <div class="cover">
+    <div class="cover-media">
+      <img src="{{ banners.1.get_image_url }}" alt="{{ banners.1.title }}">
+    </div>
+    <div class="cover-body">
+      <p class="cover-eyebrow">{{ banners.1.subtitle|default:"Nueva colección" }}</p>
+      <h2 class="cover-title">{{ banners.1.title|default:"Diseño que habla por sí solo"|safe }}</h2>
+      <p class="cover-lead">{{ banners.1.description|default:"Formas limpias, silhouette contemporáneo y detalles artesanales en cada pieza." }}</p>
+      <a class="btn" href="{% url 'products:product_list' %}">Ver lookbook</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Lookbook mixto - Bento Grid -->
+<section class="lookbook">
+  <div class="section-header">
+    <h2 class="section-title">Piezas destacadas</h2>
+    <a class="section-link" href="{% url 'products:product_list' %}">Ver todo →</a>
+  </div>
+
+  {% if featured_products %}
+  <div class="bento-grid">
+    {% for product in featured_products|slice:":8" %}
+      {% include '_bento_item.html' with product=product %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="bento-grid">
+    <div class="note" style="grid-column: 1 / -1;">
+      <h4>Próximamente</h4>
+      <p>Estamos preparando productos destacados increíbles para ti. ¡Vuelve pronto!</p>
+    </div>
+  </div>
+  {% endif %}
+</section>
+
+{% include 'footer_editorial.html' %}
+{% endblock %}
