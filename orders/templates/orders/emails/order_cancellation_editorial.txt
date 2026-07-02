@@ -8,4 +8,4 @@ Cancelación: {% now "F j, Y" %}
 
 Si esto fue un error o necesitas ayuda, contacta con nosotros.
 
-© {% now "Y" %} Miluxiousaccesorios. Todos los derechos reservados.
+© {% now "Y" %} Miluxious accesorios. Todos los derechos reservados.

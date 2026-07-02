@@ -1,4 +1,4 @@
-# Guía de Estilos CSS - Jewelry Catalog
+# Guía de Estilos CSS - Miluxious accesorios
 
 ## Sistema de Grid Responsive
 

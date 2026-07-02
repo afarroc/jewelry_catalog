@@ -21,4 +21,4 @@ Envío:
 
 Si tienes preguntas sobre tu pedido, contacta con nosotros.
 
-© {% now "Y" %} Miluxiousaccesorios. Todos los derechos reservados.
+© {% now "Y" %} Miluxious accesorios. Todos los derechos reservados.

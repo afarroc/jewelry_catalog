@@ -1,6 +1,6 @@
-# Jewelry Catalog
+# Miluxious accesorios
 
-Catálogo de joyería desarrollado con Django para venta en línea.
+Catálogo de accesorios desarrollado con Django para venta en línea.
 
 ## Características
 

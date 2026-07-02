@@ -30,7 +30,7 @@ class Category(models.Model):
         logger.info(f"Category '{self.name}' saved")
 
 class Product(models.Model):
-    """Model representing a fantasy jewelry product."""
+    """Model representing a Miluxious accesorios product."""
     JEWELRY_TYPES = [
         ('ring', 'Ring'),
         ('necklace', 'Necklace'),

@@ -37,8 +37,8 @@ class IndexView(TemplateView):
             logger.error(f"Error al obtener datos para la página de inicio: {str(e)}")
 
         context.update({
-            'title': 'Catálogo de Joyería Fantasía',
-            'welcome_message': '¡Bienvenido a nuestra Colección de Joyería Fantasía!',
+            'title': 'Miluxious accesorios',
+            'welcome_message': '¡Bienvenido a nuestra colección de Miluxious accesorios!',
             'banners': active_banners,
             'categories': active_categories,
             'featured_products': featured_products,
