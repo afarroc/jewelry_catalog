@@ -1,6 +1,40 @@
 <footer class="site-footer">
   <div class="footer-inner">
-    <span>© 2026 Jewelry Catalog</span>
-    <span>Envíos · Devoluciones · Privacidad</span>
+    <div class="footer-grid">
+      <div class="footer-section">
+        <h3 class="footer-title">Enlaces Rápidos</h3>
+        <ul class="footer-links">
+          <li><a href="{% url 'home:index' %}">Inicio</a></li>
+          <li><a href="{% url 'products:product_list' %}">Catálogo</a></li>
+          <li><a href="{% url 'orders:order_history' %}">Mis Pedidos</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3 class="footer-title">Legal</h3>
+        <ul class="footer-links">
+          <li><a href="{% url 'orders:terms' %}">Términos y Condiciones</a></li>
+          <li><a href="#">Política de Privacidad</a></li>
+          <li><a href="#">Política de Envíos</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3 class="footer-title">Conectar</h3>
+        <div class="social-links">
+          {% for social in social_media %}
+            <a href="{{ social.url }}" aria-label="{{ social.name }}" title="{{ social.name }}" target="_blank" rel="noopener noreferrer">
+              <i class="{{ social.platform_icon }}"></i>
+            </a>
+          {% empty %}
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; {% now "Y" %} Jewelry Catalog. Todos los derechos reservados.</p>
+    </div>
   </div>
 </footer>

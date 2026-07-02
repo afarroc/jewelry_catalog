@@ -1,11 +1,9 @@
-{% extends 'base_editorial.html' %}
+{% extends 'home/base.html' %}
 {% load static %}
 
 {% block title %}Jewelry Catalog — Piezas destacadas{% endblock %}
 
 {% block content %}
-
-{% include 'header_editorial.html' %}
 
 <!-- Hero cinemático -->
 {% if banners and banners.0 %}
@@ -87,5 +85,4 @@
   {% endif %}
 </section>
 
-{% include 'footer_editorial.html' %}
 {% endblock %}
