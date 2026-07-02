@@ -1,7 +1,39 @@
 {% extends 'home/base.html' %}
+{% load static %}
 
 {% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
-    {% include 'products/_product_detail.html' %}
+{% include 'header_editorial.html' %}
+
+<section class="lookbook">
+  <div class="bento-grid">
+    <article class="bento-item bento-item--{{ product.bento_size }}">
+      <div class="product-media">
+        {% if product.image %}
+          <img class="bento-media" src="{{ product.image }}" alt="{{ product.name }}">
+        {% else %}
+          <div style="width: 100%; height: 100%; background: #e6e0d8;"></div>
+        {% endif %}
+      </div>
+      <div class="bento-info{% if product.bento_size in 'wide,tall,featured' %} bento-info--large{% endif %}">
+        {% if product.category %}
+          <p class="product-category">{{ product.category.name }}</p>
+        {% endif %}
+        <h1 class="product-title">{{ product.name }}</h1>
+        <p class="product-price">{{ product.display_price }}</p>
+        <p class="product-desc">{{ product.description|linebreaks }}</p>
+        <p><strong>Tipo:</strong> {{ product.get_jewelry_type_display }}</p>
+        <p><strong>Material:</strong> {{ product.get_material_display }}</p>
+        {% if product.stock > 0 %}
+          <p><strong>Stock:</strong> {{ product.stock }}</p>
+        {% else %}
+          <p class="text-danger">Agotado</p>
+        {% endif %}
+      </div>
+    </article>
+  </div>
+</section>
+
+{% include 'footer_editorial.html' %}
 {% endblock %}

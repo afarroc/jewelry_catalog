@@ -1,0 +1,24 @@
+{% load static %}
+<article class="bento-item bento-item--{{ product.bento_size }} {% if product.is_new %}bento-item--new{% endif %}">
+  <a href="{% url 'products:product_detail' product.id product.slug %}" class="text-decoration-none">
+    <div class="product-media">
+      {% if product.image %}
+        <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy">
+      {% else %}
+        <div class="product-media product-media--placeholder" aria-hidden="true"></div>
+      {% endif %}
+    </div>
+    <div class="bento-info{% if product.bento_size in 'wide,tall,featured' %} bento-info--large{% endif %}">
+      {% if product.category %}
+        <p class="product-category">{{ product.category.name }}</p>
+      {% endif %}
+      <h3 class="product-title">{{ product.name }}</h3>
+      {% if product.description and product.bento_size in 'wide,tall,featured' %}
+        <p class="product-desc">{{ product.description|truncatechars:100 }}</p>
+      {% elif product.description %}
+        <p class="product-desc">{{ product.description|truncatechars:60 }}</p>
+      {% endif %}
+      <p class="product-price">{{ product.display_price }}</p>
+    </div>
+  </a>
+</article>
