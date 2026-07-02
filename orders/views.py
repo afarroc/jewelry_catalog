@@ -172,7 +172,7 @@ def checkout(request):
         'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY
     }
     
-    return render(request, 'orders/checkout.html', context)
+    return render(request, 'orders/checkout_editorial.html', context)
 
 @csrf_exempt
 @login_required

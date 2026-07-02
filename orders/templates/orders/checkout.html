@@ -1,229 +1,108 @@
 {% extends 'home/base.html' %}
-{% load order_filters %}
-{% block title %}{{ title }}{% endblock %}
+{% load static %}
+
+{% block title %}Checkout{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <h1 class="page-header">Checkout</h1>
-            
-            <!-- Checkout Steps - Mobile/Desktop Version -->
-            <div class="checkout-steps">
-                <div class="step active">
-                    <span>1</span>
-                    <p class="d-none d-sm-block">Review Order</p>
-                </div>
-                <div class="step">
-                    <span>2</span>
-                    <p class="d-none d-sm-block">Shipping & Payment</p>
-                </div>
-                <div class="step">
-                    <span>3</span>
-                    <p class="d-none d-sm-block">Confirmation</p>
-                </div>
-            </div>
-            
-            <div class="checkout-content">
-                <div class="row">
-                    <!-- Main Form -->
-                    <div class="col-12 col-lg-7 order-lg-1">
-                        <form method="POST" class="checkout-form" id="payment-form" data-stripe-key="{{ STRIPE_PUBLIC_KEY }}">
-                            {% csrf_token %}
-                            
-                            <!-- Shipping Section -->
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h2 class="section-title mb-0">
-                                        <i class="fas fa-truck mr-2"></i>Shipping Information
-                                    </h2>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        {{ form.shipping_address.label_tag }}
-                                        {{ form.shipping_address }}
-                                        {{ form.shipping_address.errors }}
-                                        <div class="mt-2">
-                                            {{ form.save_shipping }}
-                                            <label for="{{ form.save_shipping.id_for_label }}">Save shipping address to my profile</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Billing Section -->
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h2 class="section-title mb-0">
-                                        <i class="fas fa-file-invoice-dollar mr-2"></i>Billing Information
-                                    </h2>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <div class="billing-options">
-                                            {% for radio in form.billing_option %}
-                                            <div class="billing-option">
-                                                {{ radio.tag }}
-                                                <label for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                            </div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                    
-                                    <div id="billing-address-section" class="mt-3" 
-                                         style="display: {% if form.billing_option.value == 'different' %}block{% else %}none{% endif %};">
-                                        <div class="form-group">
-                                            {{ form.billing_address.label_tag }}
-                                            {{ form.billing_address }}
-                                            {{ form.billing_address.errors }}
-                                            <div class="mt-2">
-                                                {{ form.save_billing }}
-                                                <label for="{{ form.save_billing.id_for_label }}">Save billing address to my profile</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Payment Section (Updated) -->
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h2 class="section-title mb-0">
-                                        <i class="fas fa-credit-card mr-2"></i>Payment Method
-                                    </h2>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-group payment-methods">
-                                        <!-- Credit Card -->
-                                        <div class="payment-method">
-                                            <input type="radio" name="payment_method" id="payment_credit_card" value="credit_card" checked>
-                                            <label for="payment_credit_card" class="w-100">
-                                                <i class="fas fa-credit-card mr-2"></i> Credit/Debit Card
-                                                <span class="float-right">
-                                                    <i class="fab fa-cc-visa"></i>
-                                                    <i class="fab fa-cc-mastercard ml-2"></i>
-                                                    <i class="fab fa-cc-amex ml-2"></i>
-                                                </span>
-                                            </label>
-                                        </div>
-                                        
-                                        <!-- Stripe Container -->
-                                        <div id="stripe-payment-container" class="mt-3 p-3 border rounded">
-                                            <div id="payment-element" class="payment-method-section"></div>
-                                            <div class="secure-checkout text-center mt-2">
-                                                <i class="fas fa-lock"></i> 256-bit SSL encrypted payment
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- PayPal -->
-                                        <div class="payment-method mt-3">
-                                            <input type="radio" name="payment_method" id="payment_paypal" value="paypal">
-                                            <label for="payment_paypal">
-                                                <i class="fab fa-cc-paypal mr-2"></i> PayPal
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Additional Notes -->
-                            <div class="card mb-4 d-none d-lg-block">
-                                <div class="card-header">
-                                    <h2 class="section-title mb-0">
-                                        <i class="fas fa-edit mr-2"></i>Additional Notes
-                                    </h2>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        {{ form.notes }}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Terms and Purchase Button -->
-                            <div class="place-order-section card border-primary">
-                                <div class="card-body">
-                                    <div class="terms-agreement mb-3">
-                                        <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input" id="agree-terms" name="agree_terms" required>
-                                            <label class="custom-control-label" for="agree-terms">
-                                                I agree to the <a href="{% url 'orders:terms' %}" target="_blank">Terms and Conditions</a>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    
-                                    <button type="submit" class="btn btn-primary btn-block btn-lg" id="place-order-btn">
-                                        <i class="fas fa-lock"></i> Complete Purchase - ${{ cart.subtotal|add:5|add:cart.subtotal|multiply:0.08|floatformat:2 }}
-                                    </button>
-                                    
-                                    <div class="secure-checkout text-center mt-2">
-                                        <i class="fas fa-shield-alt"></i> Secure checkout - Your data is protected
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    
-                    <!-- Order Summary -->
-                    <div class="col-12 col-lg-5 order-lg-2 mb-4 mb-lg-0">
-                        <div class="order-summary card sticky-top" style="top: 20px;">
-                            <div class="card-header">
-                                <h2 class="section-title mb-0">
-                                    <i class="fas fa-shopping-bag mr-2"></i>Order Summary
-                                </h2>
-                            </div>
-                            <div class="card-body">
-                                <div class="order-items">
-                                    {% for item in cart.items.all %}
-                                    <div class="order-item py-3 border-bottom">
-                                        <div class="d-flex">
-                                            <div class="item-image mr-3">
-                                                {% if item.product.image %}
-                                                <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
-                                                {% endif %}
-                                            </div>
-                                            <div class="item-details flex-grow-1">
-                                                <h5 class="mb-1">{{ item.product.name }}</h5>
-                                                <p class="text-muted small mb-1">{{ item.quantity }} × ${{ item.product.price|floatformat:2 }}</p>
-                                            </div>
-                                            <div class="item-total font-weight-bold">
-                                                ${{ item.total_price|floatformat:2 }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                                
-                                <div class="order-totals mt-4">
-                                    <div class="total-row d-flex justify-content-between py-2">
-                                        <span>Subtotal:</span>
-                                        <span>${{ cart.subtotal|floatformat:2 }}</span>
-                                    </div>
-                                    <div class="total-row d-flex justify-content-between py-2">
-                                        <span>Shipping:</span>
-                                        <span>$5.00</span>
-                                    </div>
-                                    <div class="total-row d-flex justify-content-between py-2">
-                                        <span>Tax (8%):</span>
-                                        <span>${{ cart.subtotal|multiply:0.08|floatformat:2 }}</span>
-                                    </div>
-                                    <div class="total-row grand-total d-flex justify-content-between py-2 border-top mt-2">
-                                        <span class="font-weight-bold">Total:</span>
-                                        <span class="font-weight-bold">${{ cart.subtotal|add:5|add:cart.subtotal|multiply:0.08|floatformat:2 }}</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Additional Notes (Mobile Only) -->
-                                <div class="d-lg-none mt-4">
-                                    <h3 class="h5"><i class="fas fa-edit mr-2"></i>Additional Notes</h3>
-                                    {{ form.notes }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+{% include 'header_editorial.html' %}
+
+<section class="lookbook">
+  <div class="section-header">
+    <h2 class="section-title">Checkout</h2>
+  </div>
+
+  <div class="bento-grid">
+    <!-- Shipping -->
+    <article class="bento-item bento-item--wide">
+      <div class="bento-info bento-info--large">
+        <h3 class="product-title">Envío</h3>
+        <form method="POST">
+          {% csrf_token %}
+          {{ form.shipping_address }}
+          <button type="submit" class="btn" style="margin-top:12px;">Guardar</button>
+        </form>
+      </div>
+    </article>
+
+    <!-- Billing -->
+    <article class="bento-item bento-item--wide">
+      <div class="bento-info bento-info--large">
+        <h3 class="product-title">Facturación</h3>
+        <div class="billing-options">
+          {% for radio in form.billing_option %}
+          <div class="billing-option">
+            {{ radio.tag }}
+            <label for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+          </div>
+          {% endfor %}
         </div>
-    </div>
-</div>
+        <div id="billing-address-section" style="margin-top:12px;">
+          {{ form.billing_address }}
+        </div>
+      </div>
+    </article>
+
+    <!-- Payment -->
+    <article class="bento-item bento-item--wide">
+      <div class="bento-info bento-info--large">
+        <h3 class="product-title">Pago</h3>
+        <div class="payment-methods">
+          <div class="payment-method">
+            <input type="radio" name="payment_method" id="payment_credit_card" value="credit_card" checked>
+            <label for="payment_credit_card">Tarjeta</label>
+          </div>
+          <div class="payment-method">
+            <input type="radio" name="payment_method" id="payment_paypal" value="paypal">
+            <label for="payment_paypal">PayPal</label>
+          </div>
+        </div>
+        <div id="stripe-payment-container" style="margin-top:12px;">
+          <div id="payment-element"></div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Notes -->
+    <article class="bento-item bento-item--wide">
+      <div class="bento-info bento-info--large">
+        <h3 class="product-title">Notas</h3>
+        {{ form.notes }}
+      </div>
+    </article>
+
+    <!-- Terms -->
+    <article class="bento-item bento-item--wide">
+      <div class="bento-info bento-info--large">
+        <div class="terms-agreement">
+          <input type="checkbox" id="agree-terms" name="agree_terms" required>
+          <label for="agree-terms">Acepto los <a href="{% url 'orders:terms' %}" target="_blank">Términos</a></label>
+        </div>
+        <button type="submit" class="btn" style="margin-top:12px;">Comprar</button>
+      </div>
+    </article>
+
+    <!-- Order Summary -->
+    <article class="bento-item bento-item--featured">
+      <div class="bento-info bento-info--large">
+        <h3 class="product-title">Resumen</h3>
+        <div class="order-items">
+          {% for item in cart.items.all %}
+          <div class="order-item">
+            <span>{{ item.product.name }} × {{ item.quantity }}</span>
+            <span>{{ item.total_price }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="order-totals" style="margin-top:16px;">
+          <div class="total-row"><span>Subtotal:</span><span>{{ cart.subtotal }}</span></div>
+          <div class="total-row"><span>Envío:</span><span>$5.00</span></div>
+          <div class="total-row"><span>Impuesto (8%):</span><span>{{ cart.subtotal|multiply:0.08|floatformat:2 }}</span></div>
+          <div class="total-row grand-total"><span>Total:</span><span>{{ cart.subtotal|add:5|add:cart.subtotal|multiply:0.08|floatformat:2 }}</span></div>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+{% include 'footer_editorial.html' %}
 {% endblock %}

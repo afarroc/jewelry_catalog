@@ -1,274 +1,65 @@
 {% extends 'home/base.html' %}
+{% load static %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}Tu Carrito{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-10 col-xl-8">
+{% include 'header_editorial.html' %}
 
-            <!-- Page Header -->
-            <div class="text-center mb-5">
-                <h1 class="display-4 text-primary mb-3">
-                    <i class="fas fa-shopping-cart me-3"></i>
-                    Your Shopping Cart
-                </h1>
-                <p class="lead text-muted">Review and manage your selected items</p>
-            </div>
+<section class="lookbook">
+  <div class="section-header">
+    <h2 class="section-title">Tu Carrito</h2>
+  </div>
 
-            {% if cart.total_items > 0 %}
-                <!-- Cart Items -->
-                <div class="row g-4 mb-5">
-                    {% for item in cart.items.all %}
-                    <div class="col-12">
-                        <div class="card shadow-sm border-0 h-100">
-                            <div class="card-body p-4">
-                                <div class="row align-items-center">
-
-                                    <!-- Product Image -->
-                                    <div class="col-md-3 col-lg-2 text-center mb-3 mb-md-0">
-                                        {% if item.product.image %}
-                                            <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}"
-                                                 class="img-fluid rounded shadow-sm"
-                                                 style="max-width: 120px; max-height: 120px; object-fit: cover;">
-                                        {% else %}
-                                            <div class="bg-light rounded d-flex align-items-center justify-content-center"
-                                                 style="width: 120px; height: 120px;">
-                                                <i class="fas fa-image text-muted fa-2x"></i>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-
-                                    <!-- Product Details -->
-                                    <div class="col-md-4 col-lg-4 mb-3 mb-md-0">
-                                        <h5 class="card-title mb-2">
-                                            <a href="{% url 'products:product_detail' item.product.id item.product.slug %}"
-                                               class="text-decoration-none text-dark fw-bold">
-                                                {{ item.product.name }}
-                                            </a>
-                                        </h5>
-
-                                        <div class="mb-2">
-                                            <span class="badge bg-primary me-2">
-                                                <i class="fas fa-tag me-1"></i>
-                                                {{ item.product.category.name|default:"Uncategorized" }}
-                                            </span>
-                                            <span class="badge bg-info me-2">
-                                                {% if item.product.jewelry_type == 'ring' %}
-                                                    <i class="fas fa-ring me-1"></i>
-                                                {% elif item.product.jewelry_type == 'necklace' %}
-                                                    <i class="fas fa-gem me-1"></i>
-                                                {% elif item.product.jewelry_type == 'bracelet' %}
-                                                    <i class="fas fa-circle-notch me-1"></i>
-                                                {% elif item.product.jewelry_type == 'earring' %}
-                                                    <i class="fas fa-circle me-1"></i>
-                                                {% elif item.product.jewelry_type == 'brooch' %}
-                                                    <i class="fas fa-map-pin me-1"></i>
-                                                {% elif item.product.jewelry_type == 'tiara' %}
-                                                    <i class="fas fa-crown me-1"></i>
-                                                {% else %}
-                                                    <i class="fas fa-star me-1"></i>
-                                                {% endif %}
-                                                {{ item.product.get_jewelry_type_display }}
-                                            </span>
-                                            <span class="badge bg-secondary">
-                                                <i class="fas fa-tools me-1"></i>
-                                                {{ item.product.get_material_display }}
-                                            </span>
-                                        </div>
-
-                                        <!-- Stock Status -->
-                                        {% if item.product.stock > 10 %}
-                                            <small class="text-success fw-semibold">
-                                                <i class="fas fa-check-circle me-1"></i>
-                                                In Stock ({{ item.product.stock }} available)
-                                            </small>
-                                        {% elif item.product.stock > 0 %}
-                                            <small class="text-warning fw-semibold">
-                                                <i class="fas fa-exclamation-triangle me-1"></i>
-                                                Limited Stock ({{ item.product.stock }} available)
-                                            </small>
-                                        {% else %}
-                                            <small class="text-danger fw-semibold">
-                                                <i class="fas fa-times-circle me-1"></i>
-                                                Out of Stock
-                                            </small>
-                                        {% endif %}
-                                    </div>
-
-                                    <!-- Quantity Controls -->
-                                    <div class="col-md-2 col-lg-2 text-center mb-3 mb-md-0">
-                                        {% if user.is_authenticated %}
-                                            <form method="POST" action="{% url 'cart:cart_update' item.product.id %}" class="d-inline">
-                                                {% csrf_token %}
-                                                <div class="input-group input-group-sm" style="width: 120px;">
-                                                    <button type="button" class="btn btn-outline-secondary qty-btn minus"
-                                                            title="Decrease quantity">
-                                                        <i class="fas fa-minus"></i>
-                                                    </button>
-                                                    <input type="number" class="form-control text-center"
-                                                           name="quantity" value="{{ item.quantity }}"
-                                                           min="1" max="{{ item.product.stock }}" step="1"
-                                                           onchange="this.form.submit()" readonly>
-                                                    <button type="button" class="btn btn-outline-secondary qty-btn plus"
-                                                            title="Increase quantity">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        {% else %}
-                                            <div class="text-center">
-                                                <span class="badge bg-light text-dark fs-6 px-3 py-2">{{ item.quantity }}</span>
-                                                <br>
-                                                <small class="text-muted">Login to modify</small>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-
-                                    <!-- Price -->
-                                    <div class="col-md-2 col-lg-2 text-center mb-3 mb-md-0">
-                                        <div class="price-info">
-                                            <div class="text-muted small">{{ item.product.display_price }} each</div>
-                                            <div class="fw-bold text-primary fs-5">${{ item.total_price|floatformat:2 }}</div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Remove Button -->
-                                    <div class="col-md-1 col-lg-2 text-center">
-                                        {% if user.is_authenticated %}
-                                            <form method="POST" action="{% url 'cart:cart_remove' item.product.id %}" class="d-inline">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-outline-danger btn-sm"
-                                                        title="Remove from cart">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </form>
-                                        {% else %}
-                                            <button class="btn btn-outline-danger btn-sm" disabled
-                                                    title="Login to remove">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        {% endif %}
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Cart Summary -->
-                <div class="row justify-content-center">
-                    <div class="col-12 col-md-8 col-lg-6">
-                        <div class="card shadow border-0">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="card-title mb-0">
-                                    <i class="fas fa-receipt me-2"></i>
-                                    Order Summary
-                                </h5>
-                            </div>
-                            <div class="card-body">
-
-                                <!-- Summary Items -->
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span>Subtotal ({{ cart.total_items }} items)</span>
-                                    <span class="fw-semibold">${{ cart.subtotal|floatformat:2 }}</span>
-                                </div>
-
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span>Shipping</span>
-                                    <span class="text-muted">Calculated at checkout</span>
-                                </div>
-
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span>Tax</span>
-                                    <span class="text-muted">Calculated at checkout</span>
-                                </div>
-
-                                <hr class="my-3">
-
-                                <div class="d-flex justify-content-between mb-4">
-                                    <span class="fw-bold fs-5">Estimated Total</span>
-                                    <span class="fw-bold fs-5 text-primary">${{ cart.subtotal|floatformat:2 }}</span>
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <div class="d-grid gap-2">
-                                    {% if user.is_authenticated %}
-                                        <a href="{% url 'orders:checkout' %}"
-                                           class="btn btn-primary btn-lg {% if cart.total_items == 0 %}disabled{% endif %}">
-                                            <i class="fas fa-credit-card me-2"></i>
-                                            Proceed to Checkout
-                                        </a>
-                                    {% else %}
-                                        <a href="{% url 'accounts:login' %}?next={% url 'orders:checkout' %}"
-                                           class="btn btn-primary btn-lg {% if cart.total_items == 0 %}disabled{% endif %}">
-                                            <i class="fas fa-sign-in-alt me-2"></i>
-                                            Login to Checkout
-                                        </a>
-                                    {% endif %}
-
-                                    <div class="row g-2">
-                                        <div class="col-6">
-                                            <a href="{% url 'products:product_list' %}"
-                                               class="btn btn-outline-primary w-100">
-                                                <i class="fas fa-arrow-left me-1"></i>
-                                                Continue Shopping
-                                            </a>
-                                        </div>
-                                        <div class="col-6">
-                                            {% if user.is_authenticated %}
-                                                <button form="clear-form" type="submit"
-                                                        class="btn btn-outline-danger w-100">
-                                                    <i class="fas fa-trash me-1"></i>
-                                                    Clear Cart
-                                                </button>
-                                                <form id="clear-form" method="POST" action="{% url 'cart:cart_clear' %}">
-                                                    {% csrf_token %}
-                                                </form>
-                                            {% else %}
-                                                <button class="btn btn-outline-danger w-100" disabled
-                                                        title="Login to clear cart">
-                                                    <i class="fas fa-trash me-1"></i>
-                                                    Clear Cart
-                                                </button>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            {% else %}
-                <!-- Empty Cart -->
-                <div class="row justify-content-center">
-                    <div class="col-12 col-md-8 col-lg-6">
-                        <div class="card shadow border-0 text-center">
-                            <div class="card-body py-5">
-                                <div class="mb-4">
-                                    <i class="fas fa-shopping-cart fa-4x text-muted"></i>
-                                </div>
-                                <h3 class="card-title text-muted mb-3">Your cart is empty</h3>
-                                <p class="card-text text-muted mb-4">
-                                    Looks like you haven't added any items to your cart yet.
-                                    Browse our beautiful collection and find something special!
-                                </p>
-                                <a href="{% url 'products:product_list' %}"
-                                   class="btn btn-primary btn-lg">
-                                    <i class="fas fa-gem me-2"></i>
-                                    Start Shopping
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-
+  {% if cart.total_items > 0 %}
+    <div class="bento-grid">
+      {% for item in cart.items.all %}
+      <article class="bento-item bento-item--wide">
+        <div class="product-media">
+          {% if item.product.image %}
+            <img class="bento-media" src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}">
+          {% else %}
+            <div style="width: 100%; height: 100%; background: #e6e0d8;"></div>
+          {% endif %}
         </div>
+        <div class="bento-info bento-info--large">
+          {% if item.product.category %}
+            <p class="product-category">{{ item.product.category.name }}</p>
+          {% endif %}
+          <h3 class="product-title">{{ item.product.name }}</h3>
+          <p class="product-desc">Cantidad: {{ item.quantity }}</p>
+          <p class="product-price">{{ item.total_price }}</p>
+          <form method="POST" action="{% url 'cart:cart_remove' item.product.id %}" style="margin-top: 12px;">
+            {% csrf_token %}
+            <button type="submit" class="btn outline" style="border-color: rgba(255,255,255,0.35); color: #fff;">Eliminar</button>
+          </form>
+        </div>
+      </article>
+      {% endfor %}
     </div>
-</div>
+
+    <div class="lookbook" style="margin-top: 32px;">
+      <div class="bento-grid">
+        <article class="bento-item bento-item--featured">
+          <div class="bento-info bento-info--large">
+            <h3 class="product-title">Resumen</h3>
+            <p class="product-desc">Total items: {{ cart.total_items }}</p>
+            <p class="product-price">{{ cart.subtotal }}</p>
+            <a href="{% url 'orders:checkout' %}" class="btn">Ir a checkout</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  {% else %}
+    <div class="bento-grid">
+      <div class="note" style="grid-column: 1 / -1;">
+        <h4>Tu carrito está vacío</h4>
+        <p>Explora nuestra colección y encuentra algo especial.</p>
+        <a href="{% url 'products:product_list' %}" class="btn">Ver catálogo</a>
+      </div>
+    </div>
+  {% endif %}
+</section>
+
+{% include 'footer_editorial.html' %}
 {% endblock %}

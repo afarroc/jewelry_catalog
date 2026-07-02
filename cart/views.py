@@ -24,7 +24,7 @@ def cart_detail(request):
         'title': 'Shopping Cart',
         'cart': cart,
     }
-    return render(request, 'cart/cart_detail.html', context)
+    return render(request, 'cart/cart_detail_editorial.html', context)
 
 def cart_add(request, product_id):
     """Add a product to the cart or increment quantity."""
