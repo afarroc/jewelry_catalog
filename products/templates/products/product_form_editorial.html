@@ -1,0 +1,108 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+  <div class="auth-page-inner">
+    <header class="auth-header">
+      <p class="auth-eyebrow">Productos</p>
+      <h1 class="auth-title">{{ title }}</h1>
+    </header>
+
+    <div class="auth-card">
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <div class="auth-form">
+          <div class="auth-field">
+            <label class="auth-label" for="{{ form.name.id_for_label }}">{{ form.name.label }} <span style="color:#b00020;">*</span></label>
+            {{ form.name }}
+            {% if form.name.errors %}
+              <p class="auth-field-error">{{ form.name.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div class="auth-field">
+            <label class="auth-label" for="{{ form.description.id_for_label }}">{{ form.description.label }} <span style="color:#b00020;">*</span></label>
+            {{ form.description }}
+            {% if form.description.errors %}
+              <p class="auth-field-error">{{ form.description.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div class="profile-form-grid">
+            <div class="auth-field">
+              <label class="auth-label" for="{{ form.price.id_for_label }}">{{ form.price.label }} <span style="color:#b00020;">*</span></label>
+              {{ form.price }}
+              {% if form.price.errors %}
+                <p class="auth-field-error">{{ form.price.errors.0 }}</p>
+              {% endif %}
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="{{ form.stock.id_for_label }}">{{ form.stock.label }} <span style="color:#b00020;">*</span></label>
+              {{ form.stock }}
+              {% if form.stock.errors %}
+                <p class="auth-field-error">{{ form.stock.errors.0 }}</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="profile-form-grid">
+            <div class="auth-field">
+              <label class="auth-label" for="{{ form.jewelry_type.id_for_label }}">{{ form.jewelry_type.label }} <span style="color:#b00020;">*</span></label>
+              {{ form.jewelry_type }}
+              {% if form.jewelry_type.errors %}
+                <p class="auth-field-error">{{ form.jewelry_type.errors.0 }}</p>
+              {% endif %}
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="{{ form.material.id_for_label }}">{{ form.material.label }} <span style="color:#b00020;">*</span></label>
+              {{ form.material }}
+              {% if form.material.errors %}
+                <p class="auth-field-error">{{ form.material.errors.0 }}</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="auth-field">
+            <label class="auth-label" for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
+            {{ form.category }}
+            {% if form.category.errors %}
+              <p class="auth-field-error">{{ form.category.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div class="auth-field">
+            <label class="auth-label" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+            {{ form.image }}
+            {% if form.image.errors %}
+              <p class="auth-field-error">{{ form.image.errors.0 }}</p>
+            {% endif %}
+            {% if form.instance.image %}
+            <div style="margin-top:10px;">
+              <p style="margin:0 0 6px;"><strong>Imagen actual:</strong></p>
+              <img src="{{ form.instance.image.url }}" alt="{{ form.instance.name }}" style="max-width:200px; max-height:200px; border-radius:12px; border:1px solid var(--line);">
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="auth-field">
+            <label class="auth-label" for="{{ form.available.id_for_label }}">{{ form.available.label }}</label>
+            {{ form.available }}
+            {% if form.available.errors %}
+              <p class="auth-field-error">{{ form.available.errors.0 }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="profile-form-actions">
+          <a class="btn btn-secondary" href="{% url 'products:product_list' %}">Cancelar</a>
+          <button type="submit" class="btn btn-primary">{{ button_text }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -503,8 +503,8 @@ def send_order_confirmation(order):
     subject = f"Order Confirmation #{order.order_number}"
     context = {'order': order}
     
-    text_message = render_to_string('orders/emails/order_confirmation.txt', context)
-    html_message = render_to_string('orders/emails/order_confirmation.html', context)
+    text_message = render_to_string('orders/emails/order_confirmation_editorial.txt', context)
+    html_message = render_to_string('orders/emails/order_confirmation_editorial.html', context)
     
     send_mail(
         subject,
@@ -520,8 +520,8 @@ def send_order_cancellation(order):
     subject = f"Order Cancelled #{order.order_number}"
     context = {'order': order}
     
-    text_message = render_to_string('orders/emails/cancellation.txt', context)
-    html_message = render_to_string('orders/emails/cancellation.html', context)
+    text_message = render_to_string('orders/emails/order_cancellation_editorial.txt', context)
+    html_message = render_to_string('orders/emails/order_cancellation_editorial.html', context)
     
     send_mail(
         subject,

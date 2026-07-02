@@ -1,0 +1,24 @@
+Confirmación de pedido #{{ order.order_number }}
+
+Gracias por tu compra.
+
+Pedido: #{{ order.order_number }}
+Fecha: {{ order.created_at|date:"F j, Y" }}
+Estado: {{ order.get_status_display }}
+
+Productos:
+{% for item in order.items.all %}
+- {{ item.quantity }} × {{ item.product.name }}: ${{ item.total_price|floatformat:2 }}
+{% endfor %}
+
+Subtotal: ${{ order.subtotal|floatformat:2 }}
+Envío: ${{ order.shipping_cost|floatformat:2 }}
+Impuesto: ${{ order.tax|floatformat:2 }}
+Total: ${{ order.total|floatformat:2 }}
+
+Envío:
+{{ order.shipping_address|linebreaks }}
+
+Si tienes preguntas sobre tu pedido, contacta con nosotros.
+
+© {% now "Y" %} Miluxiousaccesorios. Todos los derechos reservados.

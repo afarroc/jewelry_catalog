@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Pedido cancelado #{{ order.order_number }}</title>
+    <style>
+        body {
+            font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1511;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .email-container {
+            border: 1px solid #e6e1db;
+            border-radius: 18px;
+            padding: 28px;
+            background: #fff;
+        }
+        .logo {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .order-header {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .order-details {
+            border: 1px solid #e6e1db;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+        .footer {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b6560;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="logo">Miluxiousaccesorios</div>
+
+        <div class="order-header">
+            <h2 style="margin:0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px;">Pedido cancelado</h2>
+            <p style="margin:6px 0 0; color:#6b6560;">Tu pedido ha sido cancelado correctamente.</p>
+        </div>
+
+        <div class="order-details">
+            <div class="order-item">
+                <span><strong>Pedido:</strong> #{{ order.order_number }}</span>
+                <span>{{ order.created_at|date:"F j, Y" }}</span>
+            </div>
+            <div class="order-item">
+                <span><strong>Cancelación:</strong> {% now "F j, Y" %}</span>
+                <span></span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Si esto fue un error o necesitas ayuda, contacta con nosotros.</p>
+            <p>&copy; {% now "Y" %} Miluxiousaccesorios. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

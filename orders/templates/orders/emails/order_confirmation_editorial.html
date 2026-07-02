@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Confirmación de pedido #{{ order.order_number }}</title>
+    <style>
+        body {
+            font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1511;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .email-container {
+            border: 1px solid #e6e1db;
+            border-radius: 18px;
+            padding: 28px;
+            background: #fff;
+        }
+        .logo {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .order-header {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .order-details {
+            border: 1px solid #e6e1db;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #e6e1db;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .order-totals {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 2px solid #1a1511;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .grand-total {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        .footer {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b6560;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="logo">Miluxiousaccesorios</div>
+
+        <div class="order-header">
+            <h2 style="margin:0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px;">Confirmación de pedido</h2>
+            <p style="margin:6px 0 0; color:#6b6560;">Gracias por tu compra. Aquí están los detalles:</p>
+        </div>
+
+        <div class="order-details">
+            <div class="order-item">
+                <span><strong>Pedido:</strong> #{{ order.order_number }}</span>
+                <span>{{ order.created_at|date:"F j, Y" }}</span>
+            </div>
+            <div class="order-item">
+                <span><strong>Estado:</strong> {{ order.get_status_display }}</span>
+                <span></span>
+            </div>
+
+            {% for item in order.items.all %}
+            <div class="order-item">
+                <span>{{ item.quantity }} × {{ item.product.name }}</span>
+                <span>${{ item.total_price|floatformat:2 }}</span>
+            </div>
+            {% endfor %}
+
+            <div class="order-totals">
+                <div class="total-row"><span>Subtotal</span><span>${{ order.subtotal|floatformat:2 }}</span></div>
+                <div class="total-row"><span>Envío</span><span>${{ order.shipping_cost|floatformat:2 }}</span></div>
+                <div class="total-row"><span>Impuesto</span><span>${{ order.tax|floatformat:2 }}</span></div>
+                <div class="total-row grand-total"><span>Total</span><span>${{ order.total|floatformat:2 }}</span></div>
+            </div>
+        </div>
+
+        <div class="order-details">
+            <h3 style="margin:0 0 10px; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px;">Envío</h3>
+            <p style="margin:0;">{{ order.shipping_address|linebreaks }}</p>
+        </div>
+
+        <div class="footer">
+            <p>Si tienes preguntas sobre tu pedido, contacta con nosotros.</p>
+            <p>&copy; {% now "Y" %} Miluxiousaccesorios. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

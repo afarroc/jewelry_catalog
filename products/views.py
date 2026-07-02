@@ -200,7 +200,7 @@ def product_create(request):
         'title': 'Crear Nuevo Producto',
         'button_text': 'Crear Producto'
     }
-    return render(request, 'products/product_form.html', context)
+    return render(request, 'products/product_form_editorial.html', context)
 
 
 @login_required
@@ -224,7 +224,7 @@ def product_update(request, product_id):
         'title': f'Editar Producto: {product.name}',
         'button_text': 'Actualizar Producto'
     }
-    return render(request, 'products/product_form.html', context)
+    return render(request, 'products/product_form_editorial.html', context)
 
 
 @login_required
@@ -263,7 +263,7 @@ def product_delete(request, product_id):
             'product': product,
             'title': f'Eliminar Producto: {product.name}'
         }
-        return render(request, 'products/product_confirm_delete.html', context)
+        return render(request, 'products/product_confirm_delete_editorial.html', context)
 
     except Product.DoesNotExist:
         logger.error(f"[ERROR] Attempted to delete non-existent product: ID={product_id}, User={user}")
@@ -381,7 +381,7 @@ def image_upload(request):
         'title': 'Subir Imagen',
         'button_text': 'Subir Imagen'
     }
-    return render(request, 'products/image_upload.html', context)
+    return render(request, 'products/image_upload_editorial.html', context)
 
 
 @login_required
@@ -460,7 +460,7 @@ def image_list(request):
         'is_paginated': images_page.has_other_pages(),
         'page_obj': images_page,
     }
-    return render(request, 'products/image_list.html', context)
+    return render(request, 'products/image_list_editorial.html', context)
 
 
 @login_required
@@ -479,7 +479,7 @@ def image_detail(request, image_id):
             'image': image,
             'title': f'Imagen: {image.title}'
         }
-        return render(request, 'products/image_detail.html', context)
+        return render(request, 'products/image_detail_editorial.html', context)
 
     except ImageUpload.DoesNotExist:
         image_logger.error(f"[ERROR] Image not found: ID={image_id}, User={user}")
@@ -551,7 +551,7 @@ def image_delete(request, image_id):
             'image': image,
             'title': f'Eliminar Imagen: {image.title}'
         }
-        return render(request, 'products/image_confirm_delete.html', context)
+        return render(request, 'products/image_confirm_delete_editorial.html', context)
 
     except ImageUpload.DoesNotExist:
         image_logger.error(f"[ERROR] Attempted to delete non-existent image: ID={image_id}, User={user}")

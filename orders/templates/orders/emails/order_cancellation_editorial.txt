@@ -1,0 +1,11 @@
+Pedido cancelado #{{ order.order_number }}
+
+Tu pedido ha sido cancelado correctamente.
+
+Pedido: #{{ order.order_number }}
+Fecha: {{ order.created_at|date:"F j, Y" }}
+Cancelación: {% now "F j, Y" %}
+
+Si esto fue un error o necesitas ayuda, contacta con nosotros.
+
+© {% now "Y" %} Miluxiousaccesorios. Todos los derechos reservados.
