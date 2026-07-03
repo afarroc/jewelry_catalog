@@ -381,7 +381,7 @@
       grid-row: span 2;
     }
     .bento-item--wide-image { grid-column: span 2; }
-    .bento-item--tall-image { grid-column: span 2; grid-row: span 2; }
+    .bento-item--tall-image { grid-column: span 1; grid-row: span 2; }
     .bento-item--hero {
       grid-column: 1 / -1;
       aspect-ratio: 16/9;
@@ -582,6 +582,20 @@
     overflow: hidden;
     position: relative;
     background: #e6e0d8;
+  }
+  .bento-item--wide-image,
+  .bento-item--tall-image {
+    display: block;
+  }
+  .bento-item--wide-image .bento-cell {
+    aspect-ratio: 2 / 1;
+  }
+  .bento-item--tall-image .bento-cell {
+    aspect-ratio: 1 / 2;
+  }
+  .bento-item--wide-image .bento-media,
+  .bento-item--tall-image .bento-media {
+    height: 100%;
   }
   .bento-cell .bento-media {
     width: 100%;
