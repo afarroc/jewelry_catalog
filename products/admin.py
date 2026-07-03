@@ -25,12 +25,12 @@ class ProductAdminForm(ModelForm):
 
 class ProductAdmin(admin.ModelAdmin):
     form = ProductAdminForm
-    list_display = ('name', 'jewelry_type', 'material', 'price', 'stock', 'available', 'image_preview', 'created_at')
+    list_display = ('name', 'jewelry_type', 'material', 'price', 'stock', 'available', 'bento_size', 'image_preview', 'created_at')
     list_display_links = ('name', 'image_preview')
-    list_filter = ('available', 'jewelry_type', 'material', 'category', 'created_at')
-    search_fields = ('name', 'description', 'slug')
+    list_filter = ('available', 'jewelry_type', 'material', 'category', 'bento_size', 'created_at')
+    search_fields = ('name', 'description', 'slug', 'bento_size')
     prepopulated_fields = {'slug': ('name',)}
-    list_editable = ('price', 'stock', 'available')
+    list_editable = ('price', 'stock', 'available', 'bento_size')
     readonly_fields = ('created_at', 'updated_at', 'image_preview_large')
     ordering = ('-created_at',)
     list_per_page = 25
@@ -85,6 +85,10 @@ class ProductAdmin(admin.ModelAdmin):
         }),
         ('Inventario y Precio', {
             'fields': ('price', 'stock', 'available')
+        }),
+        ('Home Bento', {
+            'fields': ('bento_size',),
+            'description': 'Elige cómo se muestra este producto en la sección destacada de la home.'
         }),
         ('Metadata', {
             'fields': ('created_at', 'updated_at'),

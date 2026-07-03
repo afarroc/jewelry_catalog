@@ -54,8 +54,11 @@ class Product(models.Model):
     BENTO_SIZES = [
         ('standard', 'Standard (1x1)'),
         ('wide', 'Wide (2x1)'),
+        ('wide-image', 'Wide image (2x1 solo imagen)'),
         ('tall', 'Tall (1x2)'),
+        ('tall-image', 'Tall image (1x2 solo imagen)'),
         ('featured', 'Featured (2x2)'),
+        ('hero', 'Hero (full-width)'),
     ]
 
     name = models.CharField(max_length=200)
