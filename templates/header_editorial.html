@@ -2,10 +2,10 @@
   <div class="header-inner">
     <a class="brand" href="{% url 'home:index' %}">Miluxious<span>accesorios</span></a>
     <nav class="nav-main">
-      <a href="{% url 'home:index' %}">Inicio</a>
-      <a href="{% url 'products:product_list' %}">Catálogo</a>
-      <a href="{% url 'products:product_list' %}?category=compromiso">Compromiso</a>
-      <a href="{% url 'products:product_list' %}?category=regalos">Regalos</a>
+      <a href="{% url 'home:index' %}" aria-label="Inicio"><i class="fas fa-house"></i></a>
+      <a href="{% url 'products:product_list' %}" aria-label="Catálogo"><i class="fas fa-store"></i></a>
+      <a href="{% url 'products:product_list' %}?category=compromiso" aria-label="Compromiso"><i class="fas fa-gem"></i></a>
+      <a href="{% url 'products:product_list' %}?category=regalos" aria-label="Regalos"><i class="fas fa-gift"></i></a>
     </nav>
     <div class="header-actions">
       {% if user.is_authenticated %}
