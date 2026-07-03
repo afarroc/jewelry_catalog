@@ -15,7 +15,10 @@
       {% else %}
         <a href="{% url 'accounts:login' %}">Ingresar</a>
       {% endif %}
-      <a href="{% url 'cart:cart_detail' %}" class="cart-badge">{{ cart_items_count|default:0 }}</a>
+      <a href="{% url 'cart:cart_detail' %}" class="cart-badge">
+        <i class="fas fa-cart-shopping"></i>
+        <span>{{ cart.total_items|default:0 }}</span>
+      </a>
     </div>
   </div>
 </header>
