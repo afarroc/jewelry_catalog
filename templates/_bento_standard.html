@@ -1,7 +1,9 @@
 {% load static product_extras %}
 <article class="bento-item bento-item--standard {% if product.is_new %}bento-item--new{% endif %}" style="grid-column: span 1; grid-row: span 1;">
   <div class="bento-cell">
-    <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy">
+    <a href="{% url 'products:product_detail' product.slug %}" class="product-media-link">
+      <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy">
+    </a>
     <div class="product-badges">
       <span class="badge badge-type">{{ product.get_jewelry_type_display }}</span>
       <span class="badge badge-material">{{ product.get_material_display }}</span>
@@ -13,7 +15,7 @@
       <div class="bento-actions">
         <form method="post" action="{% url 'cart:cart_add_ajax' product.id %}" class="add-to-cart-form">
           {% csrf_token %}
-          <button type="submit" class="add-to-cart-btn" data-product-id="{{ product.id }}">Agregar</button>
+          <button type="submit" class="btn btn-primary add-to-cart-btn" data-product-id="{{ product.id }}">Agregar</button>
         </form>
       </div>
     </div>

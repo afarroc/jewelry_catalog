@@ -2,7 +2,9 @@
 <article class="bento-item bento-item--tall {% if product.is_new %}bento-item--new{% endif %}" style="grid-column: span 1; grid-row: span 2;">
   <div class="bento-grid-inner bento-grid--1x2">
     <div class="bento-cell">
-      <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy">
+      <a href="{% url 'products:product_detail' product.slug %}" class="product-media-link">
+        <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy">
+      </a>
       <div class="product-badges">
         <span class="badge badge-type">{{ product.get_jewelry_type_display }}</span>
         <span class="badge badge-material">{{ product.get_material_display }}</span>

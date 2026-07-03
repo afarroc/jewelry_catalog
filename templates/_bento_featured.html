@@ -2,7 +2,9 @@
 <article class="bento-item bento-item--featured {% if product.is_new %}bento-item--new{% endif %}" style="grid-column: span 2; grid-row: span 2;">
   <div class="bento-grid-inner bento-grid--2x2">
     <div class="bento-cell" style="grid-column: span 2; grid-row: span 2;">
-      <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy" fetchpriority="high">
+      <a href="{% url 'products:product_detail' product.slug %}" class="product-media-link">
+        <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy" fetchpriority="high">
+      </a>
       <div class="product-badges">
         <span class="badge badge-type">{{ product.get_jewelry_type_display }}</span>
         <span class="badge badge-material">{{ product.get_material_display }}</span>
@@ -20,7 +22,7 @@
         <div class="bento-actions">
           <form method="post" action="{% url 'cart:cart_add_ajax' product.id %}" class="add-to-cart-form">
             {% csrf_token %}
-            <button type="submit" class="add-to-cart-btn" data-product-id="{{ product.id }}">Agregar</button>
+            <button type="submit" class="btn btn-primary add-to-cart-btn" data-product-id="{{ product.id }}">Agregar</button>
           </form>
         </div>
       </div>
