@@ -928,6 +928,8 @@
     padding: 8px;
     overflow: hidden;
     min-height: 0;
+    height: 100%;
+    justify-content: flex-end;
   }
   .bento-cell .bento-info .product-price {
     font-size: 14px;
