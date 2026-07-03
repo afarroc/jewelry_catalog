@@ -571,10 +571,11 @@
   /* Responsive */
   @media (max-width: 920px) {
     .header-inner {
-      grid-template-columns: 1fr auto;
-      gap: 14px;
+      grid-template-columns: 1fr;
+      justify-items: center;
+      gap: 12px;
     }
-    .header-actions { display: none; }
+    .header-actions { display: flex; }
     .hero-inner { grid-template-columns: 1fr; align-items: end; }
     .hero-meta { justify-self: start; text-align: left; }
     .hero-actions { justify-content: flex-start; }
