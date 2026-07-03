@@ -572,19 +572,18 @@
   /* Responsive */
   @media (max-width: 920px) {
     .header-inner {
-      grid-template-columns: 1fr;
-      justify-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 8px;
       padding: 8px var(--space);
     }
-    .header-actions { display: flex; gap: 10px; }
-    .header-actions a:not(.cart-badge) { font-size: 0; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--line); }
-    .header-actions a:not(.cart-badge) i { font-size: 14px; }
+    .brand { width: 100%; text-align: center; }
     .nav-main { display: flex; gap: 10px; justify-content: center; align-items: center; }
     .nav-main a { font-size: 0; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--line); }
     .nav-main a i { font-size: 14px; }
-    .nav-main a:hover { text-decoration: none; }
-    .hero-inner { grid-template-columns: 1fr; align-items: end; }
+    .nav-main a:hover { text-decoration: none; background: var(--ink); color: #fff; border-color: var(--ink); }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
     .hero-meta { justify-self: start; text-align: left; }
     .hero-actions { justify-content: flex-start; }
     .cover { grid-template-columns: 1fr; }
@@ -633,10 +632,11 @@
   
   @media (max-width: 480px) {
     .header-inner { padding: 6px var(--space); gap: 6px; }
-    .brand { font-size: 16px; letter-spacing: 0.2px; }
+    .brand { width: 100%; text-align: center; font-size: 16px; letter-spacing: 0.2px; }
     .nav-main { gap: 6px; }
     .nav-main a { font-size: 0; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--line); }
     .nav-main a i { font-size: 12px; }
+    .nav-main a:hover { text-decoration: none; background: var(--ink); color: #fff; border-color: var(--ink); }
     .header-actions { gap: 6px; }
     .header-actions a:not(.cart-badge) { font-size: 0; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--line); }
     .header-actions a:not(.cart-badge) i { font-size: 12px; }
