@@ -677,7 +677,7 @@
     letter-spacing: 0.1em;
     margin: 0;
   }
-  .product-meta {
+  .product-meta-grid {
     display: grid;
     gap: 10px;
   }
