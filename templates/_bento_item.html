@@ -1,6 +1,6 @@
 {% load static %}
 <article class="bento-item bento-item--{{ product.bento_size }} {% if product.is_new %}bento-item--new{% endif %}">
-  <div class="product-media">
+  <div class="product-media{% if product.description %} product-media--has-desc{% endif %}">
     <a href="{% url 'products:product_detail' product.id product.slug %}" class="text-decoration-none">
       {% if product.image %}
         <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy">
@@ -8,6 +8,9 @@
         <div class="product-media product-media--placeholder" aria-hidden="true"></div>
       {% endif %}
     </a>
+    {% if product.description %}
+      <p class="product-desc">{{ product.description|truncatechars:90 }}</p>
+    {% endif %}
   </div>
   <div class="bento-info{% if product.bento_size in 'wide,tall,featured' %} bento-info--large{% endif %}">
     {% if product.category %}
@@ -15,11 +18,6 @@
     {% endif %}
     <h3 class="product-title">{{ product.name }}</h3>
     <p class="product-meta">{{ product.jewelry_type|title }} · {{ product.material|title }}</p>
-    {% if product.description and product.bento_size in 'wide,tall,featured' %}
-      <p class="product-desc">{{ product.description|truncatechars:100 }}</p>
-    {% elif product.description %}
-      <p class="product-desc">{{ product.description|truncatechars:60 }}</p>
-    {% endif %}
     <p class="product-price">{{ product.display_price }}</p>
     <div class="product-actions">
       {% if product.stock > 0 %}
