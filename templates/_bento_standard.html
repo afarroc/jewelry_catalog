@@ -1,0 +1,21 @@
+{% load static product_extras %}
+<article class="bento-item bento-item--standard {% if product.is_new %}bento-item--new{% endif %}" style="grid-column: span 1; grid-row: span 1;">
+  <div class="bento-cell">
+    <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy">
+    <div class="product-badges">
+      <span class="badge badge-type">{{ product.get_jewelry_type_display }}</span>
+      <span class="badge badge-material">{{ product.get_material_display }}</span>
+    </div>
+    <span class="bento-size-badge" aria-label="Tamaño bento {{ product.bento_size|bento_label }}">{{ product.bento_size|bento_label }}</span>
+    <div class="bento-foot">
+      <p class="product-price">{{ product.display_price }}</p>
+      <p class="product-title">{{ product.name }}</p>
+      <div class="bento-actions">
+        <form method="post" action="{% url 'cart:cart_add_ajax' product.id %}" class="add-to-cart-form">
+          {% csrf_token %}
+          <button type="submit" class="add-to-cart-btn" data-product-id="{{ product.id }}">Agregar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</article>

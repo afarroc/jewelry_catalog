@@ -42,7 +42,7 @@
       <form method="post">
         {% csrf_token %}
         <div class="profile-form-actions">
-          <a class="btn btn-secondary" href="{% url 'products:product_detail' product.id product.slug %}">Cancelar</a>
+          <a class="btn btn-secondary" href="{% url 'products:product_detail' product.slug %}">Cancelar</a>
           <button type="submit" class="btn btn-ghost" style="color:#b00020; border-color:#f5c6cb;">Eliminar producto</button>
         </div>
       </form>

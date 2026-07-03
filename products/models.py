@@ -99,6 +99,14 @@ class Product(models.Model):
         default='standard',
         help_text='Grid size: standard (1x1), wide (2x1), tall (1x2), featured (2x2)'
     )
+    average_rating = models.FloatField(
+        default=0.0,
+        help_text='Average product rating (0-5)'
+    )
+    review_count = models.PositiveIntegerField(
+        default=0,
+        help_text='Number of reviews'
+    )
 
     class Meta:
         ordering = ['-created_at']

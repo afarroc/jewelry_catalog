@@ -7,7 +7,7 @@ app_name = 'products'
 urlpatterns = [
     # Template views
     path('', views.product_list, name='product_list'),
-    path('<int:id>/<slug:slug>/', views.ProductDetailView.as_view(), name='product_detail'),
+    path('<slug:slug>/', views.ProductDetailView.as_view(), name='product_detail'),
 
     # Product management views (require login)
     path('create/', views.product_create, name='product_create'),

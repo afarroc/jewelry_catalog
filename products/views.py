@@ -70,35 +70,6 @@ class ProductDetailView(DetailView):
         """Only show available products with optimized queries."""
         return Product.objects.filter(available=True).select_related('category')
 
-    def get_object(self, queryset=None):
-        """Get product by id and slug for URL validation with caching."""
-        if queryset is None:
-            queryset = self.get_queryset()
-
-        # Get both id and slug from URL
-        product_id = self.kwargs.get('id')
-        slug = self.kwargs.get('slug')
-
-        # Try cache first
-        cache_key = f'product_detail_{product_id}_{slug}'
-        product = cache.get(cache_key)
-
-        if product is None:
-            # Validate that id and slug match
-            product = get_object_or_404(
-                queryset,
-                id=product_id,
-                slug=slug
-            )
-            # Cache the product
-            cache.set(cache_key, product, 600)  # Cache for 10 minutes
-            logger.debug(f"Cached product detail: {cache_key}")
-        else:
-            logger.debug(f"Cache hit for product detail: {cache_key}")
-
-        logger.debug(f"Displaying product detail for: {product.name}")
-        return product
-
 
 # API Views
 class StandardResultsSetPagination(PageNumberPagination):
@@ -191,7 +162,7 @@ def product_create(request):
             product = form.save()
             messages.success(request, f'Producto "{product.name}" creado exitosamente.')
             logger.info(f"Product created: {product.name} by user {request.user.username}")
-            return redirect('products:product_detail', id=product.id, slug=product.slug)
+            return redirect('products:product_detail', slug=product.slug)
     else:
         form = ProductForm()
 
@@ -214,7 +185,7 @@ def product_update(request, product_id):
             product = form.save()
             messages.success(request, f'Producto "{product.name}" actualizado exitosamente.')
             logger.info(f"Product updated: {product.name} by user {request.user.username}")
-            return redirect('products:product_detail', id=product.id, slug=product.slug)
+            return redirect('products:product_detail', slug=product.slug)
     else:
         form = ProductForm(instance=product)
 

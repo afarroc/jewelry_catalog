@@ -1,0 +1,32 @@
+{% load static product_extras %}
+<article class="bento-item bento-item--hero {% if product.is_new %}bento-item--new{% endif %}" style="grid-column: 1 / -1;">
+  <div class="bento-cell" style="aspect-ratio: 16/5; position: relative;">
+    <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy" fetchpriority="high">
+    <div class="product-badges">
+      <span class="badge badge-type">{{ product.get_jewelry_type_display }}</span>
+      <span class="badge badge-material">{{ product.get_material_display }}</span>
+    </div>
+    <span class="bento-size-badge" aria-label="Tamaño bento {{ product.bento_size|bento_label }}">{{ product.bento_size|bento_label }}</span>
+    <div class="bento-foot" style="flex-direction: row; flex-wrap: wrap; gap: 12px; align-items: end; justify-content: space-between;">
+      <div>
+        <p class="product-price">{{ product.display_price }}</p>
+        <p class="product-title">{{ product.name }}</p>
+        {% if product.category %}
+          <p class="product-meta">{{ product.category.name }}</p>
+        {% endif %}
+      </div>
+      <div class="product-actions">
+        {% if product.stock > 0 %}
+          <span class="stock-badge stock-badge--in">Disponible</span>
+          <span class="stock-badge stock-badge--qty">{{ product.stock }} uds.</span>
+        {% else %}
+          <span class="stock-badge stock-badge--out">Agotado</span>
+        {% endif %}
+        <form method="post" action="{% url 'cart:cart_add_ajax' product.id %}" class="add-to-cart-form">
+          {% csrf_token %}
+          <button type="submit" class="add-to-cart-btn" data-product-id="{{ product.id }}">Agregar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</article>

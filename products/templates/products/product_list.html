@@ -13,13 +13,13 @@
   </div>
 
   {% if products %}
-    <div class="bento-grid">
+    <div class="product-grid">
       {% for product in products %}
-        {% include '_bento_item.html' with product=product %}
+        {% include '_product_card_classic.html' with product=product %}
       {% endfor %}
     </div>
   {% else %}
-    <div class="bento-grid">
+    <div class="product-grid">
       <div class="note" style="grid-column: 1 / -1;">
         <h4>Próximamente</h4>
         <p>No hay productos disponibles en esta categoría.</p>

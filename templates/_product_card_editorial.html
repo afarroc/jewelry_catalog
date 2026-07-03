@@ -1,6 +1,6 @@
 {% load static %}
 <article class="product-card">
-  <a href="{% url 'products:product_detail' product.id product.slug %}" class="text-decoration-none">
+  <a href="{% url 'products:product_detail' product.slug %}" class="text-decoration-none">
     <div class="product-media">
       {% if product.image %}
         <img src="{{ product.get_image_url }}" alt="{{ product.name }}">

@@ -25,8 +25,8 @@ class IndexView(TemplateView):
             # Obtener categorías activas
             active_categories = Category.objects.all()[:4]
 
-            # Obtener productos destacados
-            featured_products = Product.objects.filter(available=True).order_by('-created_at')[:8]
+            # Obtener productos destacados por mejor rating/review_count primero
+            featured_products = Product.objects.filter(available=True).order_by('-average_rating', '-review_count', '-created_at')[:8]
 
             logger.debug(f"Mostrando {len(active_banners)} banners, {len(active_categories)} categorías y {len(featured_products)} productos")
 
