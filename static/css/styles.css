@@ -381,6 +381,16 @@
   .product-media--has-desc .product-media--placeholder {
     aspect-ratio: 4/3;
   }
+  .product-media--has-desc::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 55%;
+    background: linear-gradient(180deg, rgba(26,21,17,0) 0%, rgba(26,21,17,0.75) 100%);
+    pointer-events: none;
+  }
   .product-media--placeholder {
     width: 100%;
     height: 100%;
@@ -402,7 +412,6 @@
     max-height: 40%;
     overflow: hidden;
     padding: 8px 10px 0;
-    background: linear-gradient(180deg, rgba(26,21,17,0) 0%, rgba(26,21,17,0.75) 100%);
     color: #fff;
     font-size: 11px;
     line-height: 1.3;
@@ -411,6 +420,7 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     text-overflow: ellipsis;
+    z-index: 1;
   }
   .product-info {
     padding: 26px 26px 26px 0;
