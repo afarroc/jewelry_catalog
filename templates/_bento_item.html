@@ -8,6 +8,10 @@
         <div class="product-media product-media--placeholder" aria-hidden="true"></div>
       {% endif %}
     </a>
+    <div class="product-badges">
+      <span class="badge badge-type">{{ product.get_jewelry_type_display }}</span>
+      <span class="badge badge-material">{{ product.get_material_display }}</span>
+    </div>
     {% if product.description %}
       <p class="product-desc">{{ product.description|truncatechars:90 }}</p>
     {% endif %}
@@ -17,7 +21,6 @@
       <p class="product-category">{{ product.category.name }}</p>
     {% endif %}
     <h3 class="product-title">{{ product.name }}</h3>
-    <p class="product-meta">{{ product.jewelry_type|title }} · {{ product.material|title }}</p>
     <p class="product-price">{{ product.display_price }}</p>
     <div class="product-actions">
       {% if product.stock > 0 %}
