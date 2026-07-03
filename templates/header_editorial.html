@@ -16,7 +16,7 @@
       {% endif %}
       <a href="{% url 'cart:cart_detail' %}" class="cart-badge" aria-label="Carrito">
         <i class="fas fa-cart-shopping"></i>
-        <span>{{ cart.total_items|default:0 }}</span>
+        <span class="cart-counter">{{ cart.total_items|default:0 }}</span>
       </a>
     </div>
   </div>
