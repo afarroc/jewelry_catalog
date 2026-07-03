@@ -920,6 +920,47 @@
   .bento-info--large .product-actions {
     margin-top: 4px;
   }
+  .bento-cell .bento-info {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 8px;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .bento-cell .bento-info .product-price {
+    font-size: 14px;
+    margin: 0;
+  }
+  .bento-cell .bento-info .product-title {
+    font-size: 15px;
+    margin: 0;
+  }
+  .bento-cell .bento-info .product-meta {
+    font-size: 11px;
+    margin: 0;
+  }
+  .bento-cell .bento-info .product-rating {
+    font-size: 11px;
+    margin: 0;
+  }
+  .bento-cell .bento-info .product-rating-label {
+    font-size: 11px;
+  }
+  .bento-cell .bento-info .product-actions {
+    margin-top: 2px;
+    gap: 6px;
+  }
+  .bento-cell .bento-info .stock-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+  .bento-cell .bento-info .add-to-cart-btn {
+    font-size: 11px;
+    padding: 5px 10px;
+    min-height: 28px;
+  }
   /* Footer semitransparente overlay para standard y featured */
   .product-media .bento-info {
     position: absolute;
