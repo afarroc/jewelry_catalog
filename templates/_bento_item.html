@@ -27,7 +27,10 @@
         {% else %}
           <span class="stock-badge stock-badge--out">Agotado</span>
         {% endif %}
-        <a class="btn btn-primary" href="{% url 'cart:cart_add' product.id %}">Agregar</a>
+        <form method="post" action="{% url 'cart:cart_add' product.id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary">Agregar</button>
+        </form>
       </div>
     </div>
   </a>
