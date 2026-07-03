@@ -1,37 +1,37 @@
 {% load static %}
 <article class="bento-item bento-item--{{ product.bento_size }} {% if product.is_new %}bento-item--new{% endif %}">
-  <a href="{% url 'products:product_detail' product.id product.slug %}" class="text-decoration-none">
-    <div class="product-media">
+  <div class="product-media">
+    <a href="{% url 'products:product_detail' product.id product.slug %}" class="text-decoration-none">
       {% if product.image %}
         <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy">
       {% else %}
         <div class="product-media product-media--placeholder" aria-hidden="true"></div>
       {% endif %}
-    </div>
-    <div class="bento-info{% if product.bento_size in 'wide,tall,featured' %} bento-info--large{% endif %}">
-      {% if product.category %}
-        <p class="product-category">{{ product.category.name }}</p>
+    </a>
+  </div>
+  <div class="bento-info{% if product.bento_size in 'wide,tall,featured' %} bento-info--large{% endif %}">
+    {% if product.category %}
+      <p class="product-category">{{ product.category.name }}</p>
+    {% endif %}
+    <h3 class="product-title">{{ product.name }}</h3>
+    <p class="product-meta">{{ product.jewelry_type|title }} · {{ product.material|title }}</p>
+    {% if product.description and product.bento_size in 'wide,tall,featured' %}
+      <p class="product-desc">{{ product.description|truncatechars:100 }}</p>
+    {% elif product.description %}
+      <p class="product-desc">{{ product.description|truncatechars:60 }}</p>
+    {% endif %}
+    <p class="product-price">{{ product.display_price }}</p>
+    <div class="product-actions">
+      {% if product.stock > 0 %}
+        <span class="stock-badge stock-badge--in">Disponible</span>
+        <span class="stock-badge stock-badge--qty">{{ product.stock }} uds.</span>
+      {% else %}
+        <span class="stock-badge stock-badge--out">Agotado</span>
       {% endif %}
-      <h3 class="product-title">{{ product.name }}</h3>
-      <p class="product-meta">{{ product.jewelry_type|title }} · {{ product.material|title }}</p>
-      {% if product.description and product.bento_size in 'wide,tall,featured' %}
-        <p class="product-desc">{{ product.description|truncatechars:100 }}</p>
-      {% elif product.description %}
-        <p class="product-desc">{{ product.description|truncatechars:60 }}</p>
-      {% endif %}
-      <p class="product-price">{{ product.display_price }}</p>
-      <div class="product-actions">
-        {% if product.stock > 0 %}
-          <span class="stock-badge stock-badge--in">Disponible</span>
-          <span class="stock-badge stock-badge--qty">{{ product.stock }} uds.</span>
-        {% else %}
-          <span class="stock-badge stock-badge--out">Agotado</span>
-        {% endif %}
-        <form method="post" action="{% url 'cart:cart_add_ajax' product.id %}" class="add-to-cart-form">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-primary add-to-cart-btn" data-product-id="{{ product.id }}">Agregar</button>
-        </form>
-      </div>
+      <form method="post" action="{% url 'cart:cart_add_ajax' product.id %}" class="add-to-cart-form">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary add-to-cart-btn" data-product-id="{{ product.id }}">Agregar</button>
+      </form>
     </div>
-  </a>
+  </div>
 </article>

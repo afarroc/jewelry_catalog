@@ -1640,6 +1640,26 @@
   .alert-error { border-color: #f5c6cb; background: #f8d7da; color: #721c24; }
   .alert-warning { border-color: #ffe082; background: #fff3cd; color: #856404; }
   .alert-info { border-color: #bbdefb; background: #cce5ff; color: #004085; }
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10000;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 400px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .notification.success { background: #155724; }
+  .notification.error { background: #721c24; }
+  .notification.warning { background: #856404; }
+  .notification.info { background: #004085; }
   .pagination {
     display: flex;
     gap: 10px;
