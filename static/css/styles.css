@@ -673,6 +673,18 @@
     font-weight: 500;
     margin: 0;
   }
+  .bento-item--hero .bento-cell {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+  .bento-item--hero .bento-foot {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+    justify-content: space-between;
+  }
+  .bento-foot .stock-badge {
   .bento-foot .stock-badge {
     display: inline-block;
     padding: 3px 7px;
