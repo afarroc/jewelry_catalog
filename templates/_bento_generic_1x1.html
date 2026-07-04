@@ -1,0 +1,39 @@
+{% load static %}
+<div class="bento-item bento-item--generic {% if style %}bento-item--{{ style }}{% endif %}" style="grid-column: span 1; grid-row: span 1;">
+  {% if slot_type == 'subscription' %}
+    <div class="generic-subscription">
+      <p class="generic-label">{{ label }}</p>
+      <form class="generic-subscription-form" onsubmit="event.preventDefault();">
+        <input type="email" placeholder="tu@email.com" class="generic-input" />
+        <button type="submit" class="generic-btn">Suscribirme</button>
+      </form>
+    </div>
+  {% elif slot_type == 'section_buttons' %}
+    <div class="generic-section-buttons">
+      <p class="generic-label">{{ label }}</p>
+      <div class="generic-buttons-row">
+        <a href="#" class="generic-btn">Colección</a>
+        <a href="#" class="generic-btn">Ofertas</a>
+      </div>
+    </div>
+  {% elif slot_type == 'ad' %}
+    <div class="generic-ad">
+      <p class="generic-label">{{ label }}</p>
+      <span class="generic-ad-tag">Publicidad</span>
+    </div>
+  {% elif slot_type == 'icon_grid' %}
+    <div class="generic-icon-grid">
+      <p class="generic-label">{{ label }}</p>
+      <div class="generic-icons">
+        <div class="generic-icon"><i class="fas fa-truck"></i><span>Envío</span></div>
+        <div class="generic-icon"><i class="fas fa-lock"></i><span>Pago seguro</span></div>
+        <div class="generic-icon"><i class="fas fa-undo"></i><span>Devoluciones</span></div>
+        <div class="generic-icon"><i class="fas fa-headset"></i><span>Soporte</span></div>
+      </div>
+    </div>
+  {% else %}
+    <div class="generic-fallback">
+      <p class="generic-label">{{ label|default:'Info' }}</p>
+    </div>
+  {% endif %}
+</div>
