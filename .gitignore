@@ -114,5 +114,7 @@ logs/
 *.swp
 *.swo
 
-# Raw images folder
-static/images/raw/
+# Simulation / seeding scripts (local only)
+simulate_*.py
+assign_*.py
+seed_grid_test.py
