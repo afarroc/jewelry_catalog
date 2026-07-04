@@ -674,10 +674,15 @@
     margin: 0;
   }
   .bento-item--hero .bento-cell {
-    aspect-ratio: auto;
+    aspect-ratio: 16 / 5;
     height: 100%;
+    position: relative;
   }
   .bento-item--hero .bento-foot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 12px;
@@ -913,6 +918,7 @@
     object-position: center;
   }
   .bento-item--hero .bento-media {
+    object-fit: cover;
     object-position: center;
   }
   .bento-item:hover .bento-media { transform: scale(1.03); }

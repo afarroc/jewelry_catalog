@@ -1,8 +1,8 @@
 {% load static product_extras %}
-<article class="bento-item bento-item--hero {% if product.is_new %}bento-item--new{% endif %}" style="grid-column: 1 / -1;">
-  <div class="bento-cell">
-    <a href="{% url 'products:product_detail' product.slug %}" class="product-media-link">
-      <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy" fetchpriority="high">
+<article class="bento-item bento-item--hero {% if product.is_new %}bento-item--new{% endif %}">
+  <div class="bento-cell" style="display: flex; align-items: center; justify-content: center;">
+    <a href="{% url 'products:product_detail' product.slug %}" class="product-media-link" style="display: block; width: 100%; height: 100%;">
+      <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy" fetchpriority="high" style="object-fit: cover; object-position: center;">
     </a>
     <div class="product-badges">
       <span class="badge badge-type">{{ product.get_jewelry_type_display }}</span>
