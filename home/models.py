@@ -100,18 +100,12 @@ class Banner(models.Model):
 
         # Si parece ruta Cloudinary, devolverla directamente
         if filename.startswith('v') and '/' in filename:
-            cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
-            if cloud_name:
-                return f"https://res.cloudinary.com/{cloud_name}/image/upload/{filename}"
-            return f"/static/images/banners/{filename}"
-
-        # Construir URL de Cloudinary para nombres de archivo simples
-        cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
-        if cloud_name:
+            cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME', 'dwidzc3k')
             return f"https://res.cloudinary.com/{cloud_name}/image/upload/{filename}"
 
-        # Ruta local para desarrollo
-        return f"/static/images/banners/{filename}"
+        # Construir URL de Cloudinary para nombres de archivo simples
+        cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME', 'dwidzc3k')
+        return f"https://res.cloudinary.com/{cloud_name}/image/upload/{filename}"
 
     def clean(self):
         """Validaciones personalizadas"""
