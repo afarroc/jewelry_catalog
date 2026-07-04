@@ -71,25 +71,10 @@
 
   {% if featured_products %}
   <div class="bento-grid">
-    {% if featured_products|length >= 1 %}
-      {% if featured_products.0.bento_size == 'hero' %}
-        {% include '_bento_hero.html' with product=featured_products.0 %}
-      {% elif featured_products.0.bento_size == 'featured' %}
-        {% include '_bento_featured.html' with product=featured_products.0 %}
-      {% elif featured_products.0.bento_size == 'tall-image' %}
-        {% include '_bento_tall_image.html' with product=featured_products.0 %}
-      {% elif featured_products.0.bento_size == 'wide-image' %}
-        {% include '_bento_wide_image.html' with product=featured_products.0 %}
-      {% elif featured_products.0.bento_size == 'tall' %}
-        {% include '_bento_tall.html' with product=featured_products.0 %}
-      {% elif featured_products.0.bento_size == 'wide' %}
-        {% include '_bento_wide.html' with product=featured_products.0 %}
-      {% else %}
-        {% include '_bento_standard.html' with product=featured_products.0 %}
-      {% endif %}
-    {% endif %}
-    {% for product in featured_products|slice:"1:8" %}
-      {% if product.bento_size == 'hero' %}
+    {% for product in featured_products %}
+      {% if product.is_filler %}
+        {% include '_bento_generic_1x1.html' with slot_type=product.slot_type label=product.label icon=product.icon url=product.url style=product.style %}
+      {% elif product.bento_size == 'hero' %}
         {% include '_bento_hero.html' with product=product %}
       {% elif product.bento_size == 'featured' %}
         {% include '_bento_featured.html' with product=product %}
