@@ -32,11 +32,11 @@ class IndexView(TemplateView):
             heroes = list(featured_products.filter(bento_size='hero')[:2])
             featured_bucket = list(featured_products.filter(bento_size='featured')[:2])
             others_qs = featured_products.exclude(bento_size__in=['hero', 'featured'])
-            others = list(others_qs[:max(0, 58 - len(heroes) - len(featured_bucket))])
+            others = list(others_qs[:max(0, 16 - len(heroes) - len(featured_bucket))])
             ranked = sorted(
                 heroes + featured_bucket + others,
                 key=lambda p: (-p.average_rating, -p.review_count)
-            )[:58]
+            )[:16]
             mandatory_slots = [
                 GenericSlot(slot_type='ad', label='Oferta especial', icon='fas fa-tag', url='#oferta', style='accent'),
                 GenericSlot(slot_type='icon_grid', label='Servicios', icon='fas fa-gem', url='#servicios', style='neutral'),
@@ -57,12 +57,12 @@ class IndexView(TemplateView):
             products_out = [product for _, _, _, _, product in placements]
             mandatory_set = set(mandatory_slots)
             for slot in mandatory_slots:
-                if slot not in products_out[:60]:
-                    for i in range(min(60, len(products_out)) - 1, -1, -1):
+                if slot not in products_out[:18]:
+                    for i in range(min(18, len(products_out)) - 1, -1, -1):
                         if products_out[i] not in mandatory_set:
                             products_out[i] = slot
                             break
-            featured_products = products_out[:60]
+            featured_products = products_out[:18]
 
             logger.debug(f"Mostrando {len(active_banners)} banners, {len(active_categories)} categorías y {len(featured_products)} productos")
 
