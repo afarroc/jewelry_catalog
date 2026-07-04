@@ -77,10 +77,7 @@ python manage.py runserver
 Para desarrollo local, usa el script automatizado:
 ```bash
 # Configuración completa de desarrollo
-./dev_setup.sh
-
-# O en Windows:
-# bash dev_setup.sh
+bash scripts/admin/dev_setup.sh
 ```
 
 Este script:
@@ -359,20 +356,28 @@ El sitio está completamente optimizado para todos los dispositivos:
 
 ```
 jewelry_catalog/
-├── accounts/          # Gestión de usuarios
-├── cart/             # Carrito de compras
-├── home/             # Página principal
-├── orders/           # Sistema de pedidos
-├── products/         # Gestión de productos
-├── static/           # Archivos estáticos optimizados
-├── templates/        # Plantillas HTML responsive
-├── jewelry_catalog/  # Configuración principal
+├── accounts/              # Gestión de usuarios
+├── archive/               # Historial/archivo con referencias estáticas
+├── cart/                  # Carrito de compras
+├── docs/
+│   └── operational/       # Documentación operativa (Render, S3)
+├── home/                  # Página principal
+├── jewelry_catalog/       # Configuración principal
+├── logs/                  # Logs locales (ignorados)
 ├── manage.py
-├── requirements.txt
+├── orders/                # Sistema de pedidos
+├── products/              # Gestión de productos
 ├── Procfile
-├── runtime.txt
-└── README.md
+├── requirements.txt
+├── scripts/
+│   ├── admin/             # Scripts de administración y setup local
+│   └── dev/               # Scripts de desarrollo, testing y simulación
+├── static/                # Archivos estáticos
+├── templates/             # Plantillas HTML
+└── tests/                 # Tests de app
 ```
+
+> **Nota:** se mantienen en la raíz `build.sh`, `Procfile` y los archivos de configuración por compatibilidad con Render y herramientas locales.
 
 ## Comandos Útiles
 

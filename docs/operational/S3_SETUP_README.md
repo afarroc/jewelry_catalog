@@ -156,7 +156,7 @@ management360/
 ### Verificación de Carpetas
 Ejecutar el script de diagnóstico:
 ```bash
-python test_s3.py
+python scripts/dev/test/test_s3.py
 ```
 
 O acceder a la página de diagnóstico:

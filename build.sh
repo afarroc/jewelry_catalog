@@ -166,6 +166,6 @@ echo "🎯 Los banners deberían cargar correctamente ahora"
 
 # Crear usuario administrador
 echo "Creando usuario administrador..."
-python3 create_superuser.py
+python3 scripts/admin/create_superuser.py
 
 echo "Construcción completada exitosamente!"
