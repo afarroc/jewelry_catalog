@@ -339,6 +339,7 @@
   /* Cuadrantes 1x1; wide=2x1, tall=1x2, featured=2x2, hero=full-width excepto */
   .bento-grid {
     display: grid;
+    grid-auto-flow: dense;
     grid-template-columns: repeat(6, 1fr);
     gap: 8px;
     max-width: var(--max-width);
@@ -368,6 +369,79 @@
   .bento-item--hero { grid-column: 1 / -1; }
   .bento-item--wide-image { grid-column: span 2; }
   .bento-item--tall-image { grid-column: span 1; grid-row: span 2; }
+  .bento-item--generic { padding: 10px; }
+  .bento-item--generic .generic-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink);
+    margin: 0 0 8px;
+  }
+  .bento-item--generic .generic-input {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .bento-item--generic .generic-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 36px;
+    border: none;
+    border-radius: 10px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .bento-item--generic .generic-buttons-row {
+    display: grid;
+    gap: 8px;
+  }
+  .bento-item--generic .generic-ad-tag {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+  }
+  .bento-item--generic .generic-icon-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .bento-item--generic .generic-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .bento-item--generic .generic-icon i {
+    font-size: 18px;
+    color: var(--accent);
+  }
+  .bento-item--generic .generic-subscription,
+  .bento-item--generic .generic-section-buttons,
+  .bento-item--generic .generic-ad,
+  .bento-item--generic .generic-fallback {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
   @media (max-width: 767px) {
     .bento-grid {
       grid-template-columns: repeat(2, 1fr);
