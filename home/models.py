@@ -35,11 +35,11 @@ class Banner(models.Model):
         help_text="Descripción detallada del banner"
     )
 
-    # Campo para la imagen estática (no usa FileField, solo referencia)
+    # Campo para la imagen del banner
     image_filename = models.CharField(
         max_length=255,
-        verbose_name="Nombre del Archivo de Imagen",
-        help_text="Nombre del archivo de imagen en static/images/banners/ (ej: banner1.jpg)",
+        verbose_name="Ruta/URL de la Imagen",
+        help_text="Ruta relativa o URL absoluta del banner. Puede ser ruta estática (ej: banner1.jpg), ruta Cloudinary relativa (ej: v1783035210/banner.jpg) o URL completa de Cloudinary.",
         unique=True
     )
 
@@ -85,17 +85,27 @@ class Banner(models.Model):
 
     @property
     def get_image_url(self):
-        """Obtener la URL completa de la imagen desde Cloudinary o ruta local."""
+        """Obtener la URL completa de la imagen desde Cloudinary, S3/media o ruta local."""
         if not self.image_filename:
             return '/static/images/placeholder-banner.jpg'
 
         filename = self.image_filename.strip()
 
+        if not filename:
+            return '/static/images/placeholder-banner.jpg'
+
         # Ya es URL absoluta
         if filename.startswith('http://') or filename.startswith('https://'):
             return filename
 
-        # Construir URL de Cloudinary a partir del nombre de archivo
+        # Si parece ruta Cloudinary, devolverla directamente
+        if filename.startswith('v') and '/' in filename:
+            cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
+            if cloud_name:
+                return f"https://res.cloudinary.com/{cloud_name}/image/upload/{filename}"
+            return f"/static/images/banners/{filename}"
+
+        # Construir URL de Cloudinary para nombres de archivo simples
         cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
         if cloud_name:
             return f"https://res.cloudinary.com/{cloud_name}/image/upload/{filename}"

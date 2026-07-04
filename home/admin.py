@@ -57,7 +57,7 @@ class BannerAdmin(admin.ModelAdmin):
         }),
         ('Imagen', {
             'fields': ('image_filename', 'preview_image_large'),
-            'description': 'El archivo de imagen debe estar ubicado en static/images/banners/'
+            'description': 'Puede ser ruta estática (ej: banner1.jpg), ruta Cloudinary relativa (ej: v1783035210/banner.jpg) o URL completa.'
         }),
         ('Configuración', {
             'fields': ('is_active', 'order'),
