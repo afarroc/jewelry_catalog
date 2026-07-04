@@ -31,29 +31,38 @@ class IndexView(TemplateView):
             featured_products = Product.objects.filter(available=True).order_by('-average_rating', '-review_count', '-created_at')
             heroes = list(featured_products.filter(bento_size='hero')[:2])
             featured_bucket = list(featured_products.filter(bento_size='featured')[:2])
-            wide_bucket = list(featured_products.filter(bento_size__in=['wide', 'wide-image'])[:3])
-            tall_bucket = list(featured_products.filter(bento_size__in=['tall', 'tall-image'])[:2])
-            standard_bucket = list(featured_products.filter(bento_size='standard')[:2])
+            others_qs = featured_products.exclude(bento_size__in=['hero', 'featured'])
+            others = list(others_qs[:max(0, 58 - len(heroes) - len(featured_bucket))])
             ranked = sorted(
-                heroes + featured_bucket + wide_bucket + tall_bucket + standard_bucket,
+                heroes + featured_bucket + others,
                 key=lambda p: (-p.average_rating, -p.review_count)
-            )[:8]
-            ranked_ids = {p.id for p in ranked}
+            )[:58]
+            mandatory_slots = [
+                GenericSlot(slot_type='ad', label='Oferta especial', icon='fas fa-tag', url='#oferta', style='accent'),
+                GenericSlot(slot_type='icon_grid', label='Servicios', icon='fas fa-gem', url='#servicios', style='neutral'),
+            ]
+            ranked = ranked + mandatory_slots
+            ranked_ids = {p.id for p in ranked if hasattr(p, 'id')}
             filler_products = list(
                 Product.objects.exclude(id__in=ranked_ids)
                 .filter(image__isnull=False)
                 .exclude(image='')
-                .order_by('-created_at')[:50]
-            )
+                .order_by('-created_at')[:100])
             generic_slots = [
                 GenericSlot(slot_type='subscription', label='Newsletter', icon='fas fa-envelope', url='#', style='accent'),
                 GenericSlot(slot_type='section_buttons', label='Categorías', icon='fas fa-th-large', url='#categorias', style='neutral'),
-                GenericSlot(slot_type='ad', label='Oferta', icon='fas fa-tag', url='#oferta', style='accent'),
-                GenericSlot(slot_type='icon_grid', label='Servicios', icon='fas fa-gem', url='#servicios', style='neutral'),
             ]
             filler_pool = filler_products + generic_slots
-            placements = pack_products(ranked, columns=6, filler_pool=filler_pool)[:8]
-            featured_products = [product for _, _, _, _, product in placements]
+            placements = pack_products(ranked, columns=6, filler_pool=filler_pool)
+            products_out = [product for _, _, _, _, product in placements]
+            mandatory_set = set(mandatory_slots)
+            for slot in mandatory_slots:
+                if slot not in products_out[:60]:
+                    for i in range(min(60, len(products_out)) - 1, -1, -1):
+                        if products_out[i] not in mandatory_set:
+                            products_out[i] = slot
+                            break
+            featured_products = products_out[:60]
 
             logger.debug(f"Mostrando {len(active_banners)} banners, {len(active_categories)} categorías y {len(featured_products)} productos")
 
