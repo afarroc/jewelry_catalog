@@ -16,7 +16,7 @@ class CategoryAdmin(SortableAdminMixin, admin.ModelAdmin):
     list_display_links = ('name',)
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
-    list_editable = ('visible_in_index', 'index_order')
+    list_editable = ('visible_in_index',)
     list_filter = ('visible_in_index',)
     ordering = ('index_order',)
 

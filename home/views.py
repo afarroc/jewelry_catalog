@@ -25,7 +25,7 @@ class IndexView(TemplateView):
             active_social_media = SocialMedia.objects.filter(is_active=True).order_by('order', 'platform')
 
             # Obtener categorías activas
-            active_categories = Category.objects.filter(visible_in_index=True).order_by('index_order', 'name')[:4]
+            active_categories = Category.objects.filter(visible_in_index=True).order_by('index_order')[:4]
 
             # Obtener productos destacados por mejor rating/review_count primero
             featured_products = Product.objects.filter(available=True).order_by('-average_rating', '-review_count', '-created_at')
