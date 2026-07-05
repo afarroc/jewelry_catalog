@@ -4,20 +4,21 @@ from django.forms import ModelForm
 from django.utils.html import format_html
 from django.urls import path
 from django.shortcuts import redirect
+from adminsortable2.admin import SortableAdminMixin
 from .models import Category, Product, ImageUpload
 import logging
 
 logger = logging.getLogger(__name__)
 
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(SortableAdminMixin, admin.ModelAdmin):
+    ordering_field = 'index_order'
     list_display = ('name', 'slug', 'index_order', 'visible_in_index', 'created_at')
     list_display_links = ('name',)
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
-    list_editable = ('index_order', 'visible_in_index')
+    list_editable = ('visible_in_index', 'index_order')
     list_filter = ('visible_in_index',)
-    ordering = ('index_order', 'name')
-    actions = ['renumber_categories_sequentially']
+    ordering = ('index_order',)
 
     fieldsets = (
         ('Información Básica', {
@@ -38,16 +39,11 @@ class CategoryAdmin(admin.ModelAdmin):
     def renumber_categories_sequentially(self, request, queryset):
         categories = list(Category.objects.all().order_by('index_order', 'name'))
         for index, category in enumerate(categories, start=1):
-            if category.index_order != index:
-                Category.objects.filter(pk=category.pk).update(index_order=index)
+            Category.objects.filter(pk=category.pk).update(index_order=index)
         self.message_user(request, f'{len(categories)} categorías reordenadas secuencialmente.')
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        categories = list(Category.objects.all().order_by('index_order', 'name'))
-        for index, category in enumerate(categories, start=1):
-            if category.index_order != index:
-                Category.objects.filter(pk=category.pk).update(index_order=index)
         logger.info(f"Category '{obj.name}' was {'updated' if change else 'created'} by {request.user}")
 
 class ProductAdminForm(ModelForm):
