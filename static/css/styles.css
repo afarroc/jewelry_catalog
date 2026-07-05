@@ -717,10 +717,14 @@
     padding: 10px 10px 8px;
     color: #fff;
     z-index: 2;
-    pointer-events: none;
+    pointer-events: auto;
     display: flex;
     flex-direction: column;
     gap: 2px;
+  }
+  .bento-foot .add-to-cart-form,
+  .bento-foot .add-to-cart-btn {
+    pointer-events: auto;
   }
   .bento-foot .product-price {
     font-size: 13px;

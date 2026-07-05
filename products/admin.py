@@ -56,7 +56,7 @@ class ProductAdminForm(ModelForm):
 class ProductAdmin(admin.ModelAdmin):
     form = ProductAdminForm
     list_display = ('name', 'jewelry_type', 'material', 'price', 'stock', 'available', 'bento_size', 'image_preview', 'created_at')
-    list_display_links = ('name', 'image_preview')
+    list_display_links = ('name',)
     list_filter = ('available', 'jewelry_type', 'material', 'category', 'bento_size', 'created_at')
     search_fields = ('name', 'description', 'slug', 'bento_size')
     prepopulated_fields = {'slug': ('name',)}
@@ -131,9 +131,9 @@ class ProductAdmin(admin.ModelAdmin):
         if obj.image:
             try:
                 return format_html(
-                    '<div style="text-align: center;">'
-                    '<img src="{}" style="max-height: 50px; max-width: 50px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />'
-                    '<br><small style="color: #666;">{}</small>'
+                    '<div style="pointer-events:none;">'
+                    '<img src="{}" style="max-height:50px;max-width:50px;border-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,0.1);pointer-events:none;cursor:default;" alt="" role="presentation" />'
+                    '<br><small style="color:#666;pointer-events:none;">{}</small>'
                     '</div>',
                     obj.get_image_url,
                     obj.name[:20]
@@ -160,7 +160,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 class ImageUploadAdmin(admin.ModelAdmin):
     list_display = ('title', 'image_preview', 'uploaded_at')
-    list_display_links = ('title', 'image_preview')
+    list_display_links = ('title',)
     search_fields = ('title', 'description')
     readonly_fields = ('uploaded_at',)
     ordering = ('-uploaded_at',)
@@ -183,9 +183,9 @@ class ImageUploadAdmin(admin.ModelAdmin):
         if obj.image:
             try:
                 return format_html(
-                    '<div style="text-align: center;">'
-                    '<img src="{}" style="max-height: 50px; max-width: 50px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />'
-                    '<br><small style="color: #666;">{}</small>'
+                    '<div style="pointer-events:none;">'
+                    '<img src="{}" style="max-height: 50px; max-width: 50px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);pointer-events:none;cursor:default;" alt="" role="presentation" />'
+                    '<br><small style="color: #666;pointer-events:none;">{}</small>'
                     '</div>',
                     obj.image.url,
                     obj.title[:20]
