@@ -9,11 +9,29 @@
     <div class="product-gallery">
       <div class="product-gallery-main">
         {% if product.get_image_url %}
-          <img src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy">
+          <img src="{{ product.get_image_url }}" alt="{{ product.name }}" id="main-product-image" loading="lazy">
+          <div class="product-image-overlay">
+            <button class="image-action-btn" onclick="openImageModal('{{ product.get_image_url }}')" title="Zoom">
+              <i class="fas fa-search-plus"></i>
+            </button>
+            {% if product.stock > 0 %}
+            <button class="image-action-btn quick-add-btn" data-product-id="{{ product.id }}" title="Agregar rápido">
+              <i class="fas fa-cart-plus"></i>
+            </button>
+            {% endif %}
+          </div>
         {% else %}
           <div class="product-gallery-placeholder" aria-hidden="true"></div>
         {% endif %}
       </div>
+
+      {% if product.get_image_url %}
+      <div class="product-gallery-thumbs">
+        <div class="thumbnail-item active" data-image="{{ product.get_image_url }}">
+          <img src="{{ product.get_image_url }}" alt="Miniatura 1">
+        </div>
+      </div>
+      {% endif %}
     </div>
 
     <div class="product-details">
@@ -23,21 +41,52 @@
         <p class="product-eyebrow">Sin categoría</p>
       {% endif %}
 
+      <div class="product-badges">
+        {% if product.is_new %}
+        <span class="badge badge-new"><i class="fas fa-star"></i> New Arrival</span>
+        {% endif %}
+        {% if product.stock <= 5 and product.stock > 0 %}
+        <span class="badge badge-limited"><i class="fas fa-exclamation-triangle"></i> Limited Stock</span>
+        {% endif %}
+        {% if product.available %}
+        <span class="badge badge-available"><i class="fas fa-check"></i> Available</span>
+        {% endif %}
+      </div>
+
       <h1 class="product-name">{{ product.name }}</h1>
-      <p class="product-price">{{ product.display_price }}</p>
 
       {% if product.review_count %}
         <p class="product-rating">{{ product.average_rating|stars }} <span class="product-rating-label">{% rating_label product %}</span></p>
       {% endif %}
 
+      <p class="product-price">{{ product.display_price }}</p>
+
       <div class="product-meta">
         <div class="product-meta-row">
           <span class="product-meta-label">Tipo</span>
-          <span class="product-meta-value">{{ product.get_jewelry_type_display }}</span>
+          <span class="product-meta-value">
+            {% if product.jewelry_type == 'ring' %}<i class="fas fa-ring"></i>
+            {% elif product.jewelry_type == 'necklace' %}<i class="fas fa-gem"></i>
+            {% elif product.jewelry_type == 'bracelet' %}<i class="fas fa-circle-notch"></i>
+            {% elif product.jewelry_type == 'earring' %}<i class="fas fa-circle"></i>
+            {% elif product.jewelry_type == 'brooch' %}<i class="fas fa-map-pin"></i>
+            {% elif product.jewelry_type == 'tiara' %}<i class="fas fa-crown"></i>
+            {% else %}<i class="fas fa-star"></i>{% endif %}
+            {{ product.get_jewelry_type_display }}
+          </span>
         </div>
         <div class="product-meta-row">
           <span class="product-meta-label">Material</span>
-          <span class="product-meta-value">{{ product.get_material_display }}</span>
+          <span class="product-meta-value">
+            {% if product.material == 'metal' %}<i class="fas fa-tools"></i>
+            {% elif product.material == 'resin' %}<i class="fas fa-palette"></i>
+            {% elif product.material == 'glass' %}<i class="fas fa-wine-glass"></i>
+            {% elif product.material == 'crystal' %}<i class="fas fa-diamond"></i>
+            {% elif product.material == 'pearl' %}<i class="fas fa-circle"></i>
+            {% elif product.material == 'fabric' %}<i class="fas fa-scroll"></i>
+            {% else %}<i class="fas fa-question"></i>{% endif %}
+            {{ product.get_material_display }}
+          </span>
         </div>
         <div class="product-meta-row">
           <span class="product-meta-label">Stock</span>
@@ -45,6 +94,20 @@
             {% if product.stock > 0 %}{{ product.stock }} unidades{% else %}Agotado{% endif %}
           </span>
         </div>
+        <div class="product-meta-row">
+          <span class="product-meta-label">ID</span>
+          <span class="product-meta-value">#{{ product.id }}</span>
+        </div>
+      </div>
+
+      <div class="stock-indicator">
+        {% if product.stock > 10 %}
+        <span class="stock-level stock-level--high"><span class="stock-dot"></span> In Stock</span>
+        {% elif product.stock > 0 %}
+        <span class="stock-level stock-level--low"><span class="stock-dot"></span> Limited Stock</span>
+        {% else %}
+        <span class="stock-level stock-level--out"><span class="stock-dot"></span> Out of Stock</span>
+        {% endif %}
       </div>
 
       <p class="product-description">{{ product.description|linebreaks }}</p>
@@ -68,15 +131,283 @@
           </div>
           <button type="submit" class="btn btn-primary add-to-cart-btn">Agregar al carrito</button>
         </form>
+        <div class="product-secondary-actions">
+          {% if user.is_authenticated %}
+          <button type="button" class="btn btn-outline wishlist-btn" data-product-id="{{ product.id }}">
+            <i class="fas fa-heart"></i> <span>Add to Wishlist</span>
+          </button>
+          {% else %}
+          <a href="{% url 'accounts:login' %}?next={{ request.get_full_path }}" class="btn btn-outline">
+            <i class="fas fa-sign-in-alt"></i> <span>Login to Add to Wishlist</span>
+          </a>
+          {% endif %}
+        </div>
       {% else %}
-        <button type="button" class="btn btn-primary" disabled>Agotado</button>
+        <div class="out-of-stock-message">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>This product is currently out of stock. We'll notify you when it's back!</span>
+          <button type="button" class="btn btn-outline notify-btn" data-product-id="{{ product.id }}">
+            <i class="fas fa-bell"></i> Notify Me
+          </button>
+        </div>
       {% endif %}
 
       <div class="product-actions">
-        <a href="{% url 'home:index' %}" class="btn btn-secondary">Inicio</a>
-        <a href="{% url 'products:product_list' %}" class="btn btn-secondary">Volver al catálogo</a>
+        <button class="action-link" onclick="shareProduct()"><i class="fas fa-share"></i> Share</button>
+        <button class="action-link" onclick="printProduct()"><i class="fas fa-print"></i> Print</button>
+        <button class="action-link" onclick="reportProduct()"><i class="fas fa-flag"></i> Report</button>
+        {% if user.is_authenticated %}
+        <a href="{% url 'products:product_update' product.id %}" class="action-link"><i class="fas fa-edit"></i> Edit</a>
+        <a href="{% url 'products:product_delete' product.id %}" class="action-link text-danger"><i class="fas fa-trash"></i> Delete</a>
+        {% endif %}
       </div>
     </div>
   </div>
 </section>
+
+<nav class="breadcrumb-nav" aria-label="Breadcrumb">
+  <div class="breadcrumb-container">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'home:index' %}"><i class="fas fa-home"></i> Home</a></li>
+      {% if product.category %}
+      <li class="breadcrumb-item"><a href="{% url 'products:product_list_by_category' product.category.slug %}">{{ product.category.name }}</a></li>
+      {% endif %}
+      <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+    </ol>
+  </div>
+</nav>
+
+<section class="product-tabs-section">
+  <div class="tabs-nav">
+    <button class="tab-btn active" data-tab="description">Description</button>
+    <button class="tab-btn" data-tab="specifications">Specifications</button>
+    <button class="tab-btn" data-tab="reviews">Reviews {% if product.review_count %}({{ product.review_count }}){% endif %}</button>
+  </div>
+  <div class="tabs-content">
+    <div class="tab-pane active" id="description">
+      <div class="tab-pane-inner">
+        <h3 class="tab-pane-title"><i class="fas fa-align-left"></i> Product Description</h3>
+        <div class="tab-pane-body">{{ product.description|linebreaks }}</div>
+      </div>
+    </div>
+    <div class="tab-pane" id="specifications">
+      <div class="tab-pane-inner">
+        <h3 class="tab-pane-title"><i class="fas fa-list"></i> Product Specifications</h3>
+        <div class="specs-grid">
+          <div class="spec-item"><span class="spec-label">Type</span><span class="spec-value">{{ product.get_jewelry_type_display }}</span></div>
+          <div class="spec-item"><span class="spec-label">Material</span><span class="spec-value">{{ product.get_material_display }}</span></div>
+          <div class="spec-item"><span class="spec-label">Category</span><span class="spec-value">{{ product.category.name|default:"N/A" }}</span></div>
+          <div class="spec-item"><span class="spec-label">Stock</span><span class="spec-value">{{ product.stock }}</span></div>
+          <div class="spec-item"><span class="spec-label">Product ID</span><span class="spec-value">{{ product.id }}</span></div>
+          <div class="spec-item"><span class="spec-label">Added</span><span class="spec-value">{{ product.created_at|date:"M d, Y" }}</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane" id="reviews">
+      <div class="tab-pane-inner">
+        <h3 class="tab-pane-title"><i class="fas fa-comments"></i> Customer Reviews</h3>
+        <div class="reviews-empty">
+          <i class="fas fa-comments"></i>
+          <p>No reviews yet. Be the first to review this product!</p>
+          <button class="btn btn-primary">Write a Review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="related-section">
+  <div class="section-header">
+    <h2 class="section-title"><i class="fas fa-gem"></i> You Might Also Like</h2>
+    <p class="section-subtitle">Discover more beautiful pieces from our collection</p>
+  </div>
+  <div class="related-grid">
+    {% if product.category %}
+      {% for p in product.category.products.all %}
+        {% if p.id != product.id and p.available %}
+          {% if not forloop.counter0 > 3 %}
+            <article class="product-card product-card--editorial">
+              <a href="{% url 'products:product_detail' p.slug %}" class="product-media-link">
+                <div class="product-media">
+                  {% if p.image %}
+                    <img src="{{ p.get_image_url }}" alt="{{ p.name }}" class="product-media-img" loading="lazy">
+                  {% else %}
+                    <div class="product-media-placeholder" aria-hidden="true"></div>
+                  {% endif %}
+                </div>
+              </a>
+              <div class="product-card-info">
+                <p class="product-price">{{ p.display_price }}</p>
+                <h3 class="product-title">{{ p.name }}</h3>
+                <p class="product-meta">{{ p.category.name }} — {{ p.get_jewelry_type_display }}</p>
+                {% if p.review_count %}
+                <p class="product-rating">{{ p.average_rating|stars }} <span class="product-rating-label">{% rating_label p %}</span></p>
+                {% endif %}
+                <div class="product-actions">
+                  <a href="{% url 'products:product_detail' p.slug %}" class="btn btn-primary add-to-cart-btn">View Details</a>
+                </div>
+              </div>
+            </article>
+          {% endif %}
+        {% endif %}
+      {% empty %}
+        <div class="empty-state">
+          <i class="fas fa-gem"></i>
+          <span>Related products will be displayed here</span>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-gem"></i>
+        <span>Related products will be displayed here</span>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="recently-viewed-section">
+  <div class="section-header">
+    <h2 class="section-title"><i class="fas fa-history"></i> Recently Viewed</h2>
+  </div>
+  <div class="recently-viewed-grid">
+    <div class="empty-state">
+      <i class="fas fa-eye"></i>
+      <span>Your recently viewed products will appear here</span>
+    </div>
+  </div>
+</section>
+
+<section class="shipping-info-section">
+  <div class="shipping-info-grid">
+    <div class="info-card">
+      <div class="info-icon"><i class="fas fa-truck"></i></div>
+      <div class="info-content">
+        <h3>Free Shipping</h3>
+        <p>Free standard shipping on orders over S/. 150</p>
+        <span class="info-detail">Delivery in 3-5 business days</span>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon"><i class="fas fa-undo"></i></div>
+      <div class="info-content">
+        <h3>Easy Returns</h3>
+        <p>30-day return policy for unused items</p>
+        <span class="info-detail">Free return shipping</span>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon"><i class="fas fa-shield-alt"></i></div>
+      <div class="info-content">
+        <h3>Secure Payment</h3>
+        <p>SSL encrypted checkout process</p>
+        <span class="info-detail">Multiple payment options</span>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon"><i class="fas fa-headset"></i></div>
+      <div class="info-content">
+        <h3>Customer Support</h3>
+        <p>24/7 customer support available</p>
+        <span class="info-detail">support@miluxious.com</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq-section">
+  <div class="section-header">
+    <h2 class="section-title"><i class="fas fa-question-circle"></i> Frequently Asked Questions</h2>
+  </div>
+  <div class="faq-accordion">
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>How long does shipping take?</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="faq-answer">
+        <p>We offer standard shipping (3-5 business days) and express shipping (1-2 business days) options. Free standard shipping is available on orders over S/. 150.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Can I return or exchange items?</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="faq-answer">
+        <p>Yes, we offer a 30-day return policy for unused items in their original packaging. Return shipping is free for defective items.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>Do you offer customization?</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="faq-answer">
+        <p>Some of our pieces can be customized with different materials or engravings. Please contact our customer service for customization options.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>How do I care for my jewelry?</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="faq-answer">
+        <p>Store your jewelry in a cool, dry place away from direct sunlight. Clean with a soft cloth and avoid contact with chemicals or perfumes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="social-share-section">
+  <div class="share-container">
+    <h3>Share this product</h3>
+    <div class="share-buttons">
+      <button class="share-btn share-btn--facebook" onclick="shareOnFacebook()"><i class="fab fa-facebook-f"></i> <span>Facebook</span></button>
+      <button class="share-btn share-btn--twitter" onclick="shareOnTwitter()"><i class="fab fa-twitter"></i> <span>Twitter</span></button>
+      <button class="share-btn share-btn--pinterest" onclick="shareOnPinterest()"><i class="fab fa-pinterest-p"></i> <span>Pinterest</span></button>
+      <button class="share-btn share-btn--whatsapp" onclick="shareOnWhatsApp()"><i class="fab fa-whatsapp"></i> <span>WhatsApp</span></button>
+      <button class="share-btn share-btn--email" onclick="shareByEmail()"><i class="fas fa-envelope"></i> <span>Email</span></button>
+    </div>
+  </div>
+</section>
+
+<div class="image-modal" id="image-modal" aria-hidden="true">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeImageModal()">&times;</span>
+    <div class="modal-image-container">
+      <img id="modal-image" src="" alt="Product Image">
+      <div class="modal-navigation">
+        <button class="modal-nav-btn prev" onclick="navigateImage(-1)"><i class="fas fa-chevron-left"></i></button>
+        <button class="modal-nav-btn next" onclick="navigateImage(1)"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="quick-view-modal" id="quick-view-modal" aria-hidden="true">
+  <div class="quick-view-content">
+    <span class="close-quick-view" onclick="closeQuickView()">&times;</span>
+    <div class="quick-view-body">
+      <div class="quick-view-image">
+        <img id="quick-view-image" src="" alt="Product Image">
+      </div>
+      <div class="quick-view-info">
+        <h3 id="quick-view-title"></h3>
+        <p id="quick-view-price"></p>
+        <div class="quick-view-actions">
+          <button class="btn btn-primary" onclick="addToCartFromQuickView()">Add to Cart</button>
+          <a href="#" class="btn btn-outline" id="quick-view-link">View Details</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  initProductDetailPage();
+});
+</script>
 {% endblock %}
