@@ -45,14 +45,16 @@ def invalidate_product_cache_on_delete(sender, instance, **kwargs):
     logger.info(f"Invalidated cache for deleted product: {instance.name}")
 
 
-@receiver(post_save, sender=Category)
 def invalidate_category_cache(sender, instance, **kwargs):
     """Invalidate cache when a category is saved."""
     # Invalidate categories list cache
     cache.delete('categories_list')
 
     # Invalidate all product lists (since category names might have changed)
-    cache.delete_pattern('products_list_*')
+    try:
+        cache.delete_pattern('products_list_*')
+    except AttributeError:
+        pass
 
     logger.info(f"Invalidated cache for category: {instance.name}")
 
@@ -67,7 +69,10 @@ def invalidate_category_cache_on_delete(sender, instance, **kwargs):
     cache.delete(f'products_list_{instance.slug}')
 
     # Invalidate all product lists
-    cache.delete_pattern('products_list_*')
+    try:
+        cache.delete_pattern('products_list_*')
+    except AttributeError:
+        pass
 
     logger.info(f"Invalidated cache for deleted category: {instance.name}")
 
