@@ -28,8 +28,22 @@ class Category(models.Model):
         """Automatically create slug from name if not provided."""
         if not self.slug:
             self.slug = slugify(self.name)
+        old_index_order = None
+        if self.pk:
+            old_index_order = Category.objects.filter(pk=self.pk).values_list('index_order', flat=True).first()
         super().save(*args, **kwargs)
+        self._rebalance_index_order(old_index_order)
         logger.info(f"Category '{self.name}' saved")
+
+    def _rebalance_index_order(self, old_index_order):
+        if self.index_order is None or self.index_order <= 0:
+            return
+        if old_index_order == self.index_order:
+            return
+        if old_index_order and old_index_order < self.index_order:
+            Category.objects.exclude(pk=self.pk).filter(index_order__gt=old_index_order, index_order__lte=self.index_order).update(index_order=models.F('index_order') - 1)
+        else:
+            Category.objects.exclude(pk=self.pk).filter(index_order__gte=self.index_order, index_order__lt=(old_index_order or self.index_order)).update(index_order=models.F('index_order') + 1)
 
 class Product(models.Model):
     """Model representing a Miluxious accesorios product."""
