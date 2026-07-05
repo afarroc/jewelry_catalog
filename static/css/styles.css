@@ -1611,6 +1611,7 @@
     align-items: start;
   }
   .product-gallery-main {
+    position: relative;
     border-radius: 18px;
     overflow: hidden;
     border: 1px solid var(--line);
@@ -1652,6 +1653,24 @@
     font-weight: 600;
     letter-spacing: 0.1em;
     margin: 0;
+  }
+  .price-display {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  .current-price {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+  }
+  .out-of-stock-notice {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #b00020;
+    font-weight: 600;
   }
   .product-meta-grid {
     display: grid;

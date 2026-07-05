@@ -13,10 +13,16 @@
       <p class="product-price">{{ product.display_price }}</p>
       <p class="product-title">{{ product.name }}</p>
       <div class="bento-actions">
-        <form method="post" action="{% url 'cart:cart_add_ajax' product.id %}" class="add-to-cart-form">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-primary add-to-cart-btn" data-product-id="{{ product.id }}">Agregar</button>
-        </form>
+        {% if product.stock > 0 %}
+          <span class="stock-badge stock-badge--in">Disponible</span>
+          <span class="stock-badge stock-badge--qty">{{ product.stock }} uds.</span>
+          <form method="post" action="{% url 'cart:cart_add_ajax' product.id %}" class="add-to-cart-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary add-to-cart-btn" data-product-id="{{ product.id }}">Agregar</button>
+          </form>
+        {% else %}
+          <span class="stock-badge stock-badge--out">Agotado</span>
+        {% endif %}
       </div>
     </div>
   </div>
