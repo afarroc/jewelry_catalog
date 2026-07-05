@@ -8,9 +8,28 @@ import logging
 logger = logging.getLogger(__name__)
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'created_at')
+    list_display = ('name', 'slug', 'index_order', 'visible_in_index', 'created_at')
+    list_display_links = ('name',)
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
+    list_editable = ('index_order', 'visible_in_index')
+    list_filter = ('visible_in_index',)
+    ordering = ('index_order', 'name')
+
+    fieldsets = (
+        ('Información Básica', {
+            'fields': ('name', 'slug', 'description')
+        }),
+        ('Visualización en Index', {
+            'fields': ('visible_in_index', 'index_order'),
+            'description': 'Configuración para mostrar esta categoría en el index y header del sitio.'
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    readonly_fields = ('created_at', 'updated_at')
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
