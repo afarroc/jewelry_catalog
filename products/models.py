@@ -14,10 +14,12 @@ class Category(models.Model):
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    visible_in_index = models.BooleanField(default=True, help_text='Mostrar esta categoría en el index y header')
+    index_order = models.PositiveIntegerField(default=0, help_text='Orden de visualización en el index/header (menor número = primero)')
 
     class Meta:
         verbose_name_plural = "categories"
-        ordering = ['name']
+        ordering = ['index_order', 'name']
 
     def __str__(self):
         return self.name
