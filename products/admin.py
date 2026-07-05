@@ -2,6 +2,8 @@
 from django.contrib import admin
 from django.forms import ModelForm
 from django.utils.html import format_html
+from django.urls import path
+from django.shortcuts import redirect
 from .models import Category, Product, ImageUpload
 import logging
 
@@ -15,7 +17,7 @@ class CategoryAdmin(admin.ModelAdmin):
     list_editable = ('index_order', 'visible_in_index')
     list_filter = ('visible_in_index',)
     ordering = ('index_order', 'name')
-    actions = ['renumber_selected_categories']
+    actions = ['renumber_categories_sequentially']
 
     fieldsets = (
         ('Información Básica', {
@@ -32,15 +34,20 @@ class CategoryAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('created_at', 'updated_at')
 
-    @admin.action(description='Renumerar orden de las categorías seleccionadas')
-    def renumber_selected_categories(self, request, queryset):
-        for index, category in enumerate(queryset.order_by('name'), start=1):
-            category.index_order = index
-            category.save()
-        self.message_user(request, f'{queryset.count()} categorías reordenadas numéricamente.')
+    @admin.action(description='Renumerar categorías secuencialmente (1, 2, 3...) sin huecos')
+    def renumber_categories_sequentially(self, request, queryset):
+        categories = list(Category.objects.all().order_by('index_order', 'name'))
+        for index, category in enumerate(categories, start=1):
+            if category.index_order != index:
+                Category.objects.filter(pk=category.pk).update(index_order=index)
+        self.message_user(request, f'{len(categories)} categorías reordenadas secuencialmente.')
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
+        categories = list(Category.objects.all().order_by('index_order', 'name'))
+        for index, category in enumerate(categories, start=1):
+            if category.index_order != index:
+                Category.objects.filter(pk=category.pk).update(index_order=index)
         logger.info(f"Category '{obj.name}' was {'updated' if change else 'created'} by {request.user}")
 
 class ProductAdminForm(ModelForm):

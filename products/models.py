@@ -29,14 +29,7 @@ class Category(models.Model):
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
-        self._renumber_all_categories()
         logger.info(f"Category '{self.name}' saved")
-
-    def _renumber_all_categories(self):
-        categories = list(Category.objects.all().order_by('index_order', 'name'))
-        for index, category in enumerate(categories, start=1):
-            if category.index_order != index:
-                Category.objects.filter(pk=category.pk).update(index_order=index)
 
 class Product(models.Model):
     """Model representing a Miluxious accesorios product."""
