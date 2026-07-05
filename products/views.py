@@ -40,6 +40,9 @@ def product_list(request, category_slug=None):
     categories = Category.objects.all()
     products = Product.objects.filter(available=True)
 
+    if not category_slug and request.GET.get('category'):
+        category_slug = request.GET['category'].strip().lower()
+
     if category_slug:
         category = get_object_or_404(Category, slug=category_slug)
         products = products.filter(category=category)

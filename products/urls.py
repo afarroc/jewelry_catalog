@@ -23,8 +23,8 @@ urlpatterns = [
     # Diagnostic views (require login)
     path('diagnostic/s3/', views.s3_diagnostic, name='s3_diagnostic'),
 
-    # Category views - MUST come after specific URLs to avoid conflicts
-    path('<slug:category_slug>/', views.product_list, name='product_list_by_category'),
+    # Category views - prefixed to avoid conflicts with product detail slugs
+    path('category/<slug:category_slug>/', views.product_list, name='product_list_by_category'),
 
     # API views
     path('list/', views.ProductListAPIView.as_view(), name='api_product_list'),
