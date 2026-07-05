@@ -16,7 +16,7 @@
         <p class="product-price">{{ product.display_price }}</p>
         <h3 class="product-title">{{ product.name }}</h3>
         {% if product.category %}
-          <p class="product-meta">{{ product.category.name }}</p>
+          <a href="{% url 'products:product_list_by_category' product.category.slug %}" class="product-meta">{{ product.category.name }}</a>
         {% endif %}
         {% if product.review_count %}
           <p class="product-rating">{{ product.average_rating|stars }} <span class="product-rating-label">{% rating_label product %}</span></p>

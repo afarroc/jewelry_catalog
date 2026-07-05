@@ -14,7 +14,7 @@
         <p class="product-price">{{ product.display_price }}</p>
         <p class="product-title">{{ product.name }}</p>
         {% if product.category %}
-          <p class="product-meta">{{ product.category.name }}</p>
+          <a href="{% url 'products:product_list_by_category' product.category.slug %}" class="product-meta">{{ product.category.name }}</a>
         {% endif %}
       </div>
       <div class="product-actions">
