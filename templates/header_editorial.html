@@ -4,9 +4,6 @@
     <nav class="nav-main">
       <a href="{% url 'home:index' %}"><span class="nav-text">Inicio</span><i class="fas fa-house nav-icon"></i></a>
       <a href="{% url 'products:product_list' %}"><span class="nav-text">Catálogo</span><i class="fas fa-store nav-icon"></i></a>
-      {% for cat in categories %}
-        <a href="{% url 'products:product_list_by_category' cat.slug %}"><span class="nav-text">{{ cat.name }}</span><i class="fas fa-gem nav-icon"></i></a>
-      {% endfor %}
     </nav>
     <div class="header-actions">
       {% if user.is_authenticated %}
