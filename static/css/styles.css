@@ -1693,6 +1693,64 @@
     flex-wrap: wrap;
     margin-top: 6px;
   }
+  .product-actions .btn-secondary + .btn-secondary {
+    margin-left: 6px;
+  }
+  .add-to-cart-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .quantity-selector label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .quantity-controls {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .quantity-controls .qty-btn {
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .quantity-controls .qty-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .quantity-controls .qty-btn:not(:disabled):hover {
+    background: rgba(26,21,17,0.06);
+  }
+  .product-quantity-input {
+    width: 64px;
+    border: none;
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    text-align: center;
+    padding: 10px 0;
+    font-size: 14px;
+    color: var(--ink);
+    background: transparent;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  .product-quantity-input::-webkit-outer-spin-button,
+  .product-quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
   .btn-secondary {
     display: inline-flex;
     align-items: center;

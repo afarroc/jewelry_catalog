@@ -1,5 +1,5 @@
 {% extends 'home/base.html' %}
-{% load static %}
+{% load static product_extras %}
 
 {% block title %}{{ product.name }} — Detalle{% endblock %}
 
@@ -8,8 +8,8 @@
   <div class="product-page-inner">
     <div class="product-gallery">
       <div class="product-gallery-main">
-        {% if product.image %}
-          <img src="{{ product.get_image_url }}" alt="{{ product.name }}">
+        {% if product.get_image_url %}
+          <img src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy">
         {% else %}
           <div class="product-gallery-placeholder" aria-hidden="true"></div>
         {% endif %}
@@ -17,11 +17,20 @@
     </div>
 
     <div class="product-details">
-      <p class="product-eyebrow">{{ product.category.name|default:"Sin categoría" }}</p>
+      {% if product.category %}
+        <a href="{% url 'products:product_list_by_category' product.category.slug %}" class="product-eyebrow">{{ product.category.name }}</a>
+      {% else %}
+        <p class="product-eyebrow">Sin categoría</p>
+      {% endif %}
+
       <h1 class="product-name">{{ product.name }}</h1>
       <p class="product-price">{{ product.display_price }}</p>
 
-      <div class="product-meta-grid">
+      {% if product.review_count %}
+        <p class="product-rating">{{ product.average_rating|stars }} <span class="product-rating-label">{% rating_label product %}</span></p>
+      {% endif %}
+
+      <div class="product-meta">
         <div class="product-meta-row">
           <span class="product-meta-label">Tipo</span>
           <span class="product-meta-value">{{ product.get_jewelry_type_display }}</span>
@@ -40,7 +49,31 @@
 
       <p class="product-description">{{ product.description|linebreaks }}</p>
 
+      {% if product.stock > 0 %}
+        <form method="post" action="{% url 'cart:cart_add_ajax' product.id %}" class="add-to-cart-form" data-product-id="{{ product.id }}" id="add-to-cart-form">
+          {% csrf_token %}
+          <div class="quantity-selector">
+            <label>
+              <span class="product-meta-label">Cantidad</span>
+              <div class="quantity-controls">
+                <button type="button" class="qty-btn minus" id="qty-minus" data-target="quantity">
+                  <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}" step="1" class="product-quantity-input">
+                <button type="button" class="qty-btn plus" id="qty-plus" data-target="quantity">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary add-to-cart-btn">Agregar al carrito</button>
+        </form>
+      {% else %}
+        <button type="button" class="btn btn-primary" disabled>Agotado</button>
+      {% endif %}
+
       <div class="product-actions">
+        <a href="{% url 'home:index' %}" class="btn btn-secondary">Inicio</a>
         <a href="{% url 'products:product_list' %}" class="btn btn-secondary">Volver al catálogo</a>
       </div>
     </div>
