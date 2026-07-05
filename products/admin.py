@@ -15,6 +15,7 @@ class CategoryAdmin(admin.ModelAdmin):
     list_editable = ('index_order', 'visible_in_index')
     list_filter = ('visible_in_index',)
     ordering = ('index_order', 'name')
+    actions = ['renumber_selected_categories']
 
     fieldsets = (
         ('Información Básica', {
@@ -30,6 +31,13 @@ class CategoryAdmin(admin.ModelAdmin):
         }),
     )
     readonly_fields = ('created_at', 'updated_at')
+
+    @admin.action(description='Renumerar orden de las categorías seleccionadas')
+    def renumber_selected_categories(self, request, queryset):
+        for index, category in enumerate(queryset.order_by('name'), start=1):
+            category.index_order = index
+            category.save()
+        self.message_user(request, f'{queryset.count()} categorías reordenadas numéricamente.')
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
