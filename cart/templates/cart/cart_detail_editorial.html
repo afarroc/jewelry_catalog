@@ -16,39 +16,7 @@
       <div class="cart-layout">
         <div class="cart-items">
           {% for item in cart.items.all %}
-            <article class="cart-item">
-              <div class="cart-item-media">
-                {% if item.product.image %}
-                  <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}" loading="lazy">
-                {% else %}
-                  <div class="cart-item-placeholder" aria-hidden="true"></div>
-                {% endif %}
-              </div>
-
-              <div class="cart-item-body">
-                <div class="cart-item-header">
-                  <div>
-                    {% if item.product.category %}
-                      <p class="cart-item-category">{{ item.product.category.name }}</p>
-                    {% endif %}
-                    <h2 class="cart-item-name">{{ item.product.name }}</h2>
-                  </div>
-                  <p class="cart-item-price">{{ item.total_price }}</p>
-                </div>
-
-                <div class="cart-item-footer">
-                  <form method="POST" action="{% url 'cart:cart_remove' item.product.id }}" class="cart-item-remove">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-ghost">Eliminar</button>
-                  </form>
-
-                  <div class="cart-item-quantity">
-                    <span class="cart-item-quantity-label">Cantidad</span>
-                    <span class="cart-item-quantity-value">{{ item.quantity }}</span>
-                  </div>
-                </div>
-              </div>
-            </article>
+            {% include 'cart/_cart_item_editorial.html' with item=item %}
           {% endfor %}
         </div>
 
