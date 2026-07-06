@@ -17,9 +17,9 @@
   </div>
   {% endif %}
 
-  {% if page_obj.object_list %}
+  {% if orders %}
   <div class="orders-list">
-    {% for order in page_obj.object_list %}
+    {% for order in orders %}
     <article class="order-card">
       <div class="order-header">
         <div>

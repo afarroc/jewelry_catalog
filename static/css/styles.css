@@ -2152,6 +2152,23 @@
     display: grid;
     gap: 8px;
   }
+  .checkout-field .errorlist {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 4px;
+  }
+  .checkout-field .errorlist li,
+  .checkout-field .field-error {
+    color: #721c24;
+    font-size: 12px;
+  }
+  .checkout-save-fields {
+    display: grid;
+    gap: 10px;
+    margin-top: 8px;
+  }
   .checkout-label {
     font-size: 12px;
     letter-spacing: 0.18em;
@@ -2225,11 +2242,18 @@
     gap: 12px;
   }
   .checkout-item {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
     gap: 12px;
-    align-items: start;
+    align-items: center;
     font-size: 14px;
+  }
+  .checkout-item img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid var(--line);
   }
   .checkout-item-name {
     margin: 0;

@@ -185,7 +185,6 @@ def create_order_ajax(request):
             
             if form.is_valid():
                 with transaction.atomic():
-                    # Create order
                     order = form.save(commit=False)
                     order.user = request.user
                     order.subtotal = cart.subtotal
@@ -194,7 +193,6 @@ def create_order_ajax(request):
                     order.total = (order.subtotal + order.shipping_cost + order.tax).quantize(Decimal('0.01'))
                     order.save()
 
-                    # Create order items
                     for cart_item in cart.items.all():
                         OrderItem.objects.create(
                             order=order,
@@ -203,21 +201,23 @@ def create_order_ajax(request):
                             price=cart_item.product.price
                         )
 
-                    # Create Stripe PaymentIntent
-                    intent = stripe.PaymentIntent.create(
-                        amount=int(order.total * 100),  # Amount in cents
-                        currency='usd',
-                        metadata={
-                            'order_id': order.id,
-                            'user_id': request.user.id
-                        },
-                        description=f"Order #{order.order_number}"
-                    )
+                    client_secret = None
+                    if form.cleaned_data.get('payment_method') == 'credit_card':
+                        intent = stripe.PaymentIntent.create(
+                            amount=int(order.total * 100),
+                            currency='usd',
+                            metadata={
+                                'order_id': order.id,
+                                'user_id': request.user.id
+                            },
+                            description=f"Order #{order.order_number}"
+                        )
+                        client_secret = intent.client_secret
 
                     return JsonResponse({
                         'success': True,
                         'order_id': order.id,
-                        'client_secret': intent.client_secret
+                        'client_secret': client_secret
                     })
             else:
                 return JsonResponse({
@@ -279,6 +279,8 @@ class OrderConfirmationView(DetailView):
     model = Order
     template_name = 'orders/confirmation_editorial.html'
     context_object_name = 'order'
+    lookup_field = 'id'
+    pk_url_kwarg = 'order_id'
 
     def get_queryset(self):
         """Only show orders for the current user."""
@@ -295,7 +297,7 @@ class OrderHistoryView(ListView):
     """Class-based view for order history."""
     model = Order
     template_name = 'orders/history_editorial.html'
-    context_object_name = 'page_obj'
+    context_object_name = 'orders'
     paginate_by = 10
 
     def get_queryset(self):
@@ -313,6 +315,8 @@ class OrderDetailView(DetailView):
     model = Order
     template_name = 'orders/detail_editorial.html'
     context_object_name = 'order'
+    lookup_field = 'id'
+    pk_url_kwarg = 'order_id'
 
     def get_queryset(self):
         """Only show orders for the current user."""
@@ -332,6 +336,8 @@ class OrderInvoiceView(DetailView):
     model = Order
     template_name = 'orders/invoice_editorial.html'
     context_object_name = 'order'
+    lookup_field = 'id'
+    pk_url_kwarg = 'order_id'
 
     def get_queryset(self):
         """Only show orders for the current user."""

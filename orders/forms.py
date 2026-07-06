@@ -45,8 +45,9 @@ class CheckoutForm(forms.ModelForm):
         fields = [
             'shipping_address',
             'billing_address',
+            'payment_method',
             'notes'
-        ]  # Removed payment_method from here since we defined it explicitly
+        ]
         widgets = {
             'shipping_address': forms.Textarea(attrs={'rows': 4}),
             'billing_address': forms.Textarea(attrs={'rows': 4}),
