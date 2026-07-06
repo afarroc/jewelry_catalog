@@ -1,0 +1,150 @@
+/* components/profile.css — @layer: components (auto-split from styles.css) */
+@layer components {
+  /* Profile Page */
+  .profile-page {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--space);
+  }
+  .profile-page-inner {
+    display: grid;
+    gap: 18px;
+  }
+  .profile-header {
+    display: grid;
+    gap: 12px;
+  }
+  .profile-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0;
+  }
+  .profile-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(30px, 3.8vw, 46px);
+    font-weight: 600;
+    line-height: 1.1;
+    margin: 0;
+  }
+  .profile-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .profile-layout {
+    display: grid;
+    gap: 18px;
+  }
+  .profile-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 22px;
+    display: grid;
+    gap: 18px;
+  }
+  .profile-card-header {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .profile-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 600;
+  }
+  .profile-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .profile-username {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .profile-fields {
+    display: grid;
+    gap: 14px;
+  }
+  .profile-field {
+    display: grid;
+    gap: 4px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 12px;
+  }
+  .profile-field:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .profile-field dt {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .profile-field dd {
+    font-size: 14px;
+    color: var(--ink);
+    margin: 0;
+  }
+  .profile-form {
+    display: grid;
+    gap: 18px;
+  }
+  .profile-form-grid {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 22px;
+    display: grid;
+    gap: 14px;
+  }
+  .profile-form-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .profile-messages {
+    display: grid;
+    gap: 10px;
+  }
+  .profile-message {
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    border: 1px solid transparent;
+  }
+  .profile-message--error {
+    background: #fdecea;
+    color: #5a1a1a;
+    border-color: #f5c6cb;
+  }
+  .profile-message--success {
+    background: #e8f5e9;
+    color: #1b4d2e;
+    border-color: #c3e6cb;
+  }
+  .profile-message--warning {
+    background: #fff8e1;
+    color: #5c4303;
+    border-color: #ffe082;
+  }
+  .profile-message--info {
+    background: #e3f2fd;
+    color: #0d3b66;
+    border-color: #bbdefb;
+  }
+}

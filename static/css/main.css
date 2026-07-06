@@ -1,0 +1,17 @@
+/* main.css — ITCSS aggregator with native @layer */
+@layer tokens, base, layout, components, utilities;
+
+@import "tokens.css";
+@import "base.css";
+@import "header.css";
+@import "home.css";
+@import "components/bento.css";
+@import "components/product-card.css";
+@import "footer.css";
+@import "utilities.css";
+@import "components/product-detail.css";
+@import "components/cart.css";
+@import "components/checkout.css";
+@import "components/auth.css";
+@import "components/profile.css";
+@import "components/orders.css";
