@@ -451,40 +451,6 @@ def delete_order(request, order_id):
         logger.error(f"Order deletion failed: {str(e)}")
     return redirect('orders:order_history')
 
-@csrf_exempt
-def stripe_webhook(request):
-    """Handle Stripe webhooks."""
-    payload = request.body
-    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE', '')
-    event = None
-
-    try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
-        )
-    except ValueError as e:
-        logger.error(f"Invalid payload: {str(e)}")
-        return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError as e:
-        logger.error(f"Invalid signature: {str(e)}")
-        return HttpResponse(status=400)
-
-    # Handle payment success
-    if event['type'] == 'payment_intent.succeeded':
-        payment_intent = event['data']['object']
-        order_id = payment_intent.metadata.get('order_id')
-        
-        try:
-            order = Order.objects.get(id=order_id)
-            order.payment_status = True
-            order.payment_date = timezone.now()
-            order.save()
-            logger.info(f"Payment succeeded for order {order.order_number}")
-        except Order.DoesNotExist:
-            logger.error(f"Order {order_id} not found for payment intent {payment_intent.id}")
-
-    return HttpResponse(status=200)
-
 # Helper Functions
 def process_payment(order):
     """Process payment through Stripe."""

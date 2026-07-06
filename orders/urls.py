@@ -1,11 +1,11 @@
 from django.urls import path
 from . import views
+from .webhooks import stripe_webhook
 
 app_name = 'orders'
 
 urlpatterns = [
-    # Template views
-    path('webhooks/stripe/', views.stripe_webhook, name='stripe_webhook'),
+    path('webhooks/stripe/', stripe_webhook, name='stripe_webhook'),
     path('checkout/', views.checkout, name='checkout'),
     path('confirmation/<int:order_id>/', views.OrderConfirmationView.as_view(), name='order_confirmation'),
     path('create-order/', views.create_order_ajax, name='create_order_ajax'),
@@ -16,7 +16,6 @@ urlpatterns = [
     path('delete/<int:order_id>/', views.delete_order, name='delete_order'),
     path('terms-and-conditions/', views.TermsAndConditionsView.as_view(), name='terms'),
 
-    # API views
     path('list/', views.OrderListAPIView.as_view(), name='api_order_list'),
     path('detail/<str:order_number>/', views.OrderDetailAPIView.as_view(), name='api_order_detail'),
     path('cancel/<str:order_number>/', views.cancel_order_api, name='api_cancel_order'),
