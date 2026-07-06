@@ -70,8 +70,8 @@ class ProductDetailView(DetailView):
         return super().dispatch(*args, **kwargs)
 
     def get_queryset(self):
-        """Only show available products with optimized queries."""
-        return Product.objects.filter(available=True).select_related('category')
+        """Allow detail view for any existing product slug."""
+        return Product.objects.select_related('category')
 
 
 # API Views
@@ -124,7 +124,7 @@ class ProductListAPIView(generics.ListCreateAPIView):
 
 class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     """API view for retrieving, updating and deleting products."""
-    queryset = Product.objects.filter(available=True)
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
     lookup_field = 'slug'
