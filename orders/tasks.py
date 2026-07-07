@@ -17,7 +17,7 @@ def send_order_confirmation_task(self, order_id):
         return
 
     subject = f"Order Confirmation #{order.order_number}"
-    context = {'order': order}
+    context = {'order': order, 'site_url': settings.SITE_URL}
 
     text_message = render_to_string('orders/emails/order_confirmation_editorial.txt', context)
     html_message = render_to_string('orders/emails/order_confirmation_editorial.html', context)
@@ -49,7 +49,7 @@ def send_order_cancellation_task(self, order_id):
         return
 
     subject = f"Order Cancelled #{order.order_number}"
-    context = {'order': order}
+    context = {'order': order, 'site_url': settings.SITE_URL}
 
     text_message = render_to_string('orders/emails/order_cancellation_editorial.txt', context)
     html_message = render_to_string('orders/emails/order_cancellation_editorial.html', context)

@@ -6,6 +6,9 @@ Pedido: #{{ order.order_number }}
 Fecha: {{ order.created_at|date:"F j, Y" }}
 Cancelación: {% now "F j, Y" %}
 
+Ver mi pedido:
+{{ site_url }}{% url 'orders:order_detail' order.id %}
+
 Si esto fue un error o necesitas ayuda, contacta con nosotros.
 
 © {% now "Y" %} Miluxious accesorios. Todos los derechos reservados.

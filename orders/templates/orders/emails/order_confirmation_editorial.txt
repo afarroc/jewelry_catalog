@@ -9,6 +9,9 @@ Estado: {{ order.get_status_display }}
 Productos:
 {% for item in order.items.all %}
 - {{ item.quantity }} × {{ item.product.name }}: ${{ item.total_price|floatformat:2 }}
+{% if item.product.get_image_url %}
+  Imagen: {{ item.product.get_image_url }}
+{% endif %}
 {% endfor %}
 
 Subtotal: ${{ order.subtotal|floatformat:2 }}
@@ -18,6 +21,9 @@ Total: ${{ order.total|floatformat:2 }}
 
 Envío:
 {{ order.shipping_address|linebreaks }}
+
+Ver mi pedido:
+{{ site_url }}{% url 'orders:order_detail' order.id %}
 
 Si tienes preguntas sobre tu pedido, contacta con nosotros.
 

@@ -67,6 +67,10 @@
             </div>
         </div>
 
+        <div class="order-details" style="text-align:center;">
+            <a href="{{ site_url }}{% url 'orders:order_detail' order.id %}" style="background:#1a1511; color:#fff; padding:12px 18px; border-radius:10px; text-decoration:none; font-weight:600;">Ver mi pedido</a>
+        </div>
+
         <div class="footer">
             <p>Si esto fue un error o necesitas ayuda, contacta con nosotros.</p>
             <p>&copy; {% now "Y" %} Miluxious accesorios. Todos los derechos reservados.</p>
