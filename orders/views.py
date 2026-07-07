@@ -478,11 +478,12 @@ def send_order_confirmation(order):
     text_message = render_to_string('orders/emails/order_confirmation_editorial.txt', context)
     html_message = render_to_string('orders/emails/order_confirmation_editorial.html', context)
     
+    # TEMPORAL para prueba: cuenta Gmail configurada en .env
     try:
         send_mail(
             subject,
             text_message,
-            'orders@fantasyjewelry.com',
+            'arturofarro1@gmail.com',
             [order.user.email],
             html_message=html_message,
         )
@@ -501,11 +502,12 @@ def send_order_cancellation(order):
     text_message = render_to_string('orders/emails/order_cancellation_editorial.txt', context)
     html_message = render_to_string('orders/emails/order_cancellation_editorial.html', context)
     
+    # TEMPORAL para prueba: cuenta Gmail configurada en .env
     try:
         send_mail(
             subject,
             text_message,
-            'support@fantasyjewelry.com',
+            'arturofarro1@gmail.com',
             [order.user.email],
             html_message=html_message,
         )
