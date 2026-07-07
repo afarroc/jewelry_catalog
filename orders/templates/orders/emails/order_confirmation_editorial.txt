@@ -20,7 +20,7 @@ Impuesto: ${{ order.tax|floatformat:2 }}
 Total: ${{ order.total|floatformat:2 }}
 
 Envío:
-{{ order.shipping_address|linebreaks }}
+{{ order.shipping_address|linebreaksbr }}
 
 Ver mi pedido:
 {{ site_url }}{% url 'orders:order_detail' order.id %}
