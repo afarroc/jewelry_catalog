@@ -478,14 +478,20 @@ def send_order_confirmation(order):
     text_message = render_to_string('orders/emails/order_confirmation_editorial.txt', context)
     html_message = render_to_string('orders/emails/order_confirmation_editorial.html', context)
     
-    send_mail(
-        subject,
-        text_message,
-        'orders@fantasyjewelry.com',
-        [order.user.email],
-        html_message=html_message
-    )
-    logger.info(f"Confirmation email sent for order {order.order_number}")
+    try:
+        send_mail(
+            subject,
+            text_message,
+            'orders@fantasyjewelry.com',
+            [order.user.email],
+            html_message=html_message,
+        )
+        logger.info(f"Confirmation email sent for order {order.order_number}")
+    except Exception as e:
+        logger.error(
+            f"Failed to send confirmation email for order {order.order_number}: {e}",
+            exc_info=True,
+        )
 
 def send_order_cancellation(order):
     """Send order cancellation email."""
@@ -495,14 +501,20 @@ def send_order_cancellation(order):
     text_message = render_to_string('orders/emails/order_cancellation_editorial.txt', context)
     html_message = render_to_string('orders/emails/order_cancellation_editorial.html', context)
     
-    send_mail(
-        subject,
-        text_message,
-        'support@fantasyjewelry.com',
-        [order.user.email],
-        html_message=html_message
-    )
-    logger.info(f"Cancellation email sent for order {order.order_number}")
+    try:
+        send_mail(
+            subject,
+            text_message,
+            'support@fantasyjewelry.com',
+            [order.user.email],
+            html_message=html_message,
+        )
+        logger.info(f"Cancellation email sent for order {order.order_number}")
+    except Exception as e:
+        logger.error(
+            f"Failed to send cancellation email for order {order.order_number}: {e}",
+            exc_info=True,
+        )
     
 class TermsAndConditionsView(TemplateView):
     """Class-based view for terms and conditions page."""
