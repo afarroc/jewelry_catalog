@@ -16,7 +16,7 @@ def send_order_confirmation_task(self, order_id):
         logger.error(f"Order {order_id} not found for confirmation email")
         return
 
-    subject = f"Order Confirmation #{order.order_number}"
+    subject = f"Confirmación de pedido #{order.order_number}"
     context = {'order': order, 'site_url': settings.SITE_URL}
 
     text_message = render_to_string('orders/emails/order_confirmation_editorial.txt', context)
@@ -48,7 +48,7 @@ def send_order_cancellation_task(self, order_id):
         logger.error(f"Order {order_id} not found for cancellation email")
         return
 
-    subject = f"Order Cancelled #{order.order_number}"
+    subject = f"Pedido cancelado #{order.order_number}"
     context = {'order': order, 'site_url': settings.SITE_URL}
 
     text_message = render_to_string('orders/emails/order_cancellation_editorial.txt', context)
