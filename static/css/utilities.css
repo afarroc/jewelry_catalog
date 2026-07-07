@@ -55,9 +55,6 @@
       min-height: 44px;
       padding: 10px 14px;
     }
-    .cart-layout { grid-template-columns: 1fr; }
-    .cart-summary { position: static; }
-    .cart-item { grid-template-columns: 120px 1fr; }
     .checkout-layout { grid-template-columns: 1fr; }
     .checkout-summary { position: static; }
     .profile-form-grid { grid-template-columns: 1fr; }
@@ -106,6 +103,7 @@
   @media (max-width: 767px) {
     .cart-layout { display: block; }
     .cart-items { width: 100%; }
+    .cart-item { grid-template-columns: 120px 1fr; }
     .cart-summary {
       position: sticky;
       bottom: 0;
