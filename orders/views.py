@@ -1,8 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.template.loader import render_to_string
-from django.core.mail import send_mail
 from django.utils import timezone
 from django.db import transaction
 from django.core.paginator import Paginator
@@ -471,50 +469,15 @@ def process_payment(order):
         return False
 
 def send_order_confirmation(order):
-    """Send order confirmation email."""
-    subject = f"Order Confirmation #{order.order_number}"
-    context = {'order': order}
-    
-    text_message = render_to_string('orders/emails/order_confirmation_editorial.txt', context)
-    html_message = render_to_string('orders/emails/order_confirmation_editorial.html', context)
-    
-    try:
-        send_mail(
-            subject,
-            text_message,
-            settings.DEFAULT_FROM_EMAIL,
-            [order.user.email],
-            html_message=html_message,
-        )
-        logger.info(f"Confirmation email sent for order {order.order_number}")
-    except Exception as e:
-        logger.error(
-            f"Failed to send confirmation email for order {order.order_number}: {e}",
-            exc_info=True,
-        )
+    """Send order confirmation email asynchronously."""
+    from .tasks import send_order_confirmation_task
+    send_order_confirmation_task.delay(order.id)
+
 
 def send_order_cancellation(order):
-    """Send order cancellation email."""
-    subject = f"Order Cancelled #{order.order_number}"
-    context = {'order': order}
-    
-    text_message = render_to_string('orders/emails/order_cancellation_editorial.txt', context)
-    html_message = render_to_string('orders/emails/order_cancellation_editorial.html', context)
-    
-    try:
-        send_mail(
-            subject,
-            text_message,
-            settings.DEFAULT_FROM_EMAIL,
-            [order.user.email],
-            html_message=html_message,
-        )
-        logger.info(f"Cancellation email sent for order {order.order_number}")
-    except Exception as e:
-        logger.error(
-            f"Failed to send cancellation email for order {order.order_number}: {e}",
-            exc_info=True,
-        )
+    """Send order cancellation email asynchronously."""
+    from .tasks import send_order_cancellation_task
+    send_order_cancellation_task.delay(order.id)
     
 class TermsAndConditionsView(TemplateView):
     """Class-based view for terms and conditions page."""
