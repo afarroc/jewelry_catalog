@@ -240,40 +240,4 @@
     color: var(--muted);
     margin: 0;
   }
-
-  /* Cart responsive: floating summary on mobile */
-  @media (max-width: 767px) {
-    .cart-page-inner {
-      display: flex;
-      flex-direction: column;
-    }
-    .cart-layout {
-      display: block;
-    }
-    .cart-items {
-      gap: 12px;
-      width: 100%;
-      padding-bottom: 180px;
-    }
-    .cart-summary {
-      position: sticky;
-      bottom: 0;
-      top: auto;
-      z-index: 10;
-      width: 100%;
-    }
-    .cart-item {
-      grid-template-columns: 120px 1fr;
-      gap: 14px;
-    }
-    .cart-item-body {
-      padding: 18px;
-    }
-    .cart-item-name {
-      font-size: 18px;
-    }
-    .cart-item-price {
-      font-size: 15px;
-    }
-  }
 }

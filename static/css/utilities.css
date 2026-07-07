@@ -102,6 +102,19 @@
     .profile-form-actions .btn { width: 100%; justify-content: center; }
   }
 
+  /* Cart: floating summary on mobile (trump over global responsive) */
+  @media (max-width: 767px) {
+    .cart-layout { display: block; }
+    .cart-items { width: 100%; padding-bottom: 180px; }
+    .cart-summary {
+      position: sticky;
+      bottom: 0;
+      top: auto;
+      z-index: 10;
+      width: 100%;
+    }
+  }
+
   /* Legacy grid helpers */
   .lookbook-grid {
     display: grid;
