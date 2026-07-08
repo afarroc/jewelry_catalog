@@ -11,7 +11,7 @@ from pathlib import Path
 # Setup Django
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.append(str(BASE_DIR))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jewelry_catalog.settings_production')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jewelry_catalog.settings')
 django.setup()
 
 from django.core.files.storage import default_storage

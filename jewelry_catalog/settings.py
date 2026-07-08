@@ -24,6 +24,7 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost:8000,http://127.0.0.1:8000').split(',')
 SITE_URL = os.getenv('SITE_URL', 'http://localhost:8000').rstrip('/')
+ADMIN_URL = os.getenv('ADMIN_URL', 'admin/')
 
 STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
@@ -103,12 +104,13 @@ WSGI_APPLICATION = 'jewelry_catalog.wsgi.application'
 # =======================
 # Database
 # =======================
-# Configuración para MySQL (desarrollo local)
-# Para producción, configurar DATABASE_URL con PostgreSQL
 if os.getenv('DATABASE_URL'):
     import dj_database_url
     DATABASES = {
-        'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
+            conn_max_age=600
+        )
     }
     # Fix SSL for MySQL with pymysql
     if 'OPTIONS' in DATABASES['default']:
@@ -117,20 +119,37 @@ if os.getenv('DATABASE_URL'):
         if DATABASES['default'].get('ENGINE') == 'django.db.backends.mysql':
             DATABASES['default']['OPTIONS']['ssl'] = {}
 else:
-    # Base de datos MySQL para desarrollo local
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.getenv('DB_NAME', 'projects'),
-            'USER': os.getenv('DB_USER', 'admin'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'Peru+123'),
-            'HOST': os.getenv('DB_HOST', '127.0.0.1'),
-            'PORT': os.getenv('DB_PORT', '3306'),
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+    if DEBUG:
+        # Base de datos MySQL para desarrollo local
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.mysql',
+                'NAME': os.getenv('DB_NAME', 'projects'),
+                'USER': os.getenv('DB_USER', 'admin'),
+                'PASSWORD': os.getenv('DB_PASSWORD', 'Peru+123'),
+                'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+                'PORT': os.getenv('DB_PORT', '3306'),
+                'OPTIONS': {
+                    'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                }
             }
         }
-    }
+    else:
+        # Fallback PostgreSQL para producción local / Render
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': os.getenv('DB_NAME', 'jewelry_catalog'),
+                'USER': os.getenv('DB_USER', 'postgres'),
+                'PASSWORD': os.getenv('DB_PASSWORD', ''),
+                'HOST': os.getenv('DB_HOST', 'localhost'),
+                'PORT': os.getenv('DB_PORT', '5432'),
+                'OPTIONS': {
+                    'sslmode': 'require',
+                },
+                'CONN_MAX_AGE': 600,
+            }
+        }
 
 # =======================
 # Authentication
@@ -150,9 +169,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # =======================
 # Email Configuration
 # =======================
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+if DEBUG:
+    EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+else:
+    EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = os.getenv('EMAIL_HOST', '')
-EMAIL_PORT = os.getenv('EMAIL_PORT', 587)
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
@@ -187,13 +209,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Configuración condicional de archivos estáticos
-if not DEBUG:
-    # Producción: WhiteNoise con compresión y cache
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-else:
-    # Desarrollo: Sin compresión para desarrollo rápido
+if DEBUG:
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+else:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -213,15 +232,20 @@ CART_SESSION_ID = 'cart'
 # =======================
 if not DEBUG:
     # Security Headers
-    SECURE_HSTS_SECONDS = 3600
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
     SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
+
+    # Session and CSRF
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
 
     # Performance optimizations
     CONN_MAX_AGE = 60  # Database connection pooling
@@ -232,9 +256,33 @@ if not DEBUG:
     DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440  # 2.5MB
     FILE_UPLOAD_MAX_NUMBER_FILES = 10
 
-    # Rate limiting (if using django-ratelimit)
-    # RATELIMIT_RATE = '100/h'
-    # RATELIMIT_BLOCK = True
+    # HTTP compression
+    MIDDLEWARE.insert(0, 'django.middleware.gzip.GZipMiddleware')
+
+    # Redis Cache for production (optional)
+    try:
+        import django_redis  # noqa: F401
+        import redis  # noqa: F401
+        CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+                'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1'),
+                'OPTIONS': {
+                    'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                }
+            }
+        }
+    except ImportError:
+        CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+                'LOCATION': 'unique-snowflake',
+                'TIMEOUT': 300,
+                'OPTIONS': {
+                    'MAX_ENTRIES': 1000,
+                }
+            }
+        }
 
 else:
     # Development optimizations
@@ -340,18 +388,6 @@ LOGGING = {
 # =======================
 # Cache Configuration
 # =======================
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-        'TIMEOUT': 300,  # 5 minutes default
-        'OPTIONS': {
-            'MAX_ENTRIES': 1000,
-        }
-    }
-}
-
-# Cache settings for different types of data
 CACHE_MIDDLEWARE_ALIAS = 'default'
 CACHE_MIDDLEWARE_SECONDS = 600  # 10 minutes
 CACHE_MIDDLEWARE_KEY_PREFIX = 'jewelry_catalog'
@@ -387,6 +423,33 @@ REST_FRAMEWORK = {
         'user': '1000/hour',
     },
 }
+
+# =======================
+# AWS S3 Configuration for Media Files
+# =======================
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', 'jewelry-catalog')
+AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-2')
+
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+
+AWS_DEFAULT_ACL = None
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+AWS_S3_FILE_OVERWRITE = False
+AWS_S3_VERIFY = True
+
+if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and AWS_STORAGE_BUCKET_NAME:
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+else:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # =======================
 # Default Auto Field
