@@ -28,7 +28,6 @@ def send_order_confirmation_task(self, order_id):
             body=text_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             to=[order.user.email],
-            charset='utf-8',
         )
         msg.attach_alternative(html_message, 'text/html')
         msg.send()
@@ -62,7 +61,6 @@ def send_order_cancellation_task(self, order_id):
             body=text_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             to=[order.user.email],
-            charset='utf-8',
         )
         msg.attach_alternative(html_message, 'text/html')
         msg.send()
