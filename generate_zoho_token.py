@@ -21,7 +21,7 @@ load_dotenv()
 ZOHO_AUTH_URL = "https://accounts.zoho.com/oauth/v2/auth"
 ZOHO_TOKEN_URL = "https://accounts.zoho.com/oauth/v2/token"
 REDIRECT_URI = "http://localhost:8080/callback"
-SCOPES = "ZohoMail.messages.CREATE,ZohoMail.messages.UPDATE"
+SCOPES = "ZohoMail.messages.CREATE,ZohoMail.messages.UPDATE,ZohoMail.accounts.READ"
 
 ZOHO_CLIENT_ID = os.getenv("ZOHO_CLIENT_ID")
 ZOHO_CLIENT_SECRET = os.getenv("ZOHO_CLIENT_SECRET")
