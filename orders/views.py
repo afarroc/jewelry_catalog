@@ -469,15 +469,35 @@ def process_payment(order):
         return False
 
 def send_order_confirmation(order):
-    """Send order confirmation email asynchronously."""
+    """Send order confirmation email synchronously in-process so Render logs capture SMTP errors."""
     from .tasks import send_order_confirmation_task
-    send_order_confirmation_task.delay(order.id)
+    logger.info("Dispatching confirmation email for order %s", order.order_number)
+    try:
+        send_order_confirmation_task.apply(args=(order.id,))
+        logger.info("Confirmation email task completed for order %s", order.order_number)
+    except Exception as exc:
+        logger.error(
+            "Failed to send confirmation email for order %s: %s",
+            order.order_number,
+            exc,
+            exc_info=True,
+        )
 
 
 def send_order_cancellation(order):
-    """Send order cancellation email asynchronously."""
+    """Send order cancellation email synchronously in-process so Render logs capture SMTP errors."""
     from .tasks import send_order_cancellation_task
-    send_order_cancellation_task.delay(order.id)
+    logger.info("Dispatching cancellation email for order %s", order.order_number)
+    try:
+        send_order_cancellation_task.apply(args=(order.id,))
+        logger.info("Cancellation email task completed for order %s", order.order_number)
+    except Exception as exc:
+        logger.error(
+            "Failed to send cancellation email for order %s: %s",
+            order.order_number,
+            exc,
+            exc_info=True,
+        )
     
 class TermsAndConditionsView(TemplateView):
     """Class-based view for terms and conditions page."""
