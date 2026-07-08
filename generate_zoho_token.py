@@ -50,13 +50,29 @@ def main():
     print()
     print("2. Aceptá los permisos en la consola de Zoho.")
     print("3. Cuando Zoho redirija a:", REDIRECT_URI)
-    print("   copiá el parámetro 'code' de la URL del navegador.")
+    print("   copiá la URL completa de la barra de direcciones del navegador.")
     print()
 
-    code = input("Pegá acá el código 'code' y presioná Enter: ").strip()
-    if not code:
-        print("No ingresaste ningún código. Abortando.")
+    raw_input = input("Pegá acá la URL de redirección o solo el 'code' y presioná Enter: ").strip()
+    if not raw_input:
+        print("No ingresaste nada. Abortando.")
         sys.exit(1)
+
+    if raw_input.startswith("http"):
+        from urllib.parse import urlparse, parse_qs
+        parsed = urlparse(raw_input)
+        query = parse_qs(parsed.query)
+        code = query.get("code", [""])[0]
+        if not code:
+            print("La URL pegada no contiene el parámetro 'code'.")
+            print("Verificá haber autorizado correctamente en Zoho.")
+            sys.exit(1)
+        print("Código extraído de la URL correctamente.")
+    else:
+        code = raw_input
+
+    print()
+    print(f"Código a usar: {code}")
 
     print()
     print("Intercambiando código por refresh token...")
