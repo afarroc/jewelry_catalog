@@ -1,10 +1,13 @@
 from celery import shared_task
-from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
+import resend
+import os
 import logging
 
 logger = logging.getLogger(__name__)
+
+resend.api_key = os.getenv("RESEND_API_KEY")
 
 
 def _send_order_confirmation_email(order_id):
@@ -18,19 +21,18 @@ def _send_order_confirmation_email(order_id):
     subject = f"Confirmación de pedido #{order.order_number}"
     context = {'order': order, 'site_url': settings.SITE_URL}
 
-    text_message = render_to_string('orders/emails/order_confirmation_editorial.txt', context)
     html_message = render_to_string('orders/emails/order_confirmation_editorial.html', context)
+    text_message = render_to_string('orders/emails/order_confirmation_editorial.txt', context)
 
     try:
-        msg = EmailMultiAlternatives(
-            subject=subject,
-            body=text_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[order.user.email],
-        )
-        msg.attach_alternative(html_message, 'text/html')
-        msg.send()
-        logger.info(f"Confirmation email sent for order {order.order_number}")
+        r = resend.Emails.send({
+            "from": settings.DEFAULT_FROM_EMAIL,
+            "to": [order.user.email],
+            "subject": subject,
+            "html": html_message,
+            "text": text_message,
+        })
+        logger.info(f"Confirmation email sent for order {order.order_number}: {r.get('id')}")
     except Exception as exc:
         logger.error(
             f"Failed to send confirmation email for order {order.order_number}: {exc}",
@@ -55,19 +57,18 @@ def _send_order_cancellation_email(order_id):
     subject = f"Pedido cancelado #{order.order_number}"
     context = {'order': order, 'site_url': settings.SITE_URL}
 
-    text_message = render_to_string('orders/emails/order_cancellation_editorial.txt', context)
     html_message = render_to_string('orders/emails/order_cancellation_editorial.html', context)
+    text_message = render_to_string('orders/emails/order_cancellation_editorial.txt', context)
 
     try:
-        msg = EmailMultiAlternatives(
-            subject=subject,
-            body=text_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[order.user.email],
-        )
-        msg.attach_alternative(html_message, 'text/html')
-        msg.send()
-        logger.info(f"Cancellation email sent for order {order.order_number}")
+        r = resend.Emails.send({
+            "from": settings.DEFAULT_FROM_EMAIL,
+            "to": [order.user.email],
+            "subject": subject,
+            "html": html_message,
+            "text": text_message,
+        })
+        logger.info(f"Cancellation email sent for order {order.order_number}: {r.get('id')}")
     except Exception as exc:
         logger.error(
             f"Failed to send cancellation email for order {order.order_number}: {exc}",
