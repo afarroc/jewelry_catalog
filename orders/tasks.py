@@ -14,7 +14,7 @@ ZOHO_CLIENT_ID = os.getenv("ZOHO_CLIENT_ID")
 ZOHO_CLIENT_SECRET = os.getenv("ZOHO_CLIENT_SECRET")
 ZOHO_REFRESH_TOKEN = os.getenv("ZOHO_REFRESH_TOKEN")
 ZOHO_SENDER_EMAIL = os.getenv("ZOHO_SENDER_EMAIL")
-ZOHO_ACCOUNT_ID = os.getenv("ZOHO_ACCOUNT_ID")
+ZOHO_ACCOUNT_ID = os.getenv("ZOHO_ACCOUNT_ID") or os.getenv("ZOHO_USER_ID")
 
 
 def _get_zoho_access_token():
