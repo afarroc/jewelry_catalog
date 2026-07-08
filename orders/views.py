@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, DetailView, ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 from decimal import Decimal
 from rest_framework import generics, status
@@ -273,7 +274,7 @@ def process_order(request, cart, form):
         logger.info(f"Order {order.order_number} created successfully")
         return redirect('orders:order_confirmation', order_number=order.order_number)
 
-class OrderConfirmationView(DetailView):
+class OrderConfirmationView(LoginRequiredMixin, DetailView):
     """Class-based view for order confirmation page."""
     model = Order
     template_name = 'orders/confirmation_editorial.html'
@@ -316,7 +317,7 @@ class OrderHistoryView(ListView):
         return context
 
 
-class OrderDetailView(DetailView):
+class OrderDetailView(LoginRequiredMixin, DetailView):
     """Class-based view for order details."""
     model = Order
     template_name = 'orders/detail_editorial.html'
@@ -344,7 +345,7 @@ class OrderDetailView(DetailView):
         return context
 
 
-class OrderInvoiceView(DetailView):
+class OrderInvoiceView(LoginRequiredMixin, DetailView):
     """Class-based view for order invoice."""
     model = Order
     template_name = 'orders/invoice_editorial.html'
