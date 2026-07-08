@@ -39,14 +39,10 @@ def create_admin_user():
 
     # Crear usuario administrador
     try:
-        # Para el modelo personalizado, necesitamos crear el usuario manualmente
-        # ya que create_superuser espera username pero nuestro modelo usa email
-        user = User.objects.create_user(
+        user = User.objects.create_superuser(
             username=admin_user,
             email=admin_email,
             password=admin_password,
-            is_staff=True,
-            is_superuser=True
         )
         print(f"Usuario administrador creado exitosamente:")
         print(f"  Username: {admin_user}")
