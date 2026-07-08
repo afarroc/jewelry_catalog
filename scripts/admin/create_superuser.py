@@ -11,6 +11,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jewelry_catalog.settings')
 django.setup()
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from accounts.models import User
 
 def create_admin_user():
@@ -41,10 +42,22 @@ def create_admin_user():
             email=admin_email,
             password=admin_password,
         )
+        user.refresh_from_db()
+        user.user_permissions.set(Permission.objects.all())
+        user.is_superuser = True
+        user.is_staff = True
+        user.is_active = True
+        user.save()
+        user.refresh_from_db()
+
         print(f"Usuario administrador creado exitosamente:")
-        print(f"  Username: {admin_user}")
-        print(f"  Email: {admin_email}")
+        print(f"  Username: {user.username}")
+        print(f"  Email: {user.email}")
         print(f"  Password: {admin_password}")
+        print(f"  is_superuser: {user.is_superuser}")
+        print(f"  is_staff: {user.is_staff}")
+        print(f"  is_active: {user.is_active}")
+        print(f"  Permisos asignados: {user.user_permissions.count()}")
         print("IMPORTANTE: Cambia la contraseña después del primer login")
 
     except Exception as e:
