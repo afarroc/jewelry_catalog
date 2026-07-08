@@ -285,6 +285,13 @@ class OrderConfirmationView(DetailView):
         """Only show orders for the current user."""
         return Order.objects.filter(user=self.request.user)
 
+    def get_object(self, queryset=None):
+        """Fetch order by order_number instead of pk."""
+        if queryset is None:
+            queryset = self.get_queryset()
+        order_number = self.kwargs.get(self.pk_url_kwarg)
+        return get_object_or_404(queryset, order_number=order_number)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         order = self.get_object()
@@ -321,6 +328,13 @@ class OrderDetailView(DetailView):
         """Only show orders for the current user."""
         return Order.objects.filter(user=self.request.user)
 
+    def get_object(self, queryset=None):
+        """Fetch order by order_number instead of pk."""
+        if queryset is None:
+            queryset = self.get_queryset()
+        order_number = self.kwargs.get(self.pk_url_kwarg)
+        return get_object_or_404(queryset, order_number=order_number)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         order = self.get_object()
@@ -341,6 +355,13 @@ class OrderInvoiceView(DetailView):
     def get_queryset(self):
         """Only show orders for the current user."""
         return Order.objects.filter(user=self.request.user)
+
+    def get_object(self, queryset=None):
+        """Fetch order by order_number instead of pk."""
+        if queryset is None:
+            queryset = self.get_queryset()
+        order_number = self.kwargs.get(self.pk_url_kwarg)
+        return get_object_or_404(queryset, order_number=order_number)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
