@@ -51,10 +51,10 @@
       </div>
 
       <div class="order-actions">
-        <a class="btn btn-secondary" href="{% url 'orders:order_detail' order.id %}">Ver detalle</a>
-        <a class="btn btn-secondary" href="{% url 'orders:order_invoice' order.id %}">Factura</a>
+        <a class="btn btn-secondary" href="{% url 'orders:order_detail' order.order_number %}">Ver detalle</a>
+        <a class="btn btn-secondary" href="{% url 'orders:order_invoice' order.order_number %}">Factura</a>
         {% if order.status == 'pending' or order.status == 'processing' %}
-        <form method="POST" action="{% url 'orders:cancel_order' order.id %}">
+        <form method="POST" action="{% url 'orders:cancel_order' order.order_number %}">
           {% csrf_token %}
           <button type="submit" class="btn btn-ghost">Cancelar pedido</button>
         </form>

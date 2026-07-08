@@ -70,14 +70,14 @@
                         </div>
                         
                         <div class="order-actions">
-                            <a href="{% url 'orders:order_detail' order.id %}" class="btn outline-btn btn-sm">
+                            <a href="{% url 'orders:order_detail' order.order_number %}" class="btn outline-btn btn-sm">
                                 View Details
                             </a>
-                            <a href="{% url 'orders:order_invoice' order.id %}" class="btn outline-btn btn-sm">
+                            <a href="{% url 'orders:order_invoice' order.order_number %}" class="btn outline-btn btn-sm">
                                 Download Invoice
                             </a>
                             {% if order.status == 'pending' or order.status == 'processing' %}
-                            <form method="POST" action="{% url 'orders:cancel_order' order.id %}" style="display:inline;">
+                            <form method="POST" action="{% url 'orders:cancel_order' order.order_number %}" style="display:inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn danger-btn btn-sm" style="background:none;border:none;color:#dc3545;padding:0;text-decoration:underline;cursor:pointer;">
                                     <i class="fas fa-times-circle"></i> Cancel Order

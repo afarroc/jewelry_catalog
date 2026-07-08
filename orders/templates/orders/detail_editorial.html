@@ -113,10 +113,10 @@
 
   <div class="order-actions">
     <a class="btn btn-secondary" href="{% url 'orders:order_history' %}">Volver al historial</a>
-    <a class="btn btn-secondary" href="{% url 'orders:order_invoice' order.id %}">Descargar factura</a>
+    <a class="btn btn-secondary" href="{% url 'orders:order_invoice' order.order_number %}">Descargar factura</a>
     {% if order.status == 'pending' or order.status == 'processing' %}
-    <form method="POST" action="{% url 'orders:cancel_order' order.id %}">{% csrf_token %}<button type="submit" class="btn btn-ghost">Cancelar pedido</button></form>
-    <form method="POST" action="{% url 'orders:delete_order' order.id %}">{% csrf_token %}<button type="submit" class="btn btn-ghost" onclick="return confirm('¿Eliminar este pedido permanentemente?');">Eliminar pedido</button></form>
+    <form method="POST" action="{% url 'orders:cancel_order' order.order_number %}">{% csrf_token %}<button type="submit" class="btn btn-ghost">Cancelar pedido</button></form>
+    <form method="POST" action="{% url 'orders:delete_order' order.order_number %}">{% csrf_token %}<button type="submit" class="btn btn-ghost" onclick="return confirm('¿Eliminar este pedido permanentemente?');">Eliminar pedido</button></form>
     {% endif %}
   </div>
 </section>

@@ -145,7 +145,7 @@ def checkout(request):
                     send_order_confirmation(order)
                     
                     messages.success(request, "Your order has been placed successfully!")
-                    return redirect('orders:order_confirmation', order_id=order.id)
+                     return redirect('orders:order_confirmation', order_number=order.order_number)
 
             except Exception as e:
                 logger.error(f"Checkout failed: {str(e)}", exc_info=True)
@@ -271,15 +271,15 @@ def process_order(request, cart, form):
         
         messages.success(request, "Your order has been placed successfully!")
         logger.info(f"Order {order.order_number} created successfully")
-        return redirect('orders:order_confirmation', order_id=order.id)
+        return redirect('orders:order_confirmation', order_number=order.order_number)
 
 class OrderConfirmationView(DetailView):
     """Class-based view for order confirmation page."""
     model = Order
     template_name = 'orders/confirmation_editorial.html'
     context_object_name = 'order'
-    lookup_field = 'id'
-    pk_url_kwarg = 'order_id'
+    lookup_field = 'order_number'
+    pk_url_kwarg = 'order_number'
 
     def get_queryset(self):
         """Only show orders for the current user."""
@@ -314,8 +314,8 @@ class OrderDetailView(DetailView):
     model = Order
     template_name = 'orders/detail_editorial.html'
     context_object_name = 'order'
-    lookup_field = 'id'
-    pk_url_kwarg = 'order_id'
+    lookup_field = 'order_number'
+    pk_url_kwarg = 'order_number'
 
     def get_queryset(self):
         """Only show orders for the current user."""
@@ -335,8 +335,8 @@ class OrderInvoiceView(DetailView):
     model = Order
     template_name = 'orders/invoice_editorial.html'
     context_object_name = 'order'
-    lookup_field = 'id'
-    pk_url_kwarg = 'order_id'
+    lookup_field = 'order_number'
+    pk_url_kwarg = 'order_number'
 
     def get_queryset(self):
         """Only show orders for the current user."""
@@ -361,10 +361,31 @@ class TermsAndConditionsView(TemplateView):
 
 # Legacy function-based views for backward compatibility
 @login_required
-def order_confirmation(request, order_id):
+def order_confirmation(request, order_number):
     """Legacy function-based view for order confirmation."""
     view = OrderConfirmationView.as_view()
-    return view(request, pk=order_id)
+    return view(request, order_number=order_number)
+
+
+@login_required
+def order_history(request):
+    """Legacy function-based view for order history."""
+    view = OrderHistoryView.as_view()
+    return view(request)
+
+
+@login_required
+def order_detail(request, order_number):
+    """Legacy function-based view for order detail."""
+    view = OrderDetailView.as_view()
+    return view(request, order_number=order_number)
+
+
+@login_required
+def order_invoice(request, order_number):
+    """Legacy function-based view for order invoice."""
+    view = OrderInvoiceView.as_view()
+    return view(request, order_number=order_number)
 
 @login_required
 def order_history(request):
@@ -373,27 +394,28 @@ def order_history(request):
     return view(request)
 
 @login_required
-def order_detail(request, order_id):
+def order_detail(request, order_number):
     """Legacy function-based view for order detail."""
     view = OrderDetailView.as_view()
-    return view(request, pk=order_id)
+    return view(request, order_number=order_number)
+
 
 @login_required
-def order_invoice(request, order_id):
+def order_invoice(request, order_number):
     """Legacy function-based view for order invoice."""
     view = OrderInvoiceView.as_view()
-    return view(request, pk=order_id)
+    return view(request, order_number=order_number)
 
 @login_required
 @require_POST
-def cancel_order(request, order_id):
+def cancel_order(request, order_number):
     """Handle order cancellation request."""
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order = get_object_or_404(Order, order_number=order_number, user=request.user)
 
     if order.status not in ['pending', 'processing']:
         messages.error(request, "This order cannot be cancelled at this stage")
         logger.warning(f"Cancel attempt for non-cancellable order {order.order_number}")
-        return redirect('orders:order_detail', order_id=order.id)
+        return redirect('orders:order_detail', order_number=order.order_number)
 
     try:
         with transaction.atomic():
@@ -435,12 +457,12 @@ def cancel_order(request, order_id):
 
 @login_required
 @require_POST
-def delete_order(request, order_id):
+def delete_order(request, order_number):
     """Delete an order permanently (only if pending or processing and belongs to user)."""
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order = get_object_or_404(Order, order_number=order_number, user=request.user)
     if order.status not in ['pending', 'processing']:
         messages.error(request, "This order cannot be deleted at this stage.")
-        return redirect('orders:order_detail', order_id=order.id)
+        return redirect('orders:order_detail', order_number=order.order_number)
     try:
         order.delete()
         messages.success(request, "Order deleted successfully.")
