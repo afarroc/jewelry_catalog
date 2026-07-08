@@ -6,20 +6,58 @@ Uso:
 """
 import os
 import sys
-import requests
-from urllib.parse import urlencode
+import socket
+import threading
+import time
+import webbrowser
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlencode, urlparse, parse_qs
 
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
 ZOHO_AUTH_URL = "https://accounts.zoho.com/oauth/v2/auth"
 ZOHO_TOKEN_URL = "https://accounts.zoho.com/oauth/v2/token"
-REDIRECT_URI = "https://onrender.com"
+REDIRECT_URI = "http://localhost:8080/callback"
 SCOPES = "ZohoMail.messages.CREATE,ZohoMail.messages.UPDATE"
 
 ZOHO_CLIENT_ID = os.getenv("ZOHO_CLIENT_ID")
 ZOHO_CLIENT_SECRET = os.getenv("ZOHO_CLIENT_SECRET")
+
+
+class _CallbackHandler(BaseHTTPRequestHandler):
+    server_code = None
+
+    def do_GET(self):
+        parsed = urlparse(self.path)
+        query = parse_qs(parsed.query)
+        _CallbackHandler.server_code = query.get("code", [""])[0]
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html")
+        self.end_headers()
+        self.wfile.write(
+            b"<html><body><h1>Token capture completed</h1><p>You can close this tab.</p></body></html>"
+        )
+
+    def log_message(self, format, *args):
+        pass
+
+
+def _wait_for_code(port=8080, timeout=120):
+    server = HTTPServer(("127.0.0.1", port), _CallbackHandler)
+    thread = threading.Thread(target=server.serve_forever)
+    thread.daemon = True
+    thread.start()
+
+    print(f"Esperando autorizacion en http://127.0.0.1:{port}/callback ...")
+    deadline = time.time() + timeout
+    while _CallbackHandler.server_code is None and time.time() < deadline:
+        time.sleep(0.5)
+
+    server.shutdown()
+    return _CallbackHandler.server_code
 
 
 def main():
@@ -42,40 +80,23 @@ def main():
     print("=" * 60)
     print("GENERADOR DE REFRESH TOKEN - ZOHO MAIL")
     print("=" * 60)
-    print(f"Redirect URI registrada: {REDIRECT_URI}")
+    print(f"Redirect URI: {REDIRECT_URI}")
     print(f"Scopes: {SCOPES}")
     print()
-    print("1. Abri esta URL en el navegador:")
-    print(auth_url)
+    print("Antes de continuar, confirmar en Zoho:")
+    print("  Authorized Redirect URIs:")
+    print(f"  {REDIRECT_URI}")
     print()
-    print("2. Aceptá los permisos en la consola de Zoho.")
-    print("3. Cuando Zoho redirija a:", REDIRECT_URI)
-    print("   copiá la URL completa de la barra de direcciones del navegador.")
-    print()
+    input("Presiona Enter para abrir el navegador...")
+    webbrowser.open(auth_url)
 
-    raw_input = input("Pegá acá la URL de redirección o solo el 'code' y presioná Enter: ").strip()
-    if not raw_input:
-        print("No ingresaste nada. Abortando.")
+    code = _wait_for_code()
+    if not code:
+        print("No se capturo el codigo de autorizacion. Abortando.")
         sys.exit(1)
 
-    if raw_input.startswith("http"):
-        from urllib.parse import urlparse, parse_qs
-        parsed = urlparse(raw_input)
-        query = parse_qs(parsed.query)
-        code = query.get("code", [""])[0]
-        if not code:
-            print("La URL pegada no contiene el parámetro 'code'.")
-            print("Verificá haber autorizado correctamente en Zoho.")
-            sys.exit(1)
-        print("Código extraído de la URL correctamente.")
-    else:
-        code = raw_input
-
     print()
-    print(f"Código a usar: {code}")
-
-    print()
-    print("Intercambiando código por refresh token...")
+    print("Intercambiando codigo por refresh token...")
     try:
         response = requests.post(
             ZOHO_TOKEN_URL,
@@ -98,7 +119,7 @@ def main():
 
     refresh_token = payload.get("refresh_token")
     if not refresh_token:
-        print("ERROR: Zoho no devolvió refresh_token.")
+        print("ERROR: Zoho no devolvio refresh_token.")
         print("Respuesta:", payload)
         sys.exit(1)
 
@@ -108,10 +129,10 @@ def main():
     print("=" * 60)
     print(refresh_token)
     print()
-    print("Agregá esta variable en Render Environment y en tu .env local:")
+    print("Agregar en Render Environment y en tu .env local:")
     print(f"ZOHO_REFRESH_TOKEN={refresh_token}")
     print()
-    print("Variables adicionales que necesitas configurar:")
+    print("Verificar tambien:")
     print("- ZOHO_CLIENT_ID")
     print("- ZOHO_CLIENT_SECRET")
     print("- ZOHO_SENDER_EMAIL")
