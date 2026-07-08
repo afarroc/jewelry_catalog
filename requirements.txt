@@ -23,4 +23,4 @@ django-admin-sortable2==2.3.1
 celery==5.4.0
 redis==5.2.1
 django-redis==5.4.0
-resend==2.13.0
+requests==2.32.4
