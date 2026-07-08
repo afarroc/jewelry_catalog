@@ -26,6 +26,7 @@ from .serializers import (
 from django.views.decorators.http import require_POST
 import logging
 import stripe
+import threading
 
 logger = logging.getLogger('orders')
 api_logger = logging.getLogger('api')
@@ -468,18 +469,40 @@ def process_payment(order):
         logger.error(f"Payment failed for order {order.order_number}: {str(e)}")
         return False
 
+def _dispatch_email(func, order_id):
+    try:
+        func(order_id)
+    except Exception as exc:
+        logger.error(
+            "Failed to send email for order %s: %s",
+            order_id,
+            exc,
+            exc_info=True,
+        )
+
+
 def send_order_confirmation(order):
-    """Send order confirmation email asynchronously via Celery."""
-    from .tasks import send_order_confirmation_task
+    """Send order confirmation email in a background thread."""
+    from .tasks import _send_order_confirmation_email
     logger.info("Dispatching confirmation email for order %s", order.order_number)
-    send_order_confirmation_task.delay(order.id)
+    thread = threading.Thread(
+        target=_dispatch_email,
+        args=(_send_order_confirmation_email, order.id),
+        daemon=True,
+    )
+    thread.start()
 
 
 def send_order_cancellation(order):
-    """Send order cancellation email asynchronously via Celery."""
-    from .tasks import send_order_cancellation_task
+    """Send order cancellation email in a background thread."""
+    from .tasks import _send_order_cancellation_email
     logger.info("Dispatching cancellation email for order %s", order.order_number)
-    send_order_cancellation_task.delay(order.id)
+    thread = threading.Thread(
+        target=_dispatch_email,
+        args=(_send_order_cancellation_email, order.id),
+        daemon=True,
+    )
+    thread.start()
     
 class TermsAndConditionsView(TemplateView):
     """Class-based view for terms and conditions page."""

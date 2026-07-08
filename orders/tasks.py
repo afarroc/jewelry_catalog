@@ -7,8 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@shared_task(bind=True, max_retries=3, default_retry_delay=60)
-def send_order_confirmation_task(self, order_id):
+def _send_order_confirmation_email(order_id):
     from orders.models import Order
     try:
         order = Order.objects.get(pk=order_id)
@@ -37,11 +36,15 @@ def send_order_confirmation_task(self, order_id):
             f"Failed to send confirmation email for order {order.order_number}: {exc}",
             exc_info=True,
         )
-        raise self.retry(exc=exc)
+        raise
 
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=60)
-def send_order_cancellation_task(self, order_id):
+def send_order_confirmation_task(self, order_id):
+    _send_order_confirmation_email(order_id)
+
+
+def _send_order_cancellation_email(order_id):
     from orders.models import Order
     try:
         order = Order.objects.get(pk=order_id)
@@ -70,4 +73,9 @@ def send_order_cancellation_task(self, order_id):
             f"Failed to send cancellation email for order {order.order_number}: {exc}",
             exc_info=True,
         )
-        raise self.retry(exc=exc)
+        raise
+
+
+@shared_task(bind=True, max_retries=3, default_retry_delay=60)
+def send_order_cancellation_task(self, order_id):
+    _send_order_cancellation_email(order_id)
