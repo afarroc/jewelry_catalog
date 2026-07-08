@@ -1,4 +1,3 @@
-from celery import shared_task
 from django.template.loader import render_to_string
 from django.conf import settings
 import requests
@@ -57,8 +56,6 @@ def _send_zoho_mail(to_email, subject, html_content, text_content):
     }
     if text_content:
         payload["content"] = html_content
-        # Zoho Mail API uses `content` for the main body; some regions accept plain/text alternatives separately.
-        # We keep HTML as primary because templates already include a text fallback in HTML form.
     response = requests.post(url, json=payload, headers=headers, timeout=10)
     response.raise_for_status()
     return response.json()
@@ -89,11 +86,6 @@ def _send_order_confirmation_email(order_id):
         raise
 
 
-@shared_task(bind=True, max_retries=3, default_retry_delay=60)
-def send_order_confirmation_task(self, order_id):
-    _send_order_confirmation_email(order_id)
-
-
 def _send_order_cancellation_email(order_id):
     from orders.models import Order
     try:
@@ -117,8 +109,3 @@ def _send_order_cancellation_email(order_id):
             exc_info=True,
         )
         raise
-
-
-@shared_task(bind=True, max_retries=3, default_retry_delay=60)
-def send_order_cancellation_task(self, order_id):
-    _send_order_cancellation_email(order_id)
