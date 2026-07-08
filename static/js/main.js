@@ -303,6 +303,8 @@ function showNotification(message, type = 'info') {
 
     notification.style.cssText = `
         position: fixed;
+        top: auto;
+        left: auto;
         bottom: 20px;
         right: 20px;
         padding: 1rem 1.5rem;
@@ -312,10 +314,14 @@ function showNotification(message, type = 'info') {
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         z-index: 10000;
         animation: slideIn 0.3s ease;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         gap: 10px;
         max-width: 400px;
+        height: auto;
+        min-height: auto;
+        max-height: 90vh;
+        overflow-y: auto;
     `;
 
     document.body.appendChild(notification);
