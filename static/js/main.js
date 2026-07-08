@@ -303,7 +303,7 @@ function showNotification(message, type = 'info') {
 
     notification.style.cssText = `
         position: fixed;
-        top: 20px;
+        bottom: 20px;
         right: 20px;
         padding: 1rem 1.5rem;
         border-radius: 8px;
@@ -340,12 +340,12 @@ function getNotificationIcon(type) {
 const notificationStyles = document.createElement('style');
 notificationStyles.textContent = `
     @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
     }
     @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
+        from { transform: translateY(0); opacity: 1; }
+        to { transform: translateY(100%); opacity: 0; }
     }
 `;
 document.head.appendChild(notificationStyles);
