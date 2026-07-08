@@ -475,7 +475,7 @@ def send_order_confirmation(order):
     try:
         send_order_confirmation_task.apply(args=(order.id,))
         logger.info("Confirmation email task completed for order %s", order.order_number)
-    except Exception as exc:
+    except BaseException as exc:
         logger.error(
             "Failed to send confirmation email for order %s: %s",
             order.order_number,
@@ -491,7 +491,7 @@ def send_order_cancellation(order):
     try:
         send_order_cancellation_task.apply(args=(order.id,))
         logger.info("Cancellation email task completed for order %s", order.order_number)
-    except Exception as exc:
+    except BaseException as exc:
         logger.error(
             "Failed to send cancellation email for order %s: %s",
             order.order_number,
