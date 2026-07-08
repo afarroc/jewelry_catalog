@@ -57,6 +57,14 @@ def _send_zoho_mail(to_email, subject, html_content, text_content):
     if text_content:
         payload["content"] = html_content
     response = requests.post(url, json=payload, headers=headers, timeout=10)
+    if not response.ok:
+        logger.error(
+            "Zoho Mail API error %s: %s | url=%s | payload=%s",
+            response.status_code,
+            response.text,
+            url,
+            payload,
+        )
     response.raise_for_status()
     return response.json()
 
