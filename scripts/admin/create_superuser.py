@@ -24,13 +24,10 @@ def create_admin_user():
     admin_email = os.getenv('ADMIN_EMAIL')
     admin_password = os.getenv('ADMIN_PASSWORD')
 
-    if not admin_email or not admin_password:
-        print("ERROR: Faltan variables de entorno ADMIN_EMAIL y/o ADMIN_PASSWORD.")
+    if not all([admin_user, admin_email, admin_password]):
+        print("ERROR: Faltan variables de entorno ADMIN_USER, ADMIN_EMAIL y/o ADMIN_PASSWORD.")
         print("Definelas en tu .env o en el entorno de ejecucion antes de correr este script.")
         sys.exit(1)
-
-    if not admin_user:
-        admin_user = admin_email
 
     # Verificar si el usuario ya existe
     if User.objects.filter(email=admin_email).exists():
