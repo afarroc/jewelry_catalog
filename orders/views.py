@@ -145,7 +145,7 @@ def checkout(request):
                     send_order_confirmation(order)
                     
                     messages.success(request, "Your order has been placed successfully!")
-                     return redirect('orders:order_confirmation', order_number=order.order_number)
+                    return redirect('orders:order_confirmation', order_number=order.order_number)
 
             except Exception as e:
                 logger.error(f"Checkout failed: {str(e)}", exc_info=True)
