@@ -413,8 +413,15 @@
     color: var(--accent);
   }
   .bento-item--generic .generic-icon-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+  }
+  .bento-item--generic .generic-icons {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     gap: 8px;
   }
   .bento-item--generic .generic-icon {
