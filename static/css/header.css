@@ -44,7 +44,11 @@
     transition: color 0.2s;
   }
   .nav-main a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 6px; }
-  .nav-main .nav-icon { display: none; }
+  .nav-main .nav-icon,
+  header.site-header .nav-main .nav-icon {
+    display: none;
+    --fa-display: none;
+  }
   .nav-main .pill {
     background: var(--ink);
     color: #fff;
@@ -65,7 +69,11 @@
     text-transform: uppercase;
     font-weight: 500;
   }
-  .header-actions .nav-icon { display: none; }
+  .header-actions .nav-icon,
+  header.site-header .header-actions .nav-icon {
+    display: none;
+    --fa-display: none;
+  }
   .cart-badge {
     background: var(--ink);
     color: #fff;
