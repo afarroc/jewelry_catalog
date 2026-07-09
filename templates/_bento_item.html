@@ -5,7 +5,7 @@
   <div class="bento-row">
     <div class="product-media{% if product.description %} product-media--has-desc{% endif %}">
       <a href="{% url 'products:product_detail' product.slug %}" class="product-media-link">
-        {% if product.image %}
+        {% if product.get_image_url %}
           <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy" fetchpriority="high">
         {% else %}
           <div class="product-media product-media--placeholder" aria-hidden="true"></div>
@@ -45,7 +45,7 @@
   {% else %}
   <div class="product-media{% if product.description %} product-media--has-desc{% endif %}">
     <a href="{% url 'products:product_detail' product.slug %}" class="product-media-link">
-      {% if product.image %}
+      {% if product.get_image_url %}
         <img class="bento-media" src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy"{% if product.bento_size in 'tall,featured,hero' %} fetchpriority="high"{% endif %}>
       {% else %}
         <div class="product-media product-media--placeholder" aria-hidden="true"></div>

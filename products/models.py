@@ -1,5 +1,6 @@
 # products/models.py
 from django.db import models
+from cloudinary.models import CloudinaryField
 from django.core.validators import MinValueValidator
 from django.utils.text import slugify
 import logging
@@ -92,11 +93,15 @@ class Product(models.Model):
     available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    image = models.TextField(
+    image = CloudinaryField(
+        'image',
         blank=True,
         null=True,
-        help_text='Cloudinary URL or image path'
+        help_text='Imagen del producto (se sube a Cloudinary desde el admin)'
     )
+    # Columna legacy de respaldo (antes image era TextField con URL/path).
+    # Se conserva para trazabilidad; no se muestra en el admin.
+    image_legacy = models.TextField(blank=True, null=True)
     # Bento Grid size for e-commerce editorial layout
     bento_size = models.CharField(
         max_length=20,
@@ -133,10 +138,14 @@ class Product(models.Model):
 
     @property
     def get_image_url(self):
-        """Return image URL for display - supports Cloudinary URLs or local paths."""
-        if not self.image:
+        """Return image URL for display - supports CloudinaryField resources."""
+        img = self.image
+        if not img or not getattr(img, 'public_id', None):
             return ''
-        return self.image
+        try:
+            return img.url or ''
+        except Exception:
+            return ''
 
     @property
     def is_new(self):
@@ -149,7 +158,7 @@ class ImageUpload(models.Model):
     """Simple model for image uploads."""
     title = models.CharField(max_length=200, blank=True, help_text='Optional title for the image')
     image = models.ImageField(
-        upload_to='uploads/%Y/%m/%d/',
+        upload_to='jewelry_catalog/uploads/%Y/%m/%d/',
         help_text='Upload an image file (JPG, PNG, GIF). Max 5MB.'
     )
     uploaded_at = models.DateTimeField(auto_now_add=True)
