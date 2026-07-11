@@ -1,22 +1,10 @@
-{% extends 'home/base.html' %}
+{% extends 'products/admin_image_base.html' %}
 {% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block extra_head %}
 {{ block.super }}
-{% if request.GET.select %}
-<style>
-  .gallery-select-mode .bento-item { cursor: pointer; }
-  .gallery-select-mode .bento-item:hover { outline: 3px solid var(--ink); }
-  .gallery-select-mode .bento-item:hover .bento-media img { transform: none; }
-  .gallery-select-overlay {
-    position: absolute; inset: 0; background: rgba(26,21,17,0.6);
-    color: #fff; display: flex; align-items: center; justify-content: center;
-    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-size: 13px;
-  }
-</style>
-{% endif %}
 <style>
   .toolbar {
     display: grid;
@@ -136,9 +124,21 @@
     border-color: var(--ink);
   }
 </style>
+{% if request.GET.select %}
+<style>
+  .gallery-select-mode .bento-item { cursor: pointer; }
+  .gallery-select-mode .bento-item:hover { outline: 3px solid var(--ink); }
+  .gallery-select-mode .bento-item:hover .bento-media img { transform: none; }
+  .gallery-select-overlay {
+    position: absolute; inset: 0; background: rgba(26,21,17,0.6);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-size: 13px;
+  }
+</style>
+{% endif %}
 {% endblock %}
 
-{% block content %}
+{% block admin_content %}
 <section class="order-page{% if request.GET.select %} gallery-select-mode{% endif %}">
   <header class="section-header">
     <h1 class="section-title">{{ title }}</h1>
@@ -194,7 +194,7 @@
         <input type="hidden" name="view" value="all">
       {% endif %}
       <div class="profile-form-grid">
-        <input type="text" name="q" value="{{ search_query|default:'' }}" placeholder="Buscar por título o descripción..." style="width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:12px; font-size:14px;">
+        <input type="text" name="q" value="{{ search_query|default:'' }}" placeholder="Buscar por título o descripción..." class="admin-search-input">
         <button type="submit" class="btn btn-secondary">Buscar</button>
       </div>
     </form>
@@ -219,7 +219,7 @@
   <!-- Subfolders -->
   {% if subfolders %}
   <div class="order-card">
-    <h2 style="font-size:16px; margin:0 0 12px; font-weight:600;">Carpetas</h2>
+    <h2 class="admin-card-title">Carpetas</h2>
     <div class="folder-grid">
       {% for folder in subfolders %}
       <a class="folder-item" href="?folder={{ folder.path }}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}">
@@ -234,39 +234,47 @@
 
   <!-- Imágenes combinadas: locales + Cloudinary -->
   {% if combined_images %}
-  <div class="order-card" style="margin-top:18px;">
-    <h2 style="font-size:16px; margin:0 0 12px; font-weight:600;">
+  <div class="order-card admin-card--mt">
+    <h2 class="admin-card-title">
       {% if view_mode == 'all' %}Todos los assets{% else %}{% if folder_path %}Imágenes en {{ folder_path }}{% else %}Imágenes en raíz{% endif %}{% endif %}
     </h2>
   </div>
   <div class="bento-grid">
     {% for image in combined_images %}
     <article class="bento-item" {% if request.GET.select %}onclick="window.location='{% if image.is_cloudinary %}{% url 'products:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'"{% endif %}>
-      <div class="bento-media" style="position:relative;">
+      <div class="bento-media admin-bento-media">
         <img src="{{ image.image }}" alt="{{ image.title }}">
         {% if request.GET.select %}
           <div class="gallery-select-overlay">Seleccionar</div>
         {% endif %}
         {% if image.is_cloudinary %}
-          <div style="position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); color:#fff; font-size:10px; padding:2px 6px; border-radius:4px;">Cloudinary</div>
+          <div class="admin-badge-cloudinary">Cloudinary</div>
         {% endif %}
       </div>
       <div class="bento-info">
-        <h3 class="bento-title">{{ image.title }}</h3>
+        <h3 class="bento-title admin-bento-title">{{ image.title }}</h3>
         <p class="bento-desc">{{ image.description|default:""|truncatechars:90 }}</p>
         {% if image.asset_folder %}
-          <p style="font-size:11px; color:var(--muted); margin:6px 0 0; font-family:monospace;">{{ image.asset_folder }}</p>
+          <p class="admin-bento-folder">{{ image.asset_folder }}</p>
         {% endif %}
-        <div class="order-actions" style="margin-top:10px;">
+        <div class="order-actions admin-actions">
           {% if request.GET.select %}
-            <button type="button" class="btn btn-primary" onclick="window.location='{% if image.is_cloudinary %}{% url 'products:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'">Seleccionar</button>
+            <button type="button" class="btn btn-primary" onclick="window.location='{% if image.is_cloudinary %}{% url 'products:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'">
+              <i class="fa-solid fa-check"></i> <span class="btn-text">Seleccionar</span>
+            </button>
           {% else %}
             {% if not image.is_cloudinary %}
-              <a class="btn btn-secondary" href="{% url 'products:image_detail' image.id %}">Ver</a>
+              <a class="btn btn-secondary" href="{% url 'products:image_detail' image.id %}">
+                <i class="fa-solid fa-eye"></i> <span class="btn-text">Ver</span>
+              </a>
             {% endif %}
           {% endif %}
           {% if not image.is_cloudinary %}
-            <form method="post" action="{% url 'products:image_delete' image.id %}" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-ghost">Eliminar</button></form>
+            <form method="post" action="{% url 'products:image_delete' image.id %}">{% csrf_token %}
+              <button type="submit" class="btn btn-ghost">
+                <i class="fa-solid fa-trash"></i> <span class="btn-text">Eliminar</span>
+              </button>
+            </form>
           {% endif %}
         </div>
       </div>
@@ -286,7 +294,7 @@
     {% endif %}
   </nav>
   {% else %}
-  <div class="order-card" style="text-align:center; margin-top:18px;">
+  <div class="order-card admin-card--mt admin-card--center">
     <h3>Sin imágenes</h3>
     <p>{% if search_query %}No se encontraron imágenes para "{{ search_query }}".{% else %}No hay imágenes en esta ubicación.{% endif %}</p>
     {% if not request.GET.select %}

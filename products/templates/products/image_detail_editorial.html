@@ -1,15 +1,20 @@
-{% extends 'home/base.html' %}
+{% extends 'products/admin_image_base.html' %}
 {% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block content %}
+{% block admin_title %}{{ image.title }}{% endblock %}
+{% block admin_subtitle %}
+Detalle de imagen · {{ image.asset_folder|default:"Sin carpeta" }}
+{% endblock %}
+
+{% block admin_content %}
 <section class="order-page">
   <header class="section-header">
     <h1 class="section-title">{{ image.title }}</h1>
     <div class="order-actions">
       <a class="btn btn-secondary" href="{% url 'products:image_list' %}">Volver al listado</a>
-      <form method="post" action="{% url 'products:image_delete' image.id %}" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-ghost">Eliminar</button></form>
+      <form method="post" action="{% url 'products:image_delete' image.id %}" class="admin-inline-form">{% csrf_token %}<button type="submit" class="btn btn-ghost">Eliminar</button></form>
     </div>
   </header>
 
@@ -22,8 +27,8 @@
   {% endif %}
 
   <div class="order-card">
-    <img src="{{ image_url|default:image.image }}" alt="{{ image.title }}" style="width:100%; border-radius:14px; border:1px solid var(--line);">
-    <h2 class="section-title" style="margin-top:18px;">{{ image.title }}</h2>
+    <img src="{{ image_url|default:image.image }}" alt="{{ image.title }}" class="admin-detail-img">
+    <h2 class="section-title admin-detail-title">{{ image.title }}</h2>
     <p>{{ image.description|default:"Sin descripción"|linebreaks }}</p>
     <div class="order-body">
       {% if image.asset_folder %}

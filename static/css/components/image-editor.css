@@ -203,6 +203,14 @@
     border: 1.5px solid var(--line);
   }
 
+  .ie-current-thumb {
+    max-width: 120px;
+    max-height: 120px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    margin-top: 6px;
+  }
+
   @media (max-width: 1024px) {
     .ie-layout {
       grid-template-columns: 1fr;

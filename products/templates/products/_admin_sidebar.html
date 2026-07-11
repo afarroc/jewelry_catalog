@@ -1,0 +1,72 @@
+{% load static %}
+<aside class="admin-sidebar" id="adminSidebar" aria-label="Panel de administración de imágenes">
+  <div class="admin-sidebar-brand">
+    Miluxious<span>admin</span>
+  </div>
+
+  <nav class="admin-sidebar-nav" aria-label="Navegación principal">
+    <button class="admin-sidebar-close" id="adminSidebarClose" aria-label="Cerrar menú">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="admin-sidebar-section">Panel</div>
+    <a class="admin-sidebar-item {% if request.resolver_match.url_name == 'image_list' and not request.GET.folder %}active{% endif %}"
+       href="{% url 'products:image_list' %}">
+      <i class="fa-solid fa-images"></i>
+      <span>Imágenes</span>
+    </a>
+
+    <div class="admin-sidebar-section">Gestión</div>
+    <a class="admin-sidebar-item {% if request.resolver_match.url_name == 'product_create' %}active{% endif %}"
+       href="{% url 'products:product_create' %}">
+      <i class="fa-solid fa-plus"></i>
+      <span>Crear producto</span>
+    </a>
+    <a class="admin-sidebar-item {% if request.resolver_match.url_name == 'image_upload' %}active{% endif %}"
+       href="{% url 'products:image_upload' %}">
+      <i class="fa-solid fa-cloud-arrow-up"></i>
+      <span>Subir imagen</span>
+    </a>
+    <a class="admin-sidebar-item {% if request.resolver_match.url_name == 'image_editor' %}active{% endif %}"
+       href="{% url 'products:image_editor' %}">
+      <i class="fa-solid fa-crop-simple"></i>
+      <span>Editor de imagen</span>
+    </a>
+
+    <div class="admin-sidebar-section">Vistas</div>
+    <a class="admin-sidebar-item {% if request.GET.view == 'all' %}active{% endif %}"
+       href="{% url 'products:image_list' %}?view=all">
+      <i class="fa-solid fa-layer-group"></i>
+      <span>Todos los assets</span>
+    </a>
+    <a class="admin-sidebar-item {% if request.resolver_match.url_name == 'image_detail' %}active{% endif %}"
+       href="{% url 'products:image_list' %}">
+      <i class="fa-solid fa-images"></i>
+      <span>Galería</span>
+    </a>
+
+    {% if request.GET.folder %}
+    <div class="admin-sidebar-section">Carpeta actual</div>
+    <a class="admin-sidebar-item"
+       href="{% url 'products:image_list' %}?folder={{ request.GET.folder }}">
+      <i class="fa-solid fa-folder-open"></i>
+      <span class="admin-sidebar-folder-name">{{ request.GET.folder }}</span>
+    </a>
+    {% endif %}
+
+    <div class="admin-sidebar-section">Sistema</div>
+    <a class="admin-sidebar-item"
+       href="{% url 'admin:index' %}"
+       target="_blank" rel="noopener">
+      <i class="fa-solid fa-gear"></i>
+      <span>Django Admin</span>
+    </a>
+  </nav>
+
+  <div class="admin-sidebar-user">
+    {% if user.is_authenticated %}
+      {{ user.get_username|default:user.username }}
+    {% else %}
+      Sin autenticar
+    {% endif %}
+  </div>
+</aside>

@@ -212,6 +212,8 @@ def product_create(request):
         'title': 'Crear Nuevo Producto',
         'button_text': 'Crear Producto',
         'gallery_image_url': gallery_image_url,
+        'admin_header_title': 'Crear Nuevo Producto',
+        'admin_header_subtitle': 'Crear nuevo producto',
     }
     return render(request, 'products/product_form_editorial.html', context)
 
@@ -272,6 +274,8 @@ def product_update(request, product_id):
         'title': f'Editar Producto: {product.name}',
         'button_text': 'Actualizar Producto',
         'gallery_image_url': gallery_image_url,
+        'admin_header_title': f'Editar Producto: {product.name}',
+        'admin_header_subtitle': f'Producto: {product.name}',
     }
     return render(request, 'products/product_form_editorial.html', context)
 
@@ -407,7 +411,9 @@ def image_upload(request):
     context = {
         'form': form,
         'title': 'Subir Imagen',
-        'button_text': 'Subir Imagen'
+        'button_text': 'Subir Imagen',
+        'admin_header_title': 'Subir imagen',
+        'admin_header_subtitle': 'Subir imagen a la galería',
     }
     return render(request, 'products/image_upload_editorial.html', context)
 
@@ -535,6 +541,8 @@ def image_list(request):
         'cloudinary_resources': cloudinary_resources,
         'breadcrumbs': breadcrumbs,
         'view_mode': view_mode,
+        'admin_header_title': 'Imágenes',
+        'admin_header_subtitle': 'Panel de administración de imágenes' if not folder_path else f'Carpeta: {folder_path}',
     }
     return render(request, 'products/image_list_editorial.html', context)
 
@@ -555,6 +563,8 @@ def image_detail(request, image_id):
             'image_url': image_url,
             'title': f'Imagen: {image.title}',
             'cloudinary_cloud_name': settings.CLOUDINARY_CLOUD_NAME,
+            'admin_header_title': image.title,
+            'admin_header_subtitle': f'Detalle de imagen · {image.asset_folder or "Sin carpeta"}',
         }
         return render(request, 'products/image_detail_editorial.html', context)
 
@@ -591,7 +601,9 @@ def image_delete(request, image_id):
 
         context = {
             'image': image,
-            'title': f'Eliminar imagen: {image.title}'
+            'title': f'Eliminar imagen: {image.title}',
+            'admin_header_title': 'Confirmar eliminación',
+            'admin_header_subtitle': image.title,
         }
         return render(request, 'products/image_confirm_delete_editorial.html', context)
 
@@ -969,5 +981,7 @@ def product_image_editor(request):
         'product': product,
         'gallery_mode': gallery_mode,
         'title': 'Editor de imagen' + (f' — {product.name}' if product else ' (Galería)'),
+        'admin_header_title': 'Editor de imagen' + (f' — {product.name}' if product else ''),
+        'admin_header_subtitle': 'Galería general' if gallery_mode else (f'Producto: {product.name}' if product else 'Selecciona un producto para asignar la imagen'),
     }
     return render(request, 'products/image_editor_editorial.html', context)

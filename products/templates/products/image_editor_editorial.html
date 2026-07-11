@@ -1,14 +1,19 @@
-{% extends 'home/base.html' %}
+{% extends 'products/admin_image_base.html' %}
 {% load static %}
 
 {% block title %}{{ title }}{% endblock %}
+
+{% block admin_title %}{{ title }}{% endblock %}
+{% block admin_subtitle %}
+{% if gallery_mode %}Galería general{% elif product %}Producto: {{ product.name }}{% else %}Selecciona un producto para asignar la imagen{% endif %}
+{% endblock %}
 
 {% block extra_head %}
 {{ block.super }}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 {% endblock %}
 
-{% block content %}
+{% block admin_content %}
 <div class="ie-page">
   <header class="ie-header">
     <h1 class="ie-title">Editor de imagen{% if gallery_mode %} — Galería{% elif product %} — {{ product.name }}{% endif %}</h1>
@@ -76,7 +81,7 @@
 
       <section class="ie-canvas-wrap">
         <div class="ie-canvas-container" id="ieCanvasContainer">
-          <img id="ieImageToCrop" src="" alt="Imagen a recortar" style="display:none;">
+          <img id="ieImageToCrop" src="" alt="Imagen a recortar" class="ie-hidden">
           <div class="ie-placeholder" id="iePlaceholder">
             <i class="fa-solid fa-image"></i>
             <p>Selecciona una imagen para comenzar</p>

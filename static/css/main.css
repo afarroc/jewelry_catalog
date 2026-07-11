@@ -1,18 +1,19 @@
-/* main.css — ITCSS aggregator with native @layer */
-@import "tokens.css";
-@import "base.css";
-@import "header.css";
-@import "home.css";
-@import "components/bento.css";
-@import "components/product-card.css";
-@import "components/image-editor.css";
-@import "footer.css";
-@import "utilities.css";
-@import "components/product-detail.css";
-@import "components/cart.css";
-@import "components/checkout.css";
-@import "components/auth.css";
-@import "components/profile.css";
-@import "components/orders.css";
+ /* main.css — ITCSS aggregator with native @layer */
+ @import "tokens.css";
+ @import "base.css";
+ @import "header.css";
+ @import "footer.css";
+ @import "home.css";
+ @import "components/bento.css";
+ @import "components/product-card.css";
+ @import "components/image-editor.css";
+ @import "components/product-detail.css";
+ @import "components/cart.css";
+ @import "components/checkout.css";
+ @import "components/auth.css";
+ @import "components/profile.css";
+ @import "components/orders.css";
+ @import "admin.css";
+ @import "utilities.css";
 
-@layer tokens, base, layout, components, utilities;
+ @layer tokens, base, layout, components, utilities;

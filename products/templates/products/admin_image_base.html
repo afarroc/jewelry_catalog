@@ -1,0 +1,25 @@
+{% extends 'products/base_admin.html' %}
+{% load static %}
+
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
+
+{% block admin_layout %}
+<div class="admin-layout">
+  <div class="admin-sidebar-overlay" id="adminSidebarOverlay"></div>
+
+  {% include 'products/_admin_sidebar.html' %}
+
+  <div class="admin-main">
+    {% include 'products/_admin_header.html' %}
+
+    <main class="admin-content">
+      {% block admin_content %}{% endblock %}
+    </main>
+
+    {% include 'products/_admin_footer.html' %}
+  </div>
+</div>
+{% endblock %}

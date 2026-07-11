@@ -1,9 +1,14 @@
-{% extends 'home/base.html' %}
+{% extends 'products/admin_image_base.html' %}
 {% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block content %}
+{% block admin_title %}{{ title }}{% endblock %}
+{% block admin_subtitle %}
+Subir imagen a la galería
+{% endblock %}
+
+{% block admin_content %}
 <section class="auth-page">
   <div class="auth-page-inner">
     <header class="auth-header">
@@ -28,7 +33,7 @@
           </div>
 
           <div class="auth-field">
-            <label class="auth-label" for="{{ form.image.id_for_label }}">{{ form.image.label }} <span style="color:#b00020;">*</span></label>
+            <label class="auth-label" for="{{ form.image.id_for_label }}">{{ form.image.label }} <span class="admin-required">*</span></label>
             {{ form.image }}
             {% if form.image.errors %}
               <p class="auth-field-error">{{ form.image.errors.0 }}</p>

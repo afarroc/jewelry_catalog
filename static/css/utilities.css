@@ -87,6 +87,8 @@
     .product-editorial { grid-template-columns: 1fr; }
     .product-info { padding: 14px; }
     .btn { width: 100%; justify-content: center; }
+    .profile-form-actions .btn { width: 100%; justify-content: center; }
+    .order-actions .btn { width: auto; }
     .footer-grid { grid-template-columns: 1fr; }
     .bento-item--hero { aspect-ratio: 1/1; }
     .bento-info--large { padding: 16px; }
