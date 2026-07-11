@@ -22,12 +22,18 @@
   {% endif %}
 
   <div class="order-card">
-    <img src="{{ image.image.url }}" alt="{{ image.title }}" style="width:100%; border-radius:14px; border:1px solid var(--line);">
+    <img src="{{ image_url|default:image.image }}" alt="{{ image.title }}" style="width:100%; border-radius:14px; border:1px solid var(--line);">
     <h2 class="section-title" style="margin-top:18px;">{{ image.title }}</h2>
     <p>{{ image.description|default:"Sin descripción"|linebreaks }}</p>
     <div class="order-body">
-      <div><strong>Archivo:</strong> {{ image.image.name }}</div>
-      <div><strong>Tamaño:</strong> {{ image.image.size|filesizeformat }}</div>
+      {% if image_url %}
+        {% with cloud_prefix="https://res.cloudinary.com/"|add:cloudinary_cloud_name|add:"/image/upload/" %}
+          {% with image_path=image_url|cut:cloud_prefix %}
+            <div><strong>Ruta:</strong> <code>{{ image_path }}</code></div>
+          {% endwith %}
+        {% endwith %}
+        <div><strong>URL:</strong> <a href="{{ image_url }}" target="_blank">{{ image_url }}</a></div>
+      {% endif %}
       <div><strong>Subida:</strong> {{ image.uploaded_at|date:"F j, Y" }}</div>
     </div>
   </div>
