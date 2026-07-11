@@ -145,8 +145,13 @@
   </div>
   {% endif %}
 
-  <!-- Imágenes de la base de datos local -->
+  <!-- Imágenes combinadas: locales + Cloudinary -->
   {% if combined_images %}
+  <div class="order-card" style="margin-top:18px;">
+    <h2 style="font-size:16px; margin:0 0 12px; font-weight:600;">
+      {% if folder_path %}Imágenes en {{ folder_path }}{% else %}Imágenes{% endif %}
+    </h2>
+  </div>
   <div class="bento-grid">
     {% for image in combined_images %}
     <article class="bento-item" {% if request.GET.select %}onclick="window.location='{% if image.is_cloudinary %}{% url 'products:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'"{% endif %}>
@@ -180,37 +185,6 @@
           {% if not image.is_cloudinary %}
             <form method="post" action="{% url 'products:image_delete' image.id %}" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-ghost">Eliminar</button></form>
           {% endif %}
-        </div>
-      </div>
-    </article>
-    {% endfor %}
-  </div>
-  <div class="bento-grid">
-    {% for image in page_obj.object_list %}
-    <article class="bento-item" {% if request.GET.select %}onclick="window.location='{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'"{% endif %}>
-      <div class="bento-media" style="position:relative;">
-        <img src="{{ image.image.url }}" alt="{{ image.title }}">
-        {% if request.GET.select %}
-          <div class="gallery-select-overlay">Seleccionar</div>
-        {% endif %}
-      </div>
-      <div class="bento-info">
-        <h3 class="bento-title">{{ image.title }}</h3>
-        <p class="bento-desc">{{ image.description|default:""|truncatechars:90 }}</p>
-        {% if image.image %}
-          {% with cloud_prefix="https://res.cloudinary.com/"|add:cloudinary_cloud_name|add:"/image/upload/" %}
-            {% with image_path=image.image|cut:cloud_prefix %}
-              <p style="font-size:11px; color:var(--muted); margin:6px 0 0; font-family:monospace;">{{ image_path }}</p>
-            {% endwith %}
-          {% endwith %}
-        {% endif %}
-        <div class="order-actions" style="margin-top:10px;">
-          {% if request.GET.select %}
-            <button type="button" class="btn btn-primary" onclick="window.location='{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'">Seleccionar</button>
-          {% else %}
-            <a class="btn btn-secondary" href="{% url 'products:image_detail' image.id %}">Ver</a>
-          {% endif %}
-          <form method="post" action="{% url 'products:image_delete' image.id %}" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-ghost">Eliminar</button></form>
         </div>
       </div>
     </article>
