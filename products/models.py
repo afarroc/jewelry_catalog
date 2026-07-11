@@ -157,9 +157,9 @@ class Product(models.Model):
 class ImageUpload(models.Model):
     """Simple model for image uploads."""
     title = models.CharField(max_length=200, blank=True, help_text='Optional title for the image')
-    image = models.ImageField(
-        upload_to='jewelry_catalog/uploads/%Y/%m/%d/',
-        help_text='Upload an image file (JPG, PNG, GIF). Max 5MB.'
+    image = models.URLField(
+        max_length=500,
+        help_text='URL de la imagen (Cloudinary o path local).'
     )
     uploaded_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, help_text='Optional description')
