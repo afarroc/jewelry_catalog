@@ -441,8 +441,20 @@ def image_list(request):
         image_logger.info(f"[SEARCH] Search applied: '{search_query}'")
         image_logger.info(f"[SEARCH] Results: {images.count()} of {total_before_filter} images found")
 
+    # Apply folder filtering BEFORE pagination using asset_folder
+    if view_mode == 'folder':
+        if folder_path:
+            images = [img for img in images if img.asset_folder == folder_path]
+            image_logger.info(f"[FOLDER] Filtering by asset_folder: '{folder_path}' ({len(images)} images)")
+        else:
+            # Raíz: solo imágenes sin asset_folder (no están en ninguna carpeta de Cloudinary)
+            images = [img for img in images if not img.asset_folder]
+            image_logger.info(f"[FOLDER] Root view: showing only root images ({len(images)} images)")
+    # else: assets view, no folder filtering
+    # else: assets view, no folder filtering
+
     # Order by upload date (newest first)
-    images = images.order_by('-uploaded_at')
+    images = sorted(images, key=lambda x: x.uploaded_at, reverse=True)
 
     # Pagination
     from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -455,28 +467,11 @@ def image_list(request):
     except EmptyPage:
         images_page = paginator.page(paginator.num_pages)
 
-    # Filter by folder or view all
-    if view_mode == 'all':
-        # Assets view: show all images without folder filtering
-        filtered_images = list(images_page.object_list)
-        subfolders = []
-        cloudinary_resources = []
-        breadcrumbs = []
-        image_logger.info(f"[VIEW] Assets view: showing all images ({len(filtered_images)} images)")
-    else:
-        # Folder view: filter by folder path
-        if folder_path:
-            prefix = f"https://res.cloudinary.com/{settings.CLOUDINARY_CLOUD_NAME}/image/upload/{folder_path}/"
-            filtered_images = [img for img in images_page.object_list if str(img.image).startswith(prefix)]
-            image_logger.info(f"[FOLDER] Filtering by folder: '{folder_path}' ({len(filtered_images)} images)")
-        else:
-            # Raíz: solo imágenes en la raíz de Cloudinary o URLs no-Cloudinary
-            filtered_images = [img for img in images_page.object_list if is_cloudinary_root_image(img.image, settings.CLOUDINARY_CLOUD_NAME)]
-            image_logger.info(f"[FOLDER] Root view: showing only root images ({len(filtered_images)} images)")
-
-        # Get Cloudinary folders and resources for current path
-        subfolders = []
-        cloudinary_resources = []
+    # For folder view, get Cloudinary folders and resources
+    subfolders = []
+    cloudinary_resources = []
+    breadcrumbs = []
+    if view_mode == 'folder':
         try:
             subfolders = get_cloudinary_folders(folder_path)
             if folder_path:
@@ -484,10 +479,10 @@ def image_list(request):
         except Exception as e:
             image_logger.warning(f"[CLOUDINARY] Could not load folder data: {e}")
 
-        # Build breadcrumbs
         breadcrumbs = build_folder_breadcrumbs(folder_path)
 
     # Combine local images with Cloudinary resources not yet in local DB
+    filtered_images = list(images_page.object_list)
     local_urls = set(img.image for img in filtered_images)
     combined_images = list(filtered_images)
     for idx, res in enumerate(cloudinary_resources):
