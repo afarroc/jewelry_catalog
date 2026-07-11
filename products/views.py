@@ -7,6 +7,7 @@ from django.core.cache import cache
 from django.utils.decorators import method_decorator
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import reverse
 from django.utils import timezone
 from django.core.files.storage import default_storage
@@ -20,7 +21,8 @@ from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from .models import Category, Product, ImageUpload
-from .forms import ProductSearchForm, ProductForm, SimpleImageUploadForm
+from .forms import ProductSearchForm, ProductForm, SimpleImageUploadForm, ProductImageCropForm
+from .utils import process_product_image, get_cloudinary_folders, get_cloudinary_resources, build_folder_breadcrumbs
 from .serializers import (
     CategorySerializer, ProductSerializer,
     ProductListSerializer
@@ -158,45 +160,118 @@ def products_by_category_api(request, category_slug):
 # Product Management Views (for admin/staff)
 @login_required
 def product_create(request):
-    """View for creating new products with image upload."""
+    """View for creating new products with inline image crop."""
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
-            product = form.save()
+            product = form.save(commit=False)
+
+            # Si hay imagen + crop_data, procesar y asignar URL de Cloudinary
+            image_file = request.FILES.get('image')
+            crop_data_raw = request.POST.get('crop_data')
+            gallery_image_id = request.POST.get('gallery_image_id')
+            if gallery_image_id:
+                try:
+                    gallery = ImageUpload.objects.get(pk=gallery_image_id)
+                    product.image = gallery.image
+                except ImageUpload.DoesNotExist:
+                    messages.warning(request, 'La imagen de galería seleccionada no existe.')
+            elif image_file and crop_data_raw:
+                try:
+                    import json
+                    crop_data = json.loads(crop_data_raw)
+                    # Validar mínimo
+                    if isinstance(crop_data, dict) and 'ratio' in crop_data:
+                        url = process_product_image(image_file, crop_data, product)
+                        product.image = url
+                except Exception as e:
+                    logger.error(f"Error procesando imagen en create: {e}")
+                    messages.warning(request, f'Producto creado, pero error al procesar imagen: {e}')
+
+            product.save()
+            form.save_m2m()
             messages.success(request, f'Producto "{product.name}" creado exitosamente.')
             logger.info(f"Product created: {product.name} by user {request.user.username}")
             return redirect('products:product_detail', slug=product.slug)
     else:
         form = ProductForm()
 
+    # Si viene gallery_image_id en GET, preparar preview
+    gallery_image_url = None
+    gallery_image_id = request.GET.get('gallery_image_id')
+    if gallery_image_id:
+        try:
+            gallery = ImageUpload.objects.get(pk=gallery_image_id)
+            gallery_image_url = gallery.image
+            form = ProductForm(initial={'gallery_image_id': gallery.id})
+        except ImageUpload.DoesNotExist:
+            messages.warning(request, 'La imagen de galería seleccionada no existe.')
+
     context = {
         'form': form,
         'title': 'Crear Nuevo Producto',
-        'button_text': 'Crear Producto'
+        'button_text': 'Crear Producto',
+        'gallery_image_url': gallery_image_url,
     }
     return render(request, 'products/product_form_editorial.html', context)
 
 
 @login_required
 def product_update(request, product_id):
-    """View for updating existing products with image upload."""
+    """View for updating existing products with inline image crop."""
     product = get_object_or_404(Product, id=product_id)
 
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
-            product = form.save()
+            product = form.save(commit=False)
+
+            # Si hay imagen nueva + crop_data, procesar y reemplazar
+            image_file = request.FILES.get('image')
+            crop_data_raw = request.POST.get('crop_data')
+            gallery_image_id = request.POST.get('gallery_image_id')
+            if gallery_image_id:
+                try:
+                    gallery = ImageUpload.objects.get(pk=gallery_image_id)
+                    product.image = gallery.image
+                except ImageUpload.DoesNotExist:
+                    messages.warning(request, 'La imagen de galería seleccionada no existe.')
+            elif image_file and crop_data_raw:
+                try:
+                    import json
+                    crop_data = json.loads(crop_data_raw)
+                    if isinstance(crop_data, dict) and 'ratio' in crop_data:
+                        url = process_product_image(image_file, crop_data, product)
+                        product.image = url
+                except Exception as e:
+                    logger.error(f"Error procesando imagen en update: {e}")
+                    messages.warning(request, f'Producto actualizado, pero error al procesar imagen: {e}')
+
+            product.save()
+            form.save_m2m()
             messages.success(request, f'Producto "{product.name}" actualizado exitosamente.')
             logger.info(f"Product updated: {product.name} by user {request.user.username}")
             return redirect('products:product_detail', slug=product.slug)
     else:
         form = ProductForm(instance=product)
 
+    # Si viene gallery_image_id en GET, preparar preview
+    gallery_image_url = None
+    gallery_image_id = request.GET.get('gallery_image_id')
+    if gallery_image_id:
+        try:
+            gallery = ImageUpload.objects.get(pk=gallery_image_id)
+            gallery_image_url = gallery.image
+            form = ProductForm(instance=product, initial={'gallery_image_id': gallery.id})
+        except ImageUpload.DoesNotExist:
+            messages.warning(request, 'La imagen de galería seleccionada no existe.')
+
     context = {
         'form': form,
         'product': product,
         'title': f'Editar Producto: {product.name}',
-        'button_text': 'Actualizar Producto'
+        'button_text': 'Actualizar Producto',
+        'gallery_image_url': gallery_image_url,
     }
     return render(request, 'products/product_form_editorial.html', context)
 
@@ -290,41 +365,20 @@ def image_upload(request):
 
                 # Check if image was actually saved
                 if image_upload.image:
-                    file_size = image_upload.image.size
-                    file_name = image_upload.image.name
-                    file_url = image_upload.image.url if hasattr(image_upload.image, 'url') else 'No URL'
+                    image_url = image_upload.image
 
                     image_logger.info(f"[SUCCESS] === IMAGE UPLOAD COMPLETED SUCCESSFULLY ===")
                     image_logger.info(f"[SUCCESS] Image ID: {image_upload.id}")
                     image_logger.info(f"[SUCCESS] Title: '{image_upload.title}'")
-                    image_logger.info(f"[SUCCESS] File name: '{file_name}'")
-                    image_logger.info(f"[SUCCESS] File size: {file_size} bytes")
-                    image_logger.info(f"[SUCCESS] File URL: '{file_url}'")
+                    image_logger.info(f"[SUCCESS] Image URL: '{image_url}'")
                     image_logger.info(f"[SUCCESS] Upload timestamp: {image_upload.uploaded_at}")
                     image_logger.info(f"[SUCCESS] User: {user}")
-                    image_logger.info(f"[SUCCESS] Storage type: {type(image_upload.image.storage).__name__}")
-
-                    # Verify file exists in storage
-                    try:
-                        storage = image_upload.image.storage
-                        exists = storage.exists(file_name)
-                        image_logger.info(f"[STORAGE] File verification: exists={exists}")
-
-                        # Additional storage info
-                        if hasattr(storage, 'bucket_name'):
-                            image_logger.info(f"[STORAGE] Bucket: {storage.bucket_name}")
-                        if hasattr(storage, 'region_name'):
-                            image_logger.info(f"[STORAGE] Region: {storage.region_name}")
-
-                    except Exception as storage_check_error:
-                        image_logger.warning(f"[STORAGE] Could not verify file existence: {str(storage_check_error)}")
 
                     messages.success(request, f'Imagen "{image_upload.title}" subida exitosamente.')
                     image_logger.info(f"[REDIRECT] Redirecting to image list for user: {user}")
                     return redirect('products:image_list')
                 else:
-                    image_logger.error(f"[ERROR] Image model saved but no image file found in model")
-                    image_logger.error(f"[ERROR] This indicates a problem with the ImageField configuration")
+                    image_logger.error(f"[ERROR] Image model saved but no image URL found in model")
                     messages.error(request, 'Error: La imagen no se guardó correctamente.')
 
             except Exception as e:
@@ -360,24 +414,28 @@ def image_upload(request):
 
 @login_required
 def image_list(request):
-    """View for listing uploaded images with pagination and search."""
+    """View for listing uploaded images with folder navigation and search."""
     user = request.user.username or 'Anonymous'
     start_time = timezone.now()
 
-    # Get search query
+    # Get search query and folder path
     search_query = request.GET.get('q', '').strip()
+    folder_path = request.GET.get('folder', '').strip()
     page = request.GET.get('page', '1')
 
     image_logger.info(f"[LIST] === STARTING IMAGE LIST REQUEST ===")
     image_logger.info(f"[LIST] GET request to image_list by user: {user}")
-    image_logger.info(f"[LIST] Page: {page}, Search: '{search_query}'")
-    image_logger.info(f"[LIST] Request timestamp: {start_time}")
-    image_logger.info(f"[LIST] Remote IP: {request.META.get('REMOTE_ADDR', 'Unknown')}")
+    image_logger.info(f"[LIST] Folder: '{folder_path}', Search: '{search_query}', Page: {page}")
 
-    # Base queryset
+    # Base queryset from local DB
     images = ImageUpload.objects.all()
     total_before_filter = images.count()
-    image_logger.info(f"[LIST] Total images in database: {total_before_filter}")
+
+    # Apply folder filter if specified (based on URL prefix)
+    if folder_path:
+        cloudinary_url_prefix = f"https://res.cloudinary.com/{settings.CLOUDINARY_CLOUD_NAME}/image/upload/{folder_path}"
+        images = images.filter(image__startswith=cloudinary_url_prefix)
+        image_logger.info(f"[FOLDER] Filtering by folder: '{folder_path}' ({images.count()} images)")
 
     # Apply search filter if query exists
     if search_query:
@@ -393,17 +451,42 @@ def image_list(request):
 
     # Pagination
     from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-    paginator = Paginator(images, 12)  # 12 images per page
+    paginator = Paginator(images, 24)  # 24 images per page
 
     try:
         images_page = paginator.page(page)
-        image_logger.debug(f"[PAGE] Page {page} loaded with {images_page.object_list.count()} images")
     except PageNotAnInteger:
         images_page = paginator.page(1)
-        image_logger.warning(f"[WARNING] Invalid page number '{page}', defaulting to page 1")
     except EmptyPage:
         images_page = paginator.page(paginator.num_pages)
-        image_logger.warning(f"[WARNING] Page {page} out of range, showing last page {paginator.num_pages}")
+
+    # Get Cloudinary folders and resources for current path
+    subfolders = []
+    cloudinary_resources = []
+    try:
+        subfolders = get_cloudinary_folders(folder_path)
+        if folder_path:
+            cloudinary_resources = get_cloudinary_resources(folder_path, max_results=30)
+    except Exception as e:
+        image_logger.warning(f"[CLOUDINARY] Could not load folder data: {e}")
+
+    # Build breadcrumbs
+    breadcrumbs = build_folder_breadcrumbs(folder_path)
+
+    # Combine local images with Cloudinary resources not yet in local DB
+    local_urls = set(images_page.object_list.values_list('image', flat=True))
+    combined_images = list(images_page.object_list)
+    for idx, res in enumerate(cloudinary_resources):
+        url = res.get('secure_url', '')
+        if url and url not in local_urls:
+            combined_images.append({
+                'id': f'cloud_{idx}',
+                'title': res.get('public_id', '').split('/')[-1] or url.split('/')[-1],
+                'description': '',
+                'image': url,
+                'is_cloudinary': True,
+                'uploaded_at': None,
+            })
 
     # Statistics
     total_images = ImageUpload.objects.count()
@@ -420,19 +503,27 @@ def image_list(request):
     image_logger.info(f"[PERF] Total images in DB: {total_images}")
     image_logger.info(f"[PERF] Recent uploads (7 days): {recent_uploads}")
     image_logger.info(f"[PERF] Images on current page: {images_page.object_list.count()}")
+    image_logger.info(f"[PERF] Combined images: {len(combined_images)}")
     image_logger.info(f"[PERF] Page: {images_page.number}/{paginator.num_pages}")
+    image_logger.info(f"[PERF] Folder: '{folder_path}', Subfolders: {len(subfolders)}, Cloudinary resources: {len(cloudinary_resources)}")
     image_logger.info(f"[PERF] Search query: '{search_query}'")
     image_logger.info(f"[PERF] User: {user}")
     image_logger.info(f"[PERF] Response: 200 OK")
 
     context = {
         'images': images_page,
+        'combined_images': combined_images,
         'title': 'Imágenes Subidas',
         'search_query': search_query,
         'total_images': total_images,
         'recent_uploads': recent_uploads,
         'is_paginated': images_page.has_other_pages(),
         'page_obj': images_page,
+        'cloudinary_cloud_name': settings.CLOUDINARY_CLOUD_NAME,
+        'folder_path': folder_path,
+        'subfolders': subfolders,
+        'cloudinary_resources': cloudinary_resources,
+        'breadcrumbs': breadcrumbs,
     }
     return render(request, 'products/image_list_editorial.html', context)
 
@@ -444,14 +535,15 @@ def image_detail(request, image_id):
 
     try:
         image = get_object_or_404(ImageUpload, id=image_id)
-        file_size = image.image.size if image.image else 0
-        file_name = image.image.name if image.image else 'No file'
+        image_url = image.image or ''
 
-        image_logger.info(f"[VIEW] Image detail viewed: ID={image.id}, Title='{image.title}', File='{file_name}', Size={file_size} bytes, User={user}")
+        image_logger.info(f"[VIEW] Image detail viewed: ID={image.id}, Title='{image.title}', URL='{image_url}', User={user}")
 
         context = {
             'image': image,
-            'title': f'Imagen: {image.title}'
+            'image_url': image_url,
+            'title': f'Imagen: {image.title}',
+            'cloudinary_cloud_name': settings.CLOUDINARY_CLOUD_NAME,
         }
         return render(request, 'products/image_detail_editorial.html', context)
 
@@ -465,76 +557,39 @@ def image_detail(request, image_id):
 
 @login_required
 def image_delete(request, image_id):
-    """View for deleting uploaded images and their files."""
+    """View for deleting uploaded images from the gallery."""
     user = request.user.username or 'Anonymous'
 
     try:
         image = get_object_or_404(ImageUpload, id=image_id)
-        file_size = image.image.size if image.image else 0
-        file_name = image.image.name if image.image else 'No file'
+        image_url = image.image or ''
 
         if request.method == 'POST':
             title = image.title
             image_id_deleted = image.id
 
-            # Log before deletion
-            image_logger.warning(f"[DELETE] Starting deletion process for image: ID={image_id_deleted}, Title='{title}', File='{file_name}', Size={file_size} bytes, User={user}")
+            image_logger.warning(f"[DELETE] Starting deletion process for image: ID={image_id_deleted}, Title='{title}', URL='{image_url}', User={user}")
 
-            # Step 1: Delete the physical file first
-            file_deleted = False
-            if image.image and image.image.name:
-                try:
-                    # Get the storage backend
-                    storage = image.image.storage
+            # No hay archivo físico local que borrar porque ImageUpload.image es una URL (Cloudinary)
+            # Solo eliminamos el registro de la base de datos
+            image.delete()
+            image_logger.info(f"[DELETE] Image record deleted from database: ID={image_id_deleted}, User={user}")
 
-                    # Check if file exists
-                    if storage.exists(image.image.name):
-                        # Delete the file
-                        storage.delete(image.image.name)
-                        file_deleted = True
-                        image_logger.info(f"[FILE] Physical file deleted: '{file_name}' from storage, User={user}")
-                    else:
-                        image_logger.warning(f"[WARNING] Physical file not found: '{file_name}' - may have been already deleted, User={user}")
-                        file_deleted = True  # Consider it deleted since it doesn't exist
-                except Exception as file_error:
-                    image_logger.error(f"[ERROR] Error deleting physical file '{file_name}': {str(file_error)}, User={user}")
-                    # Continue with database deletion even if file deletion fails
-
-            # Step 2: Delete the database record
-            try:
-                image.delete()
-                image_logger.info(f"[SUCCESS] Image record deleted from database: ID={image_id_deleted}, Title='{title}', User={user}")
-
-                if file_deleted:
-                    image_logger.info(f"[COMPLETE] Complete deletion successful: ID={image_id_deleted}, Title='{title}' (file + record), User={user}")
-                else:
-                    image_logger.warning(f"[WARNING] Database record deleted but file may still exist: ID={image_id_deleted}, Title='{title}', File='{file_name}', User={user}")
-
-                messages.success(request, f'Imagen "{title}" eliminada exitosamente.')
-                return redirect('products:image_list')
-
-            except Exception as db_error:
-                image_logger.error(f"[ERROR] Error deleting database record for image ID={image_id_deleted}: {str(db_error)}, User={user}")
-                messages.error(request, 'Error al eliminar el registro de la imagen. El archivo puede haber sido eliminado.')
-                return redirect('products:image_list')
-
-        else:
-            image_logger.info(f"[CONFIRM] GET request to delete confirmation for image: ID={image.id}, Title='{image.title}', File='{file_name}', User={user}")
+            messages.success(request, f'Imagen "{title}" eliminada exitosamente.')
+            return redirect('products:image_list')
 
         context = {
             'image': image,
-            'title': f'Eliminar Imagen: {image.title}'
+            'title': f'Eliminar imagen: {image.title}'
         }
         return render(request, 'products/image_confirm_delete_editorial.html', context)
 
     except ImageUpload.DoesNotExist:
-        image_logger.error(f"[ERROR] Attempted to delete non-existent image: ID={image_id}, User={user}")
-        messages.error(request, 'La imagen que intenta eliminar no existe.')
-        return redirect('products:image_list')
+        image_logger.error(f"[ERROR] Image not found: ID={image_id}, User={user}")
+        raise
     except Exception as e:
-        image_logger.error(f"[ERROR] Unexpected error in image_delete for ID={image_id}: {str(e)}, User={user}")
-        messages.error(request, 'Error inesperado al procesar la eliminación.')
-        return redirect('products:image_list')
+        image_logger.error(f"[ERROR] Error deleting image ID={image_id}: {str(e)}, User={user}")
+        raise
 
 
 # S3 Diagnostic View
@@ -817,3 +872,91 @@ def s3_diagnostic(request):
             'title': 'Diagnóstico S3 - Error'
         }
         return render(request, 'products/s3_diagnostic.html', context)
+
+
+# @login_required
+# @staff_member_required
+def product_image_editor(request):
+    """Vista de carga y recorte de imagen.
+    
+    Modos:
+    - Con product_id: asigna la imagen procesada a un producto.
+    - Sin product_id: crea un ImageUpload en la galería general.
+    """
+    product = None
+    product_id = request.GET.get('product_id') or request.POST.get('product_id')
+    gallery_mode = not bool(product_id)
+
+    if product_id:
+        product = get_object_or_404(Product, pk=product_id)
+
+    if request.method == 'POST':
+        form = ProductImageCropForm(request.POST, request.FILES)
+        if form.is_valid():
+            crop_data = form.cleaned_data['crop_data']
+            image_file = form.cleaned_data.get('image')
+            gallery_image = form.cleaned_data.get('gallery_image_id')
+            product_id = form.cleaned_data.get('product_id')
+
+            # Modo galería: no hay product_id, crear ImageUpload
+            if gallery_mode:
+                if not image_file:
+                    messages.error(request, 'Selecciona una imagen para subir a la galería.')
+                    return redirect('products:image_editor')
+                
+                try:
+                    url = process_product_image(image_file, crop_data, product or Product(pk=0, slug='gallery'))
+                    # Crear registro en galería
+                    gallery = ImageUpload.objects.create(
+                        title=f"Galería {timezone.now().strftime('%Y-%m-%d %H:%M')}",
+                        image=url,  # Esto requiere ajuste: ImageUpload usa ImageField local
+                        description='Subida desde editor de imágenes'
+                    )
+                    messages.success(request, f'Imagen subida a galería correctamente.')
+                    return redirect('products:image_list')
+                except Exception as e:
+                    logger.error(f"Error subiendo a galería: {e}")
+                    messages.error(request, f'Error al subir la imagen: {e}')
+                    return redirect('products:image_editor')
+
+            # Modo producto: requiere product_id
+            if not product_id:
+                messages.error(request, 'Primero crea el producto antes de subir su imagen.')
+                return redirect('products:product_create')
+
+            product = get_object_or_404(Product, pk=product_id)
+
+            # Si viene gallery_image_id, usar esa imagen (ya está en Cloudinary)
+            if gallery_image:
+                product.image = gallery_image.image
+                product.save(update_fields=['image'])
+                messages.success(request, f'Imagen de galería asignada a {product.name}.')
+                return redirect('products:product_update', product_id=product.id)
+
+            # Procesar imagen nueva con crop
+            if not image_file:
+                messages.error(request, 'Selecciona una imagen o elige una de la galería.')
+                return redirect('products:product_update', product_id=product.id)
+
+            try:
+                url = process_product_image(image_file, crop_data, product)
+                product.image = url
+                product.save(update_fields=['image'])
+                messages.success(request, f'Imagen guardada correctamente para {product.name}.')
+                return redirect('products:product_update', product_id=product.id)
+            except Exception as e:
+                logger.error(f"Error procesando imagen para producto {product.id}: {e}")
+                messages.error(request, f'Error al procesar la imagen: {e}')
+        else:
+            messages.error(request, 'Corrige los errores en el formulario.')
+    else:
+        initial = {'product_id': product_id} if product_id else {}
+        form = ProductImageCropForm(initial=initial)
+
+    context = {
+        'form': form,
+        'product': product,
+        'gallery_mode': gallery_mode,
+        'title': 'Editor de imagen' + (f' — {product.name}' if product else ' (Galería)'),
+    }
+    return render(request, 'products/image_editor_editorial.html', context)
