@@ -1,0 +1,225 @@
+/* components/image-editor.css — @layer: components (herramienta admin aislada) */
+@layer components {
+  .ie-page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: var(--space);
+  }
+  .ie-header {
+    display: grid;
+    gap: 6px;
+    margin-bottom: var(--space);
+  }
+  .ie-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 3.2vw, 40px);
+    font-weight: 600;
+    line-height: 1.1;
+    margin: 0;
+  }
+  .ie-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .ie-messages {
+    display: grid;
+    gap: 10px;
+    margin-bottom: var(--space);
+  }
+  .ie-alert {
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+  }
+  .ie-alert--success {
+    background: #e8f5e9;
+    color: #1b5e20;
+  }
+  .ie-alert--error {
+    background: #ffebee;
+    color: #b71c1c;
+  }
+  .ie-form {
+    display: grid;
+    gap: var(--space);
+  }
+  .ie-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr 240px;
+    gap: var(--space);
+    align-items: start;
+  }
+  .ie-sidebar,
+  .ie-preview-sidebar {
+    display: grid;
+    gap: 14px;
+  }
+  .ie-field {
+    display: grid;
+    gap: 8px;
+  }
+  .ie-label {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .ie-help {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .ie-file-input {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 13px;
+    background: #fff;
+    color: var(--ink);
+  }
+  .ie-ratio-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .ie-ratio-btn {
+    padding: 10px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .ie-ratio-btn:hover {
+    border-color: var(--ink);
+  }
+  .ie-ratio-btn.active {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .ie-canvas-wrap {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ie-canvas-container {
+    width: 100%;
+    height: 100%;
+    min-height: 520px;
+    background: #f0ece6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .ie-canvas-container .cropper-view-box,
+  .ie-canvas-container .cropper-face {
+    border-radius: 4px;
+  }
+  .ie-canvas-container img {
+    max-width: 100%;
+    max-height: 72vh;
+    display: block;
+  }
+  .ie-placeholder {
+    text-align: center;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .ie-placeholder i {
+    font-size: 32px;
+    opacity: 0.35;
+  }
+  .ie-preview-strip {
+    display: grid;
+    gap: 10px;
+  }
+  .ie-preview-item {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    display: grid;
+    gap: 4px;
+    padding: 6px;
+  }
+  .ie-preview-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .ie-preview-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    background: #e6e0d8;
+  }
+  .ie-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 40px;
+    border: none;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .ie-btn:hover {
+    opacity: 0.85;
+  }
+  .ie-btn--primary {
+    background: var(--ink);
+    color: #fff;
+  }
+  .ie-btn--secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+  }
+
+  @media (max-width: 1024px) {
+    .ie-layout {
+      grid-template-columns: 1fr;
+    }
+    .ie-sidebar {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .ie-preview-sidebar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .ie-sidebar,
+    .ie-preview-sidebar {
+      grid-template-columns: 1fr;
+    }
+  }
+}
