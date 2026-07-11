@@ -3,11 +3,90 @@
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block extra_head %}
+{{ block.super }}
+{% if request.GET.select %}
+<style>
+  .gallery-select-mode .bento-item { cursor: pointer; }
+  .gallery-select-mode .bento-item:hover { outline: 3px solid var(--ink); }
+  .gallery-select-mode .bento-item:hover .bento-media img { transform: none; }
+  .gallery-select-overlay {
+    position: absolute; inset: 0; background: rgba(26,21,17,0.6);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-size: 13px;
+  }
+</style>
+{% endif %}
+<style>
+  .folder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .folder-item {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: var(--ink);
+    display: block;
+  }
+  .folder-item:hover {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .folder-item i {
+    font-size: 32px;
+    opacity: 0.7;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .folder-item .folder-name {
+    font-weight: 600;
+    font-size: 13px;
+    word-break: break-word;
+  }
+  .breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+  .breadcrumbs a {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .breadcrumbs a:hover {
+    text-decoration: underline;
+  }
+  .breadcrumbs .sep {
+    color: var(--muted);
+  }
+  .breadcrumbs .current {
+    color: var(--muted);
+    font-weight: 600;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<section class="order-page">
+<section class="order-page{% if request.GET.select %} gallery-select-mode{% endif %}">
   <header class="section-header">
     <h1 class="section-title">{{ title }}</h1>
-    <a class="btn btn-primary" href="{% url 'products:image_upload' %}">Subir imagen</a>
+    {% if request.GET.select %}
+      <a class="btn btn-secondary" href="{% url 'products:product_create' %}">Cancelar selección</a>
+    {% else %}
+      <a class="btn btn-primary" href="{% url 'products:image_upload' %}">Subir imagen</a>
+    {% endif %}
   </header>
 
   {% if messages %}
@@ -18,8 +97,32 @@
   </div>
   {% endif %}
 
+  <!-- Breadcrumbs de navegación de folders -->
+  {% if folder_path or breadcrumbs %}
+  <nav class="breadcrumbs" aria-label="Ruta de carpetas">
+    <a href="?{% if request.GET.select %}select=1&{% endif %}{% if request.GET.product_id %}product_id={{ request.GET.product_id }}&{% endif %}">📁 Raíz</a>
+    {% for crumb in breadcrumbs %}
+      <span class="sep">/</span>
+      {% if forloop.last %}
+        <span class="current">{{ crumb.name }}</span>
+      {% else %}
+        <a href="?folder={{ crumb.path }}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}">{{ crumb.name }}</a>
+      {% endif %}
+    {% endfor %}
+  </nav>
+  {% endif %}
+
   <div class="order-card">
     <form method="get" action=".">
+      {% if request.GET.select %}
+        <input type="hidden" name="select" value="1">
+        {% if request.GET.product_id %}
+          <input type="hidden" name="product_id" value="{{ request.GET.product_id }}">
+        {% endif %}
+      {% endif %}
+      {% if folder_path %}
+        <input type="hidden" name="folder" value="{{ folder_path }}">
+      {% endif %}
       <div class="profile-form-grid">
         <input type="text" name="q" value="{{ search_query|default:'' }}" placeholder="Buscar por título o descripción..." style="width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:12px; font-size:14px;">
         <button type="submit" class="btn btn-secondary">Buscar</button>
@@ -27,24 +130,86 @@
     </form>
   </div>
 
-  {% if is_paginated %}
+  <!-- Subfolders -->
+  {% if subfolders %}
   <div class="order-card">
-    <p>{{ total_images }} imágenes en total · {{ recent_uploads }} subidas en los últimos 7 días</p>
+    <h2 style="font-size:16px; margin:0 0 12px; font-weight:600;">Carpetas</h2>
+    <div class="folder-grid">
+      {% for folder in subfolders %}
+      <a class="folder-item" href="?folder={{ folder.path }}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}">
+        <i class="fa-solid fa-folder"></i>
+        <div class="folder-name">{{ folder.name }}</div>
+      </a>
+      {% endfor %}
+    </div>
   </div>
   {% endif %}
 
-  {% if page_obj.object_list %}
+  <!-- Imágenes de la base de datos local -->
+  {% if combined_images %}
   <div class="bento-grid">
-    {% for image in page_obj.object_list %}
-    <article class="bento-item">
-      <div class="bento-media">
-        <img src="{{ image.image.url }}" alt="{{ image.title }}">
+    {% for image in combined_images %}
+    <article class="bento-item" {% if request.GET.select %}onclick="window.location='{% if image.is_cloudinary %}{% url 'products:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'"{% endif %}>
+      <div class="bento-media" style="position:relative;">
+        <img src="{{ image.image }}" alt="{{ image.title }}">
+        {% if request.GET.select %}
+          <div class="gallery-select-overlay">Seleccionar</div>
+        {% endif %}
+        {% if image.is_cloudinary %}
+          <div style="position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); color:#fff; font-size:10px; padding:2px 6px; border-radius:4px;">Cloudinary</div>
+        {% endif %}
       </div>
       <div class="bento-info">
         <h3 class="bento-title">{{ image.title }}</h3>
         <p class="bento-desc">{{ image.description|default:""|truncatechars:90 }}</p>
+        {% if image.image %}
+          {% with cloud_prefix="https://res.cloudinary.com/"|add:cloudinary_cloud_name|add:"/image/upload/" %}
+            {% with image_path=image.image|cut:cloud_prefix %}
+              <p style="font-size:11px; color:var(--muted); margin:6px 0 0; font-family:monospace;">{{ image_path }}</p>
+            {% endwith %}
+          {% endwith %}
+        {% endif %}
         <div class="order-actions" style="margin-top:10px;">
-          <a class="btn btn-secondary" href="{% url 'products:image_detail' image.id %}">Ver</a>
+          {% if request.GET.select %}
+            <button type="button" class="btn btn-primary" onclick="window.location='{% if image.is_cloudinary %}{% url 'products:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'">Seleccionar</button>
+          {% else %}
+            {% if not image.is_cloudinary %}
+              <a class="btn btn-secondary" href="{% url 'products:image_detail' image.id %}">Ver</a>
+            {% endif %}
+          {% endif %}
+          {% if not image.is_cloudinary %}
+            <form method="post" action="{% url 'products:image_delete' image.id %}" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-ghost">Eliminar</button></form>
+          {% endif %}
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  <div class="bento-grid">
+    {% for image in page_obj.object_list %}
+    <article class="bento-item" {% if request.GET.select %}onclick="window.location='{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'"{% endif %}>
+      <div class="bento-media" style="position:relative;">
+        <img src="{{ image.image.url }}" alt="{{ image.title }}">
+        {% if request.GET.select %}
+          <div class="gallery-select-overlay">Seleccionar</div>
+        {% endif %}
+      </div>
+      <div class="bento-info">
+        <h3 class="bento-title">{{ image.title }}</h3>
+        <p class="bento-desc">{{ image.description|default:""|truncatechars:90 }}</p>
+        {% if image.image %}
+          {% with cloud_prefix="https://res.cloudinary.com/"|add:cloudinary_cloud_name|add:"/image/upload/" %}
+            {% with image_path=image.image|cut:cloud_prefix %}
+              <p style="font-size:11px; color:var(--muted); margin:6px 0 0; font-family:monospace;">{{ image_path }}</p>
+            {% endwith %}
+          {% endwith %}
+        {% endif %}
+        <div class="order-actions" style="margin-top:10px;">
+          {% if request.GET.select %}
+            <button type="button" class="btn btn-primary" onclick="window.location='{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'">Seleccionar</button>
+          {% else %}
+            <a class="btn btn-secondary" href="{% url 'products:image_detail' image.id %}">Ver</a>
+          {% endif %}
           <form method="post" action="{% url 'products:image_delete' image.id %}" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-ghost">Eliminar</button></form>
         </div>
       </div>
@@ -54,20 +219,22 @@
 
   <nav class="pagination" aria-label="Paginación">
     {% if page_obj.has_previous %}
-      <a href="?page=1">&laquo; Primero</a>
-      <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+      <a href="?page=1{% if folder_path %}&folder={{ folder_path }}{% endif %}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">&laquo; Primero</a>
+      <a href="?page={{ page_obj.previous_page_number }}{% if folder_path %}&folder={{ folder_path }}{% endif %}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">Anterior</a>
     {% endif %}
     <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
     {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
-      <a href="?page={{ page_obj.paginator.num_pages }}">Último &raquo;</a>
+      <a href="?page={{ page_obj.next_page_number }}{% if folder_path %}&folder={{ folder_path }}{% endif %}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">Siguiente</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}{% if folder_path %}&folder={{ folder_path }}{% endif %}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">Último &raquo;</a>
     {% endif %}
   </nav>
   {% else %}
-  <div class="order-card" style="text-align:center;">
-    <h3>Sin imágenes</h3>
-    <p>{% if search_query %}No se encontraron imágenes para "{{ search_query }}".{% else %}Aún no hay imágenes subidas.{% endif %}</p>
-    <a class="btn btn-primary" href="{% url 'products:image_upload' %}">Subir imagen</a>
+  <div class="order-card" style="text-align:center; margin-top:18px;">
+    <h3>Sin imágenes en esta carpeta</h3>
+    <p>{% if search_query %}No se encontraron imágenes para "{{ search_query }}".{% else %}Esta carpeta está vacía o no contiene imágenes registradas.{% endif %}</p>
+    {% if not request.GET.select %}
+      <a class="btn btn-primary" href="{% url 'products:image_upload' %}">Subir imagen</a>
+    {% endif %}
   </div>
   {% endif %}
 </section>
