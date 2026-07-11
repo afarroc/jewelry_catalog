@@ -161,7 +161,7 @@ class ImageUpload(models.Model):
         max_length=500,
         help_text='URL de la imagen (Cloudinary o path local).'
     )
-    folder_path = models.CharField(max_length=255, blank=True, help_text='Carpeta en Cloudinary (ej: products, gallery, products/anillo-oro)')
+    asset_folder = models.CharField(max_length=255, blank=True, help_text='Carpeta actual en Cloudinary (asset_folder)')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, help_text='Optional description')
 
