@@ -1,7 +1,6 @@
 import cloudinary.api
 from django.core.management.base import BaseCommand
 from products.models import ImageUpload
-from django.utils.text import slugify
 import logging
 
 logger = logging.getLogger(__name__)
@@ -26,27 +25,50 @@ class Command(BaseCommand):
         updated = 0
         existing = 0
         errors = 0
+        seen_urls = set()
+
+        def extract_folder_path(secure_url):
+            """Extrae folder_path desde URL de Cloudinary."""
+            try:
+                url_path = secure_url.split('/image/upload/')[-1]
+                parts = url_path.split('/')
+                # Quitar versión si existe (v1783627893)
+                real_parts = parts[1:] if len(parts) > 1 and parts[0].startswith('v') and parts[0][1:].isdigit() else parts
+                # folder_path es todo menos el último segmento (archivo)
+                if len(real_parts) > 1:
+                    return '/'.join(real_parts[:-1])
+                return ''
+            except Exception:
+                return ''
 
         def sync_resource(secure_url, public_id):
             nonlocal created, updated, existing, errors
+            if secure_url in seen_urls:
+                return
+            seen_urls.add(secure_url)
             try:
+                folder_path = extract_folder_path(secure_url)
                 obj, was_created = ImageUpload.objects.get_or_create(
                     image=secure_url,
                     defaults={
                         'title': public_id.split('/')[-1] or secure_url.split('/')[-1],
                         'description': '',
+                        'folder_path': folder_path,
                     }
                 )
                 if was_created:
                     created += 1
                 else:
+                    if obj.folder_path != folder_path:
+                        obj.folder_path = folder_path
+                        obj.save(update_fields=['folder_path'])
+                        updated += 1
                     existing += 1
             except Exception as e:
                 logger.error(f"Error creando ImageUpload para {secure_url}: {e}")
                 errors += 1
 
         def sync_folder(path):
-            nonlocal updated
             # Recursos en este folder
             try:
                 result = cloudinary.api.resources(
@@ -79,4 +101,5 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'Sincronización completada:'))
         self.stdout.write(f'  Creados: {created}')
         self.stdout.write(f'  Ya existían: {existing}')
+        self.stdout.write(f'  Actualizados: {updated}')
         self.stdout.write(f'  Errores: {errors}')
