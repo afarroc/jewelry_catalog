@@ -27,41 +27,26 @@ class Command(BaseCommand):
         errors = 0
         seen_urls = set()
 
-        def extract_folder_path(secure_url):
-            """Extrae folder_path desde URL de Cloudinary."""
-            try:
-                url_path = secure_url.split('/image/upload/')[-1]
-                parts = url_path.split('/')
-                # Quitar versión si existe (v1783627893)
-                real_parts = parts[1:] if len(parts) > 1 and parts[0].startswith('v') and parts[0][1:].isdigit() else parts
-                # folder_path es todo menos el último segmento (archivo)
-                if len(real_parts) > 1:
-                    return '/'.join(real_parts[:-1])
-                return ''
-            except Exception:
-                return ''
-
-        def sync_resource(secure_url, public_id):
+        def sync_resource(secure_url, public_id, asset_folder):
             nonlocal created, updated, existing, errors
-            if secure_url in seen_urls:
+            if not secure_url or secure_url in seen_urls:
                 return
             seen_urls.add(secure_url)
             try:
-                folder_path = extract_folder_path(secure_url)
                 obj, was_created = ImageUpload.objects.get_or_create(
                     image=secure_url,
                     defaults={
                         'title': public_id.split('/')[-1] or secure_url.split('/')[-1],
                         'description': '',
-                        'folder_path': folder_path,
+                        'asset_folder': asset_folder or '',
                     }
                 )
                 if was_created:
                     created += 1
                 else:
-                    if obj.folder_path != folder_path:
-                        obj.folder_path = folder_path
-                        obj.save(update_fields=['folder_path'])
+                    if obj.asset_folder != (asset_folder or ''):
+                        obj.asset_folder = asset_folder or ''
+                        obj.save(update_fields=['asset_folder'])
                         updated += 1
                     existing += 1
             except Exception as e:
@@ -78,7 +63,11 @@ class Command(BaseCommand):
                     type='upload',
                 )
                 for res in result.get('resources', []):
-                    sync_resource(res.get('secure_url', ''), res.get('public_id', ''))
+                    sync_resource(
+                        res.get('secure_url', ''),
+                        res.get('public_id', ''),
+                        res.get('asset_folder', ''),
+                    )
             except Exception as e:
                 logger.error(f"Error listando recursos en '{path}': {e}")
 
