@@ -254,12 +254,8 @@
       <div class="bento-info">
         <h3 class="bento-title">{{ image.title }}</h3>
         <p class="bento-desc">{{ image.description|default:""|truncatechars:90 }}</p>
-        {% if image.image %}
-          {% with cloud_prefix="https://res.cloudinary.com/"|add:cloudinary_cloud_name|add:"/image/upload/" %}
-            {% with image_path=image.image|cut:cloud_prefix %}
-              <p style="font-size:11px; color:var(--muted); margin:6px 0 0; font-family:monospace;">{{ image_path }}</p>
-            {% endwith %}
-          {% endwith %}
+        {% if image.asset_folder %}
+          <p style="font-size:11px; color:var(--muted); margin:6px 0 0; font-family:monospace;">{{ image.asset_folder }}</p>
         {% endif %}
         <div class="order-actions" style="margin-top:10px;">
           {% if request.GET.select %}

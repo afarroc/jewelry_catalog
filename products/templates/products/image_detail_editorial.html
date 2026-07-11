@@ -26,12 +26,10 @@
     <h2 class="section-title" style="margin-top:18px;">{{ image.title }}</h2>
     <p>{{ image.description|default:"Sin descripción"|linebreaks }}</p>
     <div class="order-body">
+      {% if image.asset_folder %}
+        <div><strong>Carpeta:</strong> <code>{{ image.asset_folder }}</code></div>
+      {% endif %}
       {% if image_url %}
-        {% with cloud_prefix="https://res.cloudinary.com/"|add:cloudinary_cloud_name|add:"/image/upload/" %}
-          {% with image_path=image_url|cut:cloud_prefix %}
-            <div><strong>Ruta:</strong> <code>{{ image_path }}</code></div>
-          {% endwith %}
-        {% endwith %}
         <div><strong>URL:</strong> <a href="{{ image_url }}" target="_blank">{{ image_url }}</a></div>
       {% endif %}
       <div><strong>Subida:</strong> {{ image.uploaded_at|date:"F j, Y" }}</div>
