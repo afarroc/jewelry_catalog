@@ -78,6 +78,31 @@ def process_product_image(image_file, crop_data, product_instance):
     return result['secure_url']
 
 
+def is_cloudinary_root_image(url, cloudinary_cloud_name):
+    """
+    Determina si una URL de Cloudinary corresponde a la raíz (sin subfolders).
+    Maneja URLs con o sin versión Cloudinary.
+    """
+    if not url:
+        return True
+    url = str(url)
+    if 'res.cloudinary.com' not in url or f'/{cloudinary_cloud_name}/' not in url:
+        return True
+    try:
+        parts = url.split('/image/upload/')
+        if len(parts) != 2:
+            return True
+        path = parts[1]
+        # Quitar versión si existe (ej: v1783723855/sample.jpg)
+        path_parts = path.split('/')
+        if len(path_parts) > 1 and path_parts[0].startswith('v') and path_parts[0][1:].isdigit():
+            path_parts = path_parts[1:]
+        # Si queda solo el nombre de archivo, es raíz
+        return len(path_parts) <= 1
+    except Exception:
+        return True
+
+
 def get_cloudinary_folders(folder_path=''):
     """Obtiene subfolders de Cloudinary para un path dado."""
     try:
