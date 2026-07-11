@@ -3,6 +3,245 @@
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+<style>
+  /* Layout extendido para el editor inline */
+  .ie-inline-section {
+    display: grid;
+    gap: 14px;
+    padding: 16px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    margin-top: 8px;
+  }
+  .ie-inline-header {
+    display: grid;
+    gap: 4px;
+  }
+  .ie-inline-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .ie-inline-help {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .ie-inline-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr 220px;
+    gap: 14px;
+    align-items: start;
+  }
+  .ie-inline-sidebar,
+  .ie-inline-preview {
+    display: grid;
+    gap: 12px;
+  }
+  .ie-inline-field {
+    display: grid;
+    gap: 6px;
+  }
+  .ie-inline-label {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .ie-inline-file {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 8px;
+    font-size: 13px;
+    background: #fff;
+  }
+  .ie-inline-ratios {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .ie-inline-ratio {
+    padding: 8px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .ie-inline-ratio:hover {
+    border-color: var(--ink);
+  }
+  .ie-inline-ratio.active {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .ie-inline-canvas-wrap {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    min-height: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .ie-inline-canvas-wrap .cropper-container,
+  .ie-inline-canvas-wrap .cropper-wrap,
+  .ie-inline-canvas-wrap .cropper-canvas,
+  .ie-inline-canvas-wrap .cropper-modal,
+  .ie-inline-canvas-wrap .cropper-view-box,
+  .ie-inline-canvas-wrap .cropper-face {
+    max-width: 100% !important;
+    max-height: 65vh !important;
+  }
+  .ie-inline-canvas-wrap img {
+    max-width: 100%;
+    max-height: 65vh;
+    display: block;
+  }
+  .ie-inline-placeholder {
+    text-align: center;
+    color: var(--muted);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .ie-inline-placeholder i {
+    font-size: 28px;
+    opacity: 0.3;
+  }
+  .ie-inline-preview-strip {
+    display: grid;
+    gap: 8px;
+  }
+  .ie-inline-preview-item {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    display: grid;
+    gap: 3px;
+    padding: 5px;
+  }
+  .ie-inline-preview-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .ie-inline-preview-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    background: #e6e0d8;
+  }
+  .ie-inline-actions {
+    display: grid;
+    gap: 6px;
+  }
+  .ie-inline-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 36px;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .ie-inline-btn:hover {
+    opacity: 0.85;
+  }
+  .ie-inline-btn--primary {
+    background: var(--ink);
+    color: #fff;
+  }
+  .ie-inline-btn--ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+  }
+  .ie-current-thumb {
+    max-width: 120px;
+    max-height: 120px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    margin-top: 6px;
+  }
+
+  /* ===== Móvil / Tablet ===== */
+  @media (max-width: 1024px) {
+    .ie-inline-layout {
+      grid-template-columns: 1fr;
+    }
+    .ie-inline-sidebar {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .ie-inline-preview {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .ie-inline-canvas-wrap {
+      min-height: 320px;
+    }
+  }
+  @media (max-width: 640px) {
+    .auth-page-inner:has(.ie-inline-section) {
+      max-width: 100%;
+    }
+    .ie-inline-sidebar,
+    .ie-inline-preview {
+      grid-template-columns: 1fr;
+    }
+    .ie-inline-ratios {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .ie-inline-ratio {
+      min-height: 44px; /* touch target */
+      font-size: 13px;
+      padding: 10px;
+    }
+    .ie-inline-canvas-wrap {
+      min-height: 260px;
+      max-height: 55vh;
+    }
+    .ie-inline-canvas-wrap img {
+      max-height: 55vh;
+    }
+    .ie-inline-btn {
+      min-height: 44px;
+      font-size: 13px;
+    }
+  }
+
+  /* Cuando el formulario incluye el editor inline, expandir el contenedor */
+  .auth-page-inner:has(.ie-inline-section) {
+    max-width: 1100px;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <section class="auth-page">
   <div class="auth-page-inner">
@@ -12,10 +251,19 @@
     </header>
 
     <div class="auth-card">
-      <form method="post" enctype="multipart/form-data" novalidate>
+      {% if messages %}
+        <div class="django-messages">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="post" enctype="multipart/form-data" novalidate id="productForm">
         {% csrf_token %}
 
         <div class="auth-form">
+          <!-- Datos del producto -->
           <div class="auth-field">
             <label class="auth-label" for="{{ form.name.id_for_label }}">{{ form.name.label }} <span style="color:#b00020;">*</span></label>
             {{ form.name }}
@@ -75,34 +323,142 @@
           </div>
 
           <div class="auth-field">
-            <label class="auth-label" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
-            {{ form.image }}
-            {% if form.image.errors %}
-              <p class="auth-field-error">{{ form.image.errors.0 }}</p>
-            {% endif %}
-            {% if form.instance.image %}
-            <div style="margin-top:10px;">
-              <p style="margin:0 0 6px;"><strong>Imagen actual:</strong></p>
-              <img src="{{ form.instance.image.url }}" alt="{{ form.instance.name }}" style="max-width:200px; max-height:200px; border-radius:12px; border:1px solid var(--line);">
-            </div>
-            {% endif %}
-          </div>
-
-          <div class="auth-field">
             <label class="auth-label" for="{{ form.available.id_for_label }}">{{ form.available.label }}</label>
             {{ form.available }}
             {% if form.available.errors %}
               <p class="auth-field-error">{{ form.available.errors.0 }}</p>
             {% endif %}
           </div>
+
+          <!-- Editor de imagen inline -->
+          <div class="ie-inline-section">
+            <div class="ie-inline-header">
+              <h2 class="ie-inline-title">Imagen del producto</h2>
+              <p class="ie-inline-help">Sube una imagen, elige el formato y recorta. Si no subes imagen ahora, puedes agregarla después.</p>
+            </div>
+
+            {% if form.instance and form.instance.image %}
+              <p style="margin:0 0 6px; font-size:13px; color:var(--muted);">Imagen actual:</p>
+              <img src="{{ form.instance.image.url }}" alt="{{ form.instance.name }}" class="ie-current-thumb">
+            {% endif %}
+
+            <div class="ie-inline-layout">
+              <aside class="ie-inline-sidebar">
+                <div class="ie-inline-field">
+                  <label class="ie-inline-label" for="{{ form.bento_size.id_for_label }}">{{ form.bento_size.label }}</label>
+                  {{ form.bento_size }}
+                  {% if form.bento_size.errors %}
+                    <p class="auth-field-error">{{ form.bento_size.errors.0 }}</p>
+                  {% endif %}
+                </div>
+
+                <div class="ie-inline-field">
+                  <label class="ie-inline-label" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+                  {{ form.image }}
+                  {% if form.image.errors %}
+                    <p class="auth-field-error">{{ form.image.errors.0 }}</p>
+                  {% endif %}
+                  <p style="font-size:12px; color:var(--muted); margin:4px 0 0;">
+                    O <a href="{% url 'products:image_list' %}?select=1{% if form.instance.pk %}&product_id={{ form.instance.pk }}{% endif %}" style="color:var(--accent); text-decoration:underline;">elegir de la galería</a>
+                  </p>
+                  {% if gallery_image_url %}
+                    <img id="galleryPreview" src="{{ gallery_image_url }}" alt="Imagen de galería" data-url="{{ gallery_image_url }}" style="max-width:120px; max-height:120px; border-radius:10px; border:1px solid var(--line); margin-top:6px; display:block;">
+                    <button type="button" id="clearGallery" style="margin-top:4px; font-size:11px; color:#b00020; background:none; border:none; cursor:pointer;">Quitar imagen de galería</button>
+                  {% endif %}
+                </div>
+
+                <div class="ie-inline-field">
+                  <label class="ie-inline-label">Formato de salida</label>
+                  <div class="ie-inline-ratios" id="ieRatioGrid">
+                    <button type="button" class="ie-inline-ratio active" data-ratio="card" data-aspect="1" data-w="800" data-h="800">Card 1:1</button>
+                    <button type="button" class="ie-inline-ratio" data-ratio="banner" data-aspect="3" data-w="1200" data-h="400">Banner 3:1</button>
+                    <button type="button" class="ie-inline-ratio" data-ratio="hero" data-aspect="3.2" data-w="1920" data-h="600">Hero 16:5</button>
+                    <button type="button" class="ie-inline-ratio" data-ratio="1x1" data-aspect="1" data-w="800" data-h="800">1×1</button>
+                    <button type="button" class="ie-inline-ratio" data-ratio="1x2" data-aspect="0.5" data-w="800" data-h="1600">1×2</button>
+                    <button type="button" class="ie-inline-ratio" data-ratio="wide" data-aspect="2" data-w="1200" data-h="600">Wide 2:1</button>
+                    <button type="button" class="ie-inline-ratio" data-ratio="tall" data-aspect="0.5" data-w="600" data-h="1200">Tall 1:2</button>
+                    <button type="button" class="ie-inline-ratio" data-ratio="classic" data-aspect="1.33" data-w="800" data-h="600">Classic 4:3</button>
+                  </div>
+                </div>
+
+                <div class="ie-inline-actions">
+                  <button type="submit" class="ie-inline-btn ie-inline-btn--primary">{{ button_text }}</button>
+                  <a href="{% url 'products:product_list' %}" class="ie-inline-btn ie-inline-btn--ghost">Cancelar</a>
+                </div>
+              </aside>
+
+              <section class="ie-inline-canvas-wrap" id="ieCanvasContainer">
+                <img id="ieImageToCrop" src="" alt="Imagen a recortar" style="display:none;">
+                <div class="ie-inline-placeholder" id="iePlaceholder">
+                  <i class="fa-solid fa-image"></i>
+                  <p>Selecciona una imagen para comenzar</p>
+                </div>
+              </section>
+
+              <aside class="ie-inline-preview">
+                <label class="ie-inline-label">Previsualización</label>
+                <div class="ie-inline-preview-strip" id="iePreviewStrip">
+                  <p style="font-size:12px; color:var(--muted); margin:0;">El preview se genera al seleccionar una imagen y un formato.</p>
+                </div>
+              </aside>
+            </div>
+          </div>
         </div>
 
-        <div class="profile-form-actions">
-          <a class="btn btn-secondary" href="{% url 'products:product_list' %}">Cancelar</a>
-          <button type="submit" class="btn btn-primary">{{ button_text }}</button>
-        </div>
+        <!-- Hidden fields para crop -->
+        {{ form.crop_data }}
+        {{ form.gallery_image_id }}
+        {% if form.instance and form.instance.pk %}
+          <input type="hidden" name="product_id" value="{{ form.instance.pk }}">
+        {% endif %}
       </form>
     </div>
   </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+<script src="{% static 'js/product_image_editor.js' %}"></script>
+<script>
+(function() {
+  // Si viene gallery_image_id en GET, mostrar preview y limpiar input file
+  const galleryId = '{{ request.GET.gallery_image_id|default:"" }}';
+  const galleryPreview = document.getElementById('galleryPreview');
+  const clearBtn = document.getElementById('clearGallery');
+  const imageInput = document.querySelector('input[name="image"]');
+  
+  if (galleryId && galleryPreview) {
+    // La URL de la imagen viene del servidor en el contexto
+    // Aquí asumimos que el backend inyectó la URL en un data attribute
+    const imgUrl = galleryPreview.getAttribute('data-url');
+    if (imgUrl) {
+      galleryPreview.src = imgUrl;
+      galleryPreview.style.display = 'block';
+    }
+    if (imageInput) {
+      imageInput.style.display = 'none';
+    }
+  }
+  
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function() {
+      if (galleryPreview) {
+        galleryPreview.style.display = 'none';
+        galleryPreview.removeAttribute('data-url');
+      }
+      if (imageInput) {
+        imageInput.style.display = 'block';
+        imageInput.value = '';
+      }
+      // Limpiar hidden field
+      const hidden = document.querySelector('input[name="gallery_image_id"]');
+      if (hidden) hidden.value = '';
+      // Limpiar URL
+      window.history.replaceState({}, '', window.location.pathname + window.location.search.replace(/[?&]gallery_image_id=\d+/, ''));
+    });
+  }
+})();
+</script>
 {% endblock %}
