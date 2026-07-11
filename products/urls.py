@@ -7,15 +7,15 @@ app_name = 'products'
 urlpatterns = [
     # Template views
     path('', views.product_list, name='product_list'),
-    path('<slug:slug>/', views.ProductDetailView.as_view(), name='product_detail'),
 
-    # Product management views (require login)
+    # Product management views (require login) - BEFORE slug detail to avoid conflicts
     path('create/', views.product_create, name='product_create'),
     path('<int:product_id>/update/', views.product_update, name='product_update'),
     path('<int:product_id>/delete/', views.product_delete, name='product_delete'),
 
     # Simple image upload views (require login) - MUST come before category URLs
     path('images/upload/', views.image_upload, name='image_upload'),
+    path('images/editor/', views.product_image_editor, name='image_editor'),
     path('images/', views.image_list, name='image_list'),
     path('images/<int:image_id>/', views.image_detail, name='image_detail'),
     path('images/<int:image_id>/delete/', views.image_delete, name='image_delete'),
@@ -25,6 +25,9 @@ urlpatterns = [
 
     # Category views - prefixed to avoid conflicts with product detail slugs
     path('category/<slug:category_slug>/', views.product_list, name='product_list_by_category'),
+
+    # Product detail - AFTER management routes so /create/, /images/, etc. take precedence
+    path('<slug:slug>/', views.ProductDetailView.as_view(), name='product_detail'),
 
     # API views
     path('list/', views.ProductListAPIView.as_view(), name='api_product_list'),
