@@ -1,0 +1,46 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}Reel — Miluxious{% endblock %}
+
+{% block content %}
+
+<section class="lookbook">
+  <div class="section-header">
+    <h2 class="section-title">Piezas destacadas</h2>
+    <a class="section-link" href="{% url 'products:product_list' %}">Ver todo →</a>
+  </div>
+
+  {% if featured_products %}
+    <div class="bento-grid">
+      {% for product in featured_products %}
+        {% if product.is_filler %}
+          {% include '_bento_generic_1x1.html' with slot_type=product.slot_type label=product.label icon=product.icon url=product.url style=product.style %}
+        {% elif product.bento_size == 'hero' %}
+          {% include '_bento_hero.html' with product=product %}
+        {% elif product.bento_size == 'featured' %}
+          {% include '_bento_featured.html' with product=product %}
+        {% elif product.bento_size == 'tall-image' %}
+          {% include '_bento_tall_image.html' with product=product %}
+        {% elif product.bento_size == 'wide-image' %}
+          {% include '_bento_wide_image.html' with product=product %}
+        {% elif product.bento_size == 'tall' %}
+          {% include '_bento_tall.html' with product=product %}
+        {% elif product.bento_size == 'wide' %}
+          {% include '_bento_wide.html' with product=product %}
+        {% else %}
+          {% include '_bento_standard.html' with product=product %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="bento-grid">
+      <div class="note" style="grid-column: 1 / -1;">
+        <h4>Próximamente</h4>
+        <p>Estamos preparando productos destacados increíbles para ti. ¡Vuelve pronto!</p>
+      </div>
+    </div>
+  {% endif %}
+</section>
+
+{% endblock %}

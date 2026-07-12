@@ -1,0 +1,101 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}Miluxious accesorios{% endblock %}
+
+{% block content %}
+
+{% include 'home/_hero_section.html' with hero=hero %}
+
+<section class="trust-strip" aria-label="Confianza">
+  <div class="trust-inner">
+    <div class="trust-item">
+      <i class="fas fa-hand-sparkles"></i>
+      <span>Hecho a mano</span>
+    </div>
+    <div class="trust-item">
+      <i class="fas fa-gem"></i>
+      <span>Materiales nobles</span>
+    </div>
+    <div class="trust-item">
+      <i class="fas fa-truck-fast"></i>
+      <span>Envío protegido</span>
+    </div>
+    <div class="trust-item">
+      <i class="fas fa-rotate-left"></i>
+      <span>Devolución 30 días</span>
+    </div>
+  </div>
+</section>
+
+{% if categories %}
+<section class="categories-section" aria-label="Categorías">
+  <div class="categories-inner">
+    <span class="categories-label">Categorías</span>
+    <div class="categories-links">
+      {% for cat in categories %}
+        <a href="{% url 'products:product_list_by_category' cat.slug %}">{{ cat.name }}</a>
+        {% if not forloop.last %}<span class="separator">·</span>{% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if partners %}
+<section class="partners-home" aria-label="Tiendas de socios">
+  <div class="section-header">
+    <h2 class="section-title">Nuestras tiendas</h2>
+    <p class="section-lead">Descubrí las colecciones de nuestros socios dentro del ecosistema Miluxious.</p>
+  </div>
+  <div class="partners-grid">
+    {% for partner in partners %}
+      {% include 'partners/_partner_card.html' with partner=partner %}
+    {% endfor %}
+  </div>
+  <div class="partners-cta">
+    <a class="btn btn-outline" href="{% url 'partners:list' %}">Ver todas las tiendas →</a>
+  </div>
+</section>
+{% endif %}
+
+{% if best_sellers %}
+<section class="best-sellers" aria-label="Best sellers">
+  <div class="section-header">
+    <h2 class="section-title">Best sellers</h2>
+    <a class="section-link" href="{% url 'products:product_list' %}">Ver todo →</a>
+  </div>
+  <div class="products-grid">
+    {% for product in best_sellers %}
+      {% include '_product_card_editorial.html' with product=product %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="reel-cta" aria-label="Reel editorial">
+  <div class="reel-cta-inner">
+    <h2 class="section-title">Reel editorial</h2>
+    <p class="section-lead">Piezas destacadas en formato editorial. Navegá la colección completa.</p>
+    <a class="btn" href="{% url 'home:reel' %}">Ver reel →</a>
+  </div>
+</section>
+
+<section class="newsletter" aria-label="Newsletter">
+  <div class="newsletter-inner">
+    <h2 class="section-title">Novedades</h2>
+    <p class="newsletter-lead">Suscribite y recibí novedades, lanzamientos y acceso anticipado.</p>
+    <form class="newsletter-form" method="post" action="{% url 'home:index' %}" onsubmit="event.preventDefault(); alert('Próximamente');">
+      {% csrf_token %}
+      <input type="email" name="email" placeholder="tu@email.com" required aria-label="Correo electrónico">
+      <button type="submit" class="btn btn-primary">Suscribirme</button>
+    </form>
+  </div>
+</section>
+
+<a class="sticky-mobile-bar" href="{% url 'products:product_list' %}" aria-label="Explorar colección">
+  <span>Explorar colección</span>
+  <i class="fas fa-store"></i>
+</a>
+
+{% endblock %}

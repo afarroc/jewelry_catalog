@@ -1,0 +1,14 @@
+{% load static %}
+<section class="hero" style="--hero-bg: url('{{ hero.background_image_url }}')">
+  {% if hero.eyebrow %}<span class="eyebrow">{{ hero.eyebrow }}</span>{% endif %}
+  <h1 class="hero-title">{{ hero.title|safe }}</h1>
+  {% if hero.subtitle %}<p class="hero-lead">{{ hero.subtitle }}</p>{% endif %}
+  <div class="hero-actions">
+    {% if hero.primary_cta_text %}
+      <a class="btn btn-primary" href="{{ hero.primary_cta_url }}">{{ hero.primary_cta_text }}</a>
+    {% endif %}
+    {% if hero.secondary_cta_text %}
+      <a class="btn btn-outline" href="{{ hero.secondary_cta_url }}">{{ hero.secondary_cta_text }}</a>
+    {% endif %}
+  </div>
+</section>
