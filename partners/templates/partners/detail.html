@@ -1,0 +1,36 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}{{ partner.name }} — Miluxious{% endblock %}
+
+{% block content %}
+<section class="partner-shop">
+  <div class="partner-hero">
+    {% if partner.hero_image %}
+      <img class="partner-hero-img" src="{{ partner.hero_image.url }}" alt="{{ partner.name }}">
+    {% endif %}
+    <div class="partner-hero-overlay"></div>
+    <div class="partner-hero-inner">
+      <h1 class="partner-title">{{ partner.name }}</h1>
+      {% if partner.description %}
+        <p class="partner-lead">{{ partner.description }}</p>
+      {% endif %}
+      <a class="btn outline" href="{% url 'home:index' %}">Volver a Miluxious</a>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2 class="section-title">Colección de {{ partner.name }}</h2>
+  </div>
+
+  {% if products %}
+    <div class="products-grid">
+      {% for product in products %}
+        {% include '_product_card_editorial.html' with product=product %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Esta tienda todavía no tiene productos publicados.</p>
+  {% endif %}
+</section>
+{% endblock %}

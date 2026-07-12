@@ -1,0 +1,21 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}Tiendas — Miluxious{% endblock %}
+
+{% block content %}
+<section class="partners-directory">
+  <div class="section-header">
+    <h1 class="section-title">Nuestras tiendas</h1>
+    <p class="section-lead">Descubrí las colecciones de nuestros socios dentro del ecosistema Miluxious.</p>
+  </div>
+
+  <div class="partners-grid">
+    {% for partner in partners %}
+      {% include 'partners/_partner_card.html' with partner=partner %}
+    {% empty %}
+      <p>Próximamente abriremos nuevas tiendas. Volvé pronto.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

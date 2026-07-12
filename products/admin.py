@@ -55,18 +55,68 @@ class ProductAdminForm(ModelForm):
 
 class ProductAdmin(admin.ModelAdmin):
     form = ProductAdminForm
-    list_display = ('name', 'jewelry_type', 'material', 'price', 'stock', 'available', 'bento_size', 'image_preview', 'created_at')
+    list_display = ('name', 'partner', 'jewelry_type', 'material', 'price', 'stock', 'available', 'bento_size', 'image_preview', 'created_at')
     list_display_links = ('name',)
-    list_filter = ('available', 'jewelry_type', 'material', 'category', 'bento_size', 'created_at')
+    list_filter = ('available', 'jewelry_type', 'material', 'category', 'bento_size', 'created_at', 'partner')
     search_fields = ('name', 'description', 'slug', 'bento_size')
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ('price', 'stock', 'available', 'bento_size')
     readonly_fields = ('created_at', 'updated_at', 'image_preview_large')
     ordering = ('-created_at',)
     list_per_page = 25
+    autocomplete_fields = ['partner']
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated and not user.is_superuser:
+            allowed_partners = getattr(user, 'user_partners', set())
+            if allowed_partners:
+                return qs.filter(partner__in=allowed_partners)
+            return qs.none()
+        return qs
 
     # Actions en lote
-    actions = ['make_available', 'make_unavailable', 'export_csv']
+    actions = ['make_available', 'make_unavailable', 'export_csv', 'assign_partner']
+
+    def make_available(self, request, queryset):
+        updated = queryset.update(available=True)
+        self.message_user(request, f'{updated} productos marcados como disponibles.')
+    make_available.short_description = 'Marcar productos como disponibles'
+
+    def make_unavailable(self, request, queryset):
+        updated = queryset.update(available=False)
+        self.message_user(request, f'{updated} productos marcados como no disponibles.')
+    make_unavailable.short_description = 'Marcar productos como no disponibles'
+
+    def export_csv(self, request, queryset):
+        import csv
+        from django.http import HttpResponse
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="productos.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(['Nombre', 'Tipo', 'Material', 'Precio', 'Stock', 'Disponible'])
+
+        for product in queryset:
+            writer.writerow([
+                product.name,
+                product.get_jewelry_type_display(),
+                product.get_material_display(),
+                product.price,
+                product.stock,
+                'Sí' if product.available else 'No'
+            ])
+
+        self.message_user(request, f'Exportados {queryset.count()} productos a CSV.')
+        return response
+    export_csv.short_description = 'Exportar productos a CSV'
+
+    def assign_partner(self, request, queryset):
+        # Placeholder: por ahora redirigimos con mensaje; próximamente action con popup.
+        self.message_user(request, 'Seleccioná la acción de asignación de partner desde el formulario de edición.')
+    assign_partner.short_description = 'Asignar partner a seleccionados'
 
     def make_available(self, request, queryset):
         updated = queryset.update(available=True)
@@ -107,7 +157,7 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('name', 'slug', 'description')
         }),
         ('Características', {
-            'fields': ('jewelry_type', 'material', 'category')
+            'fields': ('jewelry_type', 'material', 'category', 'partner')
         }),
         ('Imagen', {
             'fields': ('image', 'image_preview_large'),
@@ -159,15 +209,27 @@ class ProductAdmin(admin.ModelAdmin):
         logger.info(f"Product '{obj.name}' was {'updated' if change else 'created'} by {request.user}")
 
 class ImageUploadAdmin(admin.ModelAdmin):
-    list_display = ('title', 'image_preview', 'uploaded_at')
+    list_display = ('title', 'partner', 'image_preview', 'uploaded_at')
     list_display_links = ('title',)
     search_fields = ('title', 'description')
+    list_filter = ('partner', 'uploaded_at')
     readonly_fields = ('uploaded_at',)
     ordering = ('-uploaded_at',)
+    autocomplete_fields = ['partner']
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated and not user.is_superuser:
+            allowed_partners = getattr(user, 'user_partners', set())
+            if allowed_partners:
+                return qs.filter(partner__in=allowed_partners)
+            return qs.none()
+        return qs
 
     fieldsets = (
         ('Información Básica', {
-            'fields': ('title', 'description')
+            'fields': ('title', 'description', 'partner')
         }),
         ('Imagen', {
             'fields': ('image',),

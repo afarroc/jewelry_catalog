@@ -1,0 +1,17 @@
+{% load static %}
+<article class="partner-card">
+  <div class="partner-card-media">
+    {% if partner.hero_image %}
+      <img src="{{ partner.hero_image.url }}" alt="{{ partner.name }}">
+    {% else %}
+      <div class="partner-card-placeholder">Tienda</div>
+    {% endif %}
+  </div>
+  <div class="partner-card-body">
+    <h3 class="partner-card-title">{{ partner.name }}</h3>
+    {% if partner.description %}
+      <p class="partner-card-lead">{{ partner.description|truncatewords:20 }}</p>
+    {% endif %}
+    <a class="partner-card-link" href="{% url 'partners:detail' partner.slug %}">Visitar tienda →</a>
+  </div>
+</article>

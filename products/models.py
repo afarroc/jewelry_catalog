@@ -109,6 +109,14 @@ class Product(models.Model):
         default='standard',
         help_text='Grid size: standard (1x1), wide (2x1), tall (1x2), featured (2x2)'
     )
+    partner = models.ForeignKey(
+        'partners.Partner',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='products',
+        help_text='Partner/tienda al que pertenece este producto. Vacío = producto Miluxious (marca principal).'
+    )
     average_rating = models.FloatField(
         default=0.0,
         help_text='Average product rating (0-5)'
@@ -164,6 +172,14 @@ class ImageUpload(models.Model):
     asset_folder = models.CharField(max_length=255, blank=True, help_text='Carpeta actual en Cloudinary (asset_folder)')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, help_text='Optional description')
+    partner = models.ForeignKey(
+        'partners.Partner',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='images',
+        help_text='Partner/tienda al que pertenece esta imagen. Vacío = galería global Miluxious.'
+    )
 
     class Meta:
         verbose_name = "Image Upload"
