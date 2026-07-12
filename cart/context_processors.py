@@ -3,7 +3,8 @@ from .cart import CartSession
 
 def cart(request):
     """Make the cart available globally in templates."""
-    if request.user.is_authenticated:
+    user = getattr(request, 'user', None)
+    if user and user.is_authenticated:
         # Use database cart for authenticated users
         cart, created = Cart.objects.get_or_create(user=request.user)
         return {'cart': cart}
