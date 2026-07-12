@@ -3,11 +3,16 @@
   :root {
     --ink: #1a1511;
     --paper: #f7f5f2;
+    --surface: #ffffff;
+    --surface-muted: #faf8f5;
     --muted: #8c8a86;
     --accent: #c6a355;
     --accent-ink: #2a2218;
     --line: rgba(26,21,17,0.09);
     --max-width: 1200px;
     --space: clamp(10px, 1.2vw, 18px);
+    --radius-sm: 12px;
+    --radius-md: 18px;
+    --radius-lg: 24px;
   }
 }
