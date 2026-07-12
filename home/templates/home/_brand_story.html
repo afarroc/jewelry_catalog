@@ -1,0 +1,12 @@
+{% load static %}
+<section class="brand-story">
+  <div class="brand-story-media">
+    <img src="{% static 'images/banners/banner.jpg' %}" alt="Taller Miluxious">
+  </div>
+  <div class="brand-story-body">
+    <p class="eyebrow">Artesanía</p>
+    <h2 class="section-title">Cada pieza nace en el taller</h2>
+    <p class="section-lead">Diseñamos y producimos en {{ brand_story_city|default:"nuestro taller" }}, combinando técnicas tradicionales con inspiración contemporánea. Cada detalle está pensado para perdurar.</p>
+    <a class="btn" href="#about">Conocé nuestra historia →</a>
+  </div>
+</section>
