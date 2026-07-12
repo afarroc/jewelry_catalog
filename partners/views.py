@@ -5,17 +5,20 @@ from .models import Partner
 
 
 class PartnerListView(ListView):
+    """Directorio público de tiendas (vitrina).
+
+    La vitrina es pública para todos los visitantes (anónimos o logueados),
+    sin importar la membresía: un cliente normal logueado debe poder descubrir
+    y navegar todas las tiendas activas. El aislamiento por membresía corresponde
+    al dashboard privado del partner (Fase 2) y al admin de Product/ImageUpload,
+    no a la vitrina pública.
+    """
     model = Partner
     template_name = 'partners/list.html'
     context_object_name = 'partners'
 
     def get_queryset(self):
-        qs = Partner.objects.filter(is_active=True)
-        user = getattr(self.request, 'user', None)
-        if user and user.is_authenticated and not user.is_superuser:
-            partner_ids = user.partner_memberships.values_list('partner_id', flat=True)
-            qs = qs.filter(id__in=partner_ids)
-        return qs
+        return Partner.objects.filter(is_active=True)
 
 
 class PartnerDetailView(DetailView):
@@ -26,12 +29,8 @@ class PartnerDetailView(DetailView):
     slug_url_kwarg = 'slug'
 
     def get_queryset(self):
-        qs = Partner.objects.filter(is_active=True)
-        user = getattr(self.request, 'user', None)
-        if user and user.is_authenticated and not user.is_superuser:
-            partner_ids = user.partner_memberships.values_list('partner_id', flat=True)
-            qs = qs.filter(id__in=partner_ids)
-        return qs
+        # Vitrina pública: cualquier visitante ve cualquier tienda activa.
+        return Partner.objects.filter(is_active=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

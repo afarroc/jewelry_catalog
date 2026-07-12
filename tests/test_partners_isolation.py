@@ -135,21 +135,23 @@ def test_superuser_sees_all_partners(client, superuser, partner_a, partner_b):
 
 
 @pytest.mark.django_db
-def test_user_without_membership_sees_empty_partners(client, user):
+def test_directory_public_for_logged_in_non_member(client, user):
+    # La vitrina es pública: un cliente logueado sin membresía ve todas las tiendas.
     client.force_login(user)
     response = client.get(reverse('partners:list'))
     assert response.status_code == 200
-    assert 'Muñecas y Peluches' not in response.content.decode()
-    assert 'Tazas Impresas' not in response.content.decode()
+    assert 'Muñecas y Peluches' in response.content.decode()
+    assert 'Tazas Impresas' in response.content.decode()
 
 
 @pytest.mark.django_db
-def test_partner_user_sees_only_their_partner(client, user, partner_a, partner_b, partner_user_a_manager):
+def test_directory_public_for_partner_user(client, user, partner_a, partner_b, partner_user_a_manager):
+    # Un partner user también ve el directorio completo (la vitrina no se filtra por membresía).
     client.force_login(user)
     response = client.get(reverse('partners:list'))
     assert response.status_code == 200
     assert partner_a.name in response.content.decode()
-    assert partner_b.name not in response.content.decode()
+    assert partner_b.name in response.content.decode()
 
 
 @pytest.mark.django_db
