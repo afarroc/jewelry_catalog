@@ -290,6 +290,42 @@ def image_delete(request, image_id):
 
 
 @login_required
+def image_bulk_delete(request):
+    """Bulk delete selected images from the gallery."""
+    user = request.user.username or 'Anonymous'
+
+    if request.method != 'POST':
+        messages.error(request, 'Método no permitido.')
+        return redirect('gallery:image_list')
+
+    selected_ids = request.POST.getlist('selected_images')
+    if not selected_ids:
+        messages.warning(request, 'No seleccionaste ninguna imagen para eliminar.')
+        return redirect('gallery:image_list')
+
+    # Only delete images that belong to the current user's partner scope (if applicable)
+    qs = ImageUpload.objects.filter(id__in=selected_ids)
+    if hasattr(request, 'user_partners'):
+        allowed_partners = request.user_partners
+        if allowed_partners:
+            qs = qs.filter(partner__in=allowed_partners)
+        else:
+            qs = qs.none()
+
+    deleted_count = qs.count()
+    deleted_titles = [img.title or f'Image {img.id}' for img in qs]
+
+    for img in qs:
+        image_logger.warning(f"[BULK_DELETE] Deleting image: ID={img.id}, Title='{img.title}', URL='{img.image}', User={user}")
+
+    qs.delete()
+
+    image_logger.info(f"[BULK_DELETE] Bulk deleted {deleted_count} images by user: {user}")
+    messages.success(request, f'Se eliminaron {deleted_count} imagen(es): {", ".join(deleted_titles[:5])}{"..." if len(deleted_titles) > 5 else ""}')
+    return redirect('gallery:image_list')
+
+
+@login_required
 def product_image_editor(request):
     """Vista de carga y recorte de imagen.
     

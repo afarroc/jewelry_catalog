@@ -123,6 +123,18 @@
     color: #fff;
     border-color: var(--ink);
   }
+  .bulk-select-checkbox {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 10;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+  #bulkActions {
+    display: none;
+  }
 </style>
 {% if request.GET.select %}
 <style>
@@ -240,10 +252,15 @@
     </h2>
   </div>
   <div class="bento-grid">
-    {% for image in combined_images %}
-    <article class="bento-item" {% if request.GET.select %}onclick="window.location='{% if image.is_cloudinary %}{% url 'gallery:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'"{% endif %}>
-      <div class="bento-media admin-bento-media">
-        <img src="{{ image.image }}" alt="{{ image.title }}">
+    <form method="post" action="{% url 'gallery:image_bulk_delete' %}" id="bulkDeleteForm">
+      {% csrf_token %}
+      {% for image in combined_images %}
+      <article class="bento-item" {% if request.GET.select %}onclick="window.location='{% if image.is_cloudinary %}{% url 'gallery:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'"{% endif %}>
+        <div class="bento-media admin-bento-media">
+          {% if not request.GET.select %}
+          <input type="checkbox" name="selected_images" value="{{ image.id }}" class="bulk-select-checkbox" style="position:absolute;top:8px;left:8px;z-index:10;width:18px;height:18px;cursor:pointer;" title="Seleccionar para eliminar">
+          {% endif %}
+          <img src="{{ image.image }}" alt="{{ image.title }}">
         {% if request.GET.select %}
           <div class="gallery-select-overlay">Seleccionar</div>
         {% endif %}
@@ -281,6 +298,17 @@
     </article>
     {% endfor %}
   </div>
+  {% if not request.GET.select %}
+  <div class="order-card admin-card--mt" id="bulkActions" style="display:none;">
+    <button type="submit" class="btn btn-danger" form="bulkDeleteForm" onclick="return confirm('¿Eliminar las imágenes seleccionadas? Esta acción no se puede deshacer.');">
+      <i class="fa-solid fa-trash"></i> Eliminar seleccionadas (<span id="selectedCount">0</span>)
+    </button>
+    <button type="button" class="btn btn-secondary" onclick="document.getElementById('bulkDeleteForm').reset(); document.getElementById('bulkActions').style.display='none';">
+      Cancelar
+    </button>
+  </div>
+  {% endif %}
+  </form>
 
   <nav class="pagination" aria-label="Paginación">
     {% if page_obj.has_previous %}
@@ -303,4 +331,33 @@
   </div>
   {% endif %}
 </section>
+
+<script>
+(function() {
+  const form = document.getElementById('bulkDeleteForm');
+  const bulkActions = document.getElementById('bulkActions');
+  const selectedCount = document.getElementById('selectedCount');
+  if (!form || !bulkActions || !selectedCount) return;
+
+  function updateBulkActions() {
+    const checked = form.querySelectorAll('input[name="selected_images"]:checked');
+    selectedCount.textContent = checked.length;
+    bulkActions.style.display = checked.length > 0 ? 'block' : 'none';
+  }
+
+  form.addEventListener('change', updateBulkActions);
+  // On page change, preserve selected IDs via URL params
+  const pageLinks = form.closest('section').querySelectorAll('.pagination a');
+  pageLinks.forEach(function(link) {
+    link.addEventListener('click', function() {
+      const checked = form.querySelectorAll('input[name="selected_images"]:checked');
+      const ids = Array.from(checked).map(function(c) { return c.value; });
+      if (ids.length === 0) return;
+      const url = new URL(link.href);
+      url.searchParams.set('selected', ids.join(','));
+      link.href = url.toString();
+    });
+  });
+})();
+</script>
 {% endblock %}

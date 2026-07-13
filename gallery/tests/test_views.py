@@ -52,3 +52,34 @@ def test_image_delete_post_redirects(client, user):
     response = client.post(url)
     assert response.status_code == 302
     assert ImageUpload.objects.filter(id=img.id).exists() is False
+
+
+@pytest.mark.django_db
+def test_bulk_delete_requires_post(client, user):
+    client.force_login(user)
+    url = reverse('gallery:image_bulk_delete')
+    response = client.get(url)
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_bulk_delete_removes_selected_images(client, user):
+    img1 = ImageUpload.objects.create(title='A', image='https://example.com/a.jpg')
+    img2 = ImageUpload.objects.create(title='B', image='https://example.com/b.jpg')
+    img3 = ImageUpload.objects.create(title='C', image='https://example.com/c.jpg')
+
+    client.force_login(user)
+    url = reverse('gallery:image_bulk_delete')
+    response = client.post(url, data={'selected_images': [str(img1.id), str(img2.id)]})
+    assert response.status_code == 302
+    assert ImageUpload.objects.filter(id=img1.id).exists() is False
+    assert ImageUpload.objects.filter(id=img2.id).exists() is False
+    assert ImageUpload.objects.filter(id=img3.id).exists() is True
+
+
+@pytest.mark.django_db
+def test_bulk_delete_empty_selection_redirects_with_message(client, user):
+    client.force_login(user)
+    url = reverse('gallery:image_bulk_delete')
+    response = client.post(url, data={'selected_images': []})
+    assert response.status_code == 302
