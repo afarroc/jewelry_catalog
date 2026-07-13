@@ -117,9 +117,9 @@ class ProductImageCropForm(forms.Form):
 
     image = forms.ImageField(
         label='Imagen original',
+        required=False,
         widget=forms.FileInput(attrs={
             'accept': 'image/*',
-            'required': False,  # No requerida si se elige de galería
         }),
         help_text='Formatos permitidos: JPG, PNG, WebP. Tamaño máximo recomendado: 10MB.',
     )

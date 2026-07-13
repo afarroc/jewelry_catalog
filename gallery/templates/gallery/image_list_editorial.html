@@ -158,11 +158,11 @@
       <i class="fa-solid fa-plus"></i>
       <div class="toolbar-label">Crear producto</div>
     </a>
-    <a class="toolbar-item" href="{% url 'products:image_upload' %}">
+    <a class="toolbar-item" href="{% url 'gallery:image_upload' %}">
       <i class="fa-solid fa-cloud-arrow-up"></i>
       <div class="toolbar-label">Subir imagen</div>
     </a>
-    <a class="toolbar-item" href="{% url 'products:image_editor' %}">
+    <a class="toolbar-item" href="{% url 'gallery:image_editor' %}">
       <i class="fa-solid fa-crop-simple"></i>
       <div class="toolbar-label">Editor de imagen</div>
     </a>
@@ -241,7 +241,7 @@
   </div>
   <div class="bento-grid">
     {% for image in combined_images %}
-    <article class="bento-item" {% if request.GET.select %}onclick="window.location='{% if image.is_cloudinary %}{% url 'products:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'"{% endif %}>
+    <article class="bento-item" {% if request.GET.select %}onclick="window.location='{% if image.is_cloudinary %}{% url 'gallery:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'"{% endif %}>
       <div class="bento-media admin-bento-media">
         <img src="{{ image.image }}" alt="{{ image.title }}">
         {% if request.GET.select %}
@@ -259,18 +259,18 @@
         {% endif %}
         <div class="order-actions admin-actions">
           {% if request.GET.select %}
-            <button type="button" class="btn btn-primary" onclick="window.location='{% if image.is_cloudinary %}{% url 'products:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'">
+            <button type="button" class="btn btn-primary" onclick="window.location='{% if image.is_cloudinary %}{% url 'gallery:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'">
               <i class="fa-solid fa-check"></i> <span class="btn-text">Seleccionar</span>
             </button>
           {% else %}
             {% if not image.is_cloudinary %}
-              <a class="btn btn-secondary" href="{% url 'products:image_detail' image.id %}">
+              <a class="btn btn-secondary" href="{% url 'gallery:image_detail' image.id %}">
                 <i class="fa-solid fa-eye"></i> <span class="btn-text">Ver</span>
               </a>
             {% endif %}
           {% endif %}
           {% if not image.is_cloudinary %}
-            <form method="post" action="{% url 'products:image_delete' image.id %}">{% csrf_token %}
+            <form method="post" action="{% url 'gallery:image_delete' image.id %}">{% csrf_token %}
               <button type="submit" class="btn btn-ghost">
                 <i class="fa-solid fa-trash"></i> <span class="btn-text">Eliminar</span>
               </button>
@@ -298,7 +298,7 @@
     <h3>Sin imágenes</h3>
     <p>{% if search_query %}No se encontraron imágenes para "{{ search_query }}".{% else %}No hay imágenes en esta ubicación.{% endif %}</p>
     {% if not request.GET.select %}
-      <a class="btn btn-primary" href="{% url 'products:image_upload' %}">Subir imagen</a>
+      <a class="btn btn-primary" href="{% url 'gallery:image_upload' %}">Subir imagen</a>
     {% endif %}
   </div>
   {% endif %}

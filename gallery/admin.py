@@ -19,7 +19,9 @@ class ImageUploadAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         user = getattr(request, 'user', None)
         if user and user.is_authenticated and not user.is_superuser:
-            allowed_partners = getattr(user, 'user_partners', set())
+            allowed_partners = getattr(request, 'user_partners', None)
+            if allowed_partners is None:
+                allowed_partners = getattr(user, 'user_partners', set())
             if allowed_partners:
                 return qs.filter(partner__in=allowed_partners)
             return qs.none()

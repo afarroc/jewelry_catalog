@@ -130,7 +130,7 @@
                     <p class="auth-field-error">{{ form.image.errors.0 }}</p>
                   {% endif %}
                   <p class="admin-help-text">
-                    O <a href="{% url 'products:image_list' %}?select=1{% if form.instance.pk %}&product_id={{ form.instance.pk }}{% endif %}" class="admin-link-accent">elegir de la galería</a>
+                    O <a href="{% url 'gallery:image_list' %}?select=1{% if form.instance.pk %}&product_id={{ form.instance.pk }}{% endif %}" class="admin-link-accent">elegir de la galería</a>
                   </p>
                   {% if gallery_image_url %}
                     <img id="galleryPreview" src="{{ gallery_image_url }}" alt="Imagen de galería" data-url="{{ gallery_image_url }}" class="admin-gallery-preview">

@@ -13,7 +13,7 @@
     </div>
     <div class="admin-header-right">
       {% if request.GET.view == 'all' or request.GET.folder %}
-      <a class="admin-header-btn" href="{% url 'products:image_list' %}">
+      <a class="admin-header-btn" href="{% url 'gallery:image_list' %}">
         <i class="fa-solid fa-house"></i>
         <span>Raíz</span>
       </a>

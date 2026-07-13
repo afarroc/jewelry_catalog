@@ -13,8 +13,8 @@ Detalle de imagen · {{ image.asset_folder|default:"Sin carpeta" }}
   <header class="section-header">
     <h1 class="section-title">{{ image.title }}</h1>
     <div class="order-actions">
-      <a class="btn btn-secondary" href="{% url 'products:image_list' %}">Volver al listado</a>
-      <form method="post" action="{% url 'products:image_delete' image.id %}" class="admin-inline-form">{% csrf_token %}<button type="submit" class="btn btn-ghost">Eliminar</button></form>
+      <a class="btn btn-secondary" href="{% url 'gallery:image_list' %}">Volver al listado</a>
+      <form method="post" action="{% url 'gallery:image_delete' image.id %}" class="admin-inline-form">{% csrf_token %}<button type="submit" class="btn btn-ghost">Eliminar</button></form>
     </div>
   </header>
 

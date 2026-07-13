@@ -11,7 +11,7 @@
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
-                        <a href="{% url 'products:image_list' %}">Imágenes</a>
+                        <a href="{% url 'gallery:image_list' %}">Imágenes</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">{{ image.title }}</li>
                 </ol>
@@ -40,7 +40,7 @@
                                     <a href="{{ image.image.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
                                         <i class="fas fa-external-link-alt"></i> Ver Original
                                     </a>
-                                    <a href="{% url 'products:image_delete' image.id %}" class="btn btn-outline-danger btn-sm">
+                                    <a href="{% url 'gallery:image_delete' image.id %}" class="btn btn-outline-danger btn-sm">
                                         <i class="fas fa-trash"></i> Eliminar
                                     </a>
                                 </div>
@@ -92,10 +92,10 @@
                             </div>
 
                             <div class="d-grid gap-2">
-                                <a href="{% url 'products:image_list' %}" class="btn btn-secondary">
+                                <a href="{% url 'gallery:image_list' %}" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> Volver a la Lista
                                 </a>
-                                <a href="{% url 'products:image_upload' %}" class="btn btn-primary">
+                                <a href="{% url 'gallery:image_upload' %}" class="btn btn-primary">
                                     <i class="fas fa-plus"></i> Subir Nueva Imagen
                                 </a>
                             </div>

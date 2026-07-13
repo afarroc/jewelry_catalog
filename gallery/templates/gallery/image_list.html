@@ -10,7 +10,7 @@
             <!-- Header with title and upload button -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>{{ title }}</h2>
-                <a href="{% url 'products:image_upload' %}" class="btn btn-primary">
+                <a href="{% url 'gallery:image_upload' %}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Subir Nueva Imagen
                 </a>
             </div>
@@ -61,7 +61,7 @@
                             <i class="fas fa-search"></i> Buscar
                         </button>
                         {% if search_query %}
-                            <a href="{% url 'products:image_list' %}" class="btn btn-outline-secondary ms-2">
+                            <a href="{% url 'gallery:image_list' %}" class="btn btn-outline-secondary ms-2">
                                 <i class="fas fa-times"></i> Limpiar
                             </a>
                         {% endif %}
@@ -97,13 +97,13 @@
                                             Subida: {{ image.uploaded_at|date:"d/m/Y H:i" }}
                                         </small>
                                         <div class="mt-2">
-                                            <a href="{% url 'products:image_detail' image.id %}" class="btn btn-sm btn-outline-primary">
+                                            <a href="{% url 'gallery:image_detail' image.id %}" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-eye"></i> Ver Detalles
                                             </a>
                                             <a href="{{ image.image.url }}" target="_blank" class="btn btn-sm btn-outline-info">
                                                 <i class="fas fa-external-link-alt"></i> Ver Imagen
                                             </a>
-                                            <a href="{% url 'products:image_delete' image.id %}" class="btn btn-sm btn-outline-danger">
+                                            <a href="{% url 'gallery:image_delete' image.id %}" class="btn btn-sm btn-outline-danger">
                                                 <i class="fas fa-trash"></i> Eliminar
                                             </a>
                                         </div>
@@ -118,7 +118,7 @@
                     <i class="fas fa-images fa-3x text-muted mb-3"></i>
                     <h4 class="text-muted">No hay imágenes subidas aún</h4>
                     <p class="text-muted">¡Sube tu primera imagen!</p>
-                    <a href="{% url 'products:image_upload' %}" class="btn btn-primary">
+                    <a href="{% url 'gallery:image_upload' %}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Subir Primera Imagen
                     </a>
                 </div>
