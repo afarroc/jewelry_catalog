@@ -109,6 +109,39 @@ def image_upload(request):
 
 
 @login_required
+def gallery_home(request):
+    """Home/dashboard de la galería: métricas, accesos rápidos y actividad reciente."""
+    user = request.user.username or 'Anonymous'
+    start_time = timezone.now()
+
+    total_images = ImageUpload.objects.count()
+    recent_uploads = ImageUpload.objects.filter(
+        uploaded_at__gte=timezone.now() - timezone.timedelta(days=7)
+    ).count()
+
+    try:
+        subfolders = get_cloudinary_folders('')
+    except Exception:
+        subfolders = []
+
+    try:
+        recent_images = list(ImageUpload.objects.order_by('-uploaded_at')[:8])
+    except Exception:
+        recent_images = []
+
+    context = {
+        'title': 'Galería',
+        'admin_header_title': 'Galería',
+        'admin_header_subtitle': 'Panel de administración de imágenes',
+        'total_images': total_images,
+        'recent_uploads': recent_uploads,
+        'subfolders': subfolders,
+        'recent_images': recent_images,
+    }
+    return render(request, 'gallery/gallery_home.html', context)
+
+
+@login_required
 def image_list(request):
     """View for listing uploaded images with folder navigation and search."""
     user = request.user.username or 'Anonymous'

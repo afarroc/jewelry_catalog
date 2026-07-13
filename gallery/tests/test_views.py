@@ -8,6 +8,23 @@ User = get_user_model()
 
 
 @pytest.mark.django_db
+def test_gallery_home_requires_login(client):
+    url = reverse('gallery:home')
+    response = client.get(url)
+    assert response.status_code == 302
+    assert 'login' in response.url
+
+
+@pytest.mark.django_db
+def test_gallery_home_renders_for_authenticated_user(client, user):
+    client.force_login(user)
+    url = reverse('gallery:home')
+    response = client.get(url)
+    assert response.status_code == 200
+    assert 'Galería' in response.content.decode()
+
+
+@pytest.mark.django_db
 def test_image_list_requires_login(client):
     url = reverse('gallery:image_list')
     response = client.get(url)
