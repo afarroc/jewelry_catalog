@@ -1,0 +1,107 @@
+{% extends 'products/admin_image_base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_title %}{{ title }}{% endblock %}
+{% block admin_subtitle %}
+{% if gallery_mode %}Galería general{% elif product %}Producto: {{ product.name }}{% else %}Selecciona un producto para asignar la imagen{% endif %}
+{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+{% endblock %}
+
+{% block admin_content %}
+<div class="ie-page">
+  <header class="ie-header">
+    <h1 class="ie-title">Editor de imagen{% if gallery_mode %} — Galería{% elif product %} — {{ product.name }}{% endif %}</h1>
+    {% if product %}
+      <p class="ie-subtitle">Producto: {{ product.name }}</p>
+    {% elif gallery_mode %}
+      <p class="ie-subtitle">Sube una imagen a la galería general. Podrás seleccionarla desde cualquier producto.</p>
+    {% else %}
+      <p class="ie-subtitle">Selecciona un producto existente o crea uno nuevo antes de subir la imagen.</p>
+    {% endif %}
+  </header>
+
+  {% if messages %}
+    <div class="ie-messages">
+      {% for message in messages %}
+        <div class="ie-alert ie-alert--{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="ie-form" id="ieForm">
+    {% csrf_token %}
+    {{ form.crop_data }}
+    {% if product %}
+      {{ form.product_id }}
+    {% endif %}
+
+    <div class="ie-layout">
+      <aside class="ie-sidebar">
+        <div class="ie-field">
+          <label class="ie-label" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+          {{ form.image }}
+          {% if form.image.errors %}
+            <p class="ie-alert ie-alert--error">{{ form.image.errors.0 }}</p>
+          {% endif %}
+          {% if product and product.image %}
+            <p class="ie-help">Ya existe una imagen. Sube otra para reemplazarla.</p>
+          {% endif %}
+        </div>
+
+        <div class="ie-field">
+          <label class="ie-label">Formato de salida</label>
+          <div class="ie-ratio-grid" id="ieRatioGrid">
+            <button type="button" class="ie-ratio-btn active" data-ratio="card" data-aspect="1" data-w="800" data-h="800">Card 1:1</button>
+            <button type="button" class="ie-ratio-btn" data-ratio="banner" data-aspect="3" data-w="1200" data-h="400">Banner 3:1</button>
+            <button type="button" class="ie-ratio-btn" data-ratio="hero" data-aspect="3.2" data-w="1920" data-h="600">Hero 16:5</button>
+            <button type="button" class="ie-ratio-btn" data-ratio="1x1" data-aspect="1" data-w="800" data-h="800">1×1</button>
+            <button type="button" class="ie-ratio-btn" data-ratio="1x2" data-aspect="0.5" data-w="800" data-h="1600">1×2</button>
+            <button type="button" class="ie-ratio-btn" data-ratio="wide" data-aspect="2" data-w="1200" data-h="600">Wide 2:1</button>
+            <button type="button" class="ie-ratio-btn" data-ratio="tall" data-aspect="0.5" data-w="600" data-h="1200">Tall 1:2</button>
+            <button type="button" class="ie-ratio-btn" data-ratio="classic" data-aspect="1.33" data-w="800" data-h="600">Classic 4:3</button>
+          </div>
+        </div>
+
+        <div class="ie-field">
+          <label class="ie-label">Acciones</label>
+          <button type="submit" class="ie-btn ie-btn--primary">Guardar imagen</button>
+          {% if product %}
+            <a href="{% url 'products:product_update' product_id=product.id %}" class="ie-btn ie-btn--secondary">Cancelar</a>
+          {% else %}
+            <a href="{% url 'products:product_create' %}" class="ie-btn ie-btn--secondary">Ir a crear producto</a>
+          {% endif %}
+        </div>
+      </aside>
+
+      <section class="ie-canvas-wrap">
+        <div class="ie-canvas-container" id="ieCanvasContainer">
+          <img id="ieImageToCrop" src="" alt="Imagen a recortar" class="ie-hidden">
+          <div class="ie-placeholder" id="iePlaceholder">
+            <i class="fa-solid fa-image"></i>
+            <p>Selecciona una imagen para comenzar</p>
+          </div>
+        </div>
+      </section>
+
+      <aside class="ie-preview-sidebar">
+        <label class="ie-label">Previsualización</label>
+        <div class="ie-preview-strip" id="iePreviewStrip">
+          <p class="ie-help">El preview se genera al seleccionar una imagen y un formato.</p>
+        </div>
+      </aside>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+<script src="{% static 'js/product_image_editor.js' %}"></script>
+{% endblock %}

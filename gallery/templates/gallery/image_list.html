@@ -1,0 +1,277 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header with title and upload button -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>{{ title }}</h2>
+                <a href="{% url 'products:image_upload' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Subir Nueva Imagen
+                </a>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="card-title mb-1">Total Imágenes</h5>
+                                    <h3 class="mb-0">{{ total_images }}</h3>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-images fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="card-title mb-1">Subidas Recientes</h5>
+                                    <h3 class="mb-0">{{ recent_uploads }}</h3>
+                                    <small>Últimos 7 días</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-clock fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Form -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" class="d-flex">
+                        <input type="text" name="q" class="form-control me-2"
+                               placeholder="Buscar por título o descripción..."
+                               value="{{ search_query }}">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                        {% if search_query %}
+                            <a href="{% url 'products:image_list' %}" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-times"></i> Limpiar
+                            </a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            <!-- Search Results Info -->
+            {% if search_query %}
+                <div class="alert alert-info">
+                    <i class="fas fa-search"></i>
+                    <strong>Resultados para:</strong> "{{ search_query }}"
+                    <span class="badge bg-primary ms-2">{{ images.paginator.count }} imágenes encontradas</span>
+                </div>
+            {% endif %}
+
+            {% if images %}
+                <div class="row">
+                    {% for image in images %}
+                        <div class="col-md-4 col-sm-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-img-container" style="height: 200px; overflow: hidden;">
+                                    <img src="{{ image.image.url }}" class="card-img-top img-fluid"
+                                         alt="{{ image.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">{{ image.title }}</h5>
+                                    {% if image.description %}
+                                        <p class="card-text flex-grow-1">{{ image.description|truncatechars:100 }}</p>
+                                    {% endif %}
+                                    <div class="mt-auto">
+                                        <small class="text-muted">
+                                            Subida: {{ image.uploaded_at|date:"d/m/Y H:i" }}
+                                        </small>
+                                        <div class="mt-2">
+                                            <a href="{% url 'products:image_detail' image.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i> Ver Detalles
+                                            </a>
+                                            <a href="{{ image.image.url }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-external-link-alt"></i> Ver Imagen
+                                            </a>
+                                            <a href="{% url 'products:image_delete' image.id %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i> Eliminar
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center mt-5">
+                    <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No hay imágenes subidas aún</h4>
+                    <p class="text-muted">¡Sube tu primera imagen!</p>
+                    <a href="{% url 'products:image_upload' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Subir Primera Imagen
+                    </a>
+                </div>
+            {% endif %}
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <div class="d-flex justify-content-center mt-4">
+                    <nav aria-label="Image pagination">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}page=1">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}page={{ page_obj.previous_page_number }}">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}page={{ page_obj.next_page_number }}">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}page={{ page_obj.paginator.num_pages }}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+
+                <div class="text-center mt-3 text-muted">
+                    <small>
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                        ({{ page_obj.paginator.count }} imágenes total)
+                    </small>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+.card-img-container {
+    background-color: #f8f9fa;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-outline-info:hover {
+    background-color: #0dcaf0;
+    border-color: #0dcaf0;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* Statistics Cards */
+.bg-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%) !important;
+}
+
+.bg-success {
+    background: linear-gradient(135deg, #198754 0%, #157347 100%) !important;
+}
+
+/* Pagination */
+.pagination {
+    margin-bottom: 0;
+}
+
+.page-link {
+    color: #0d6efd;
+    border-color: #dee2e6;
+}
+
+.page-link:hover {
+    color: #0a58ca;
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* Search Form */
+.form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Alert Styles */
+.alert-info {
+    border-color: #0dcaf0;
+    background-color: rgba(13, 202, 240, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .d-flex.justify-content-between.align-items-center h2 {
+        margin-bottom: 0;
+    }
+
+    .card-img-container {
+        height: 150px !important;
+    }
+}
+</style>
+{% endblock %}

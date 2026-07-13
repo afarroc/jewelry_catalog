@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     # Local Apps
     'home',
     'products',
+    'gallery',
     'accounts',
     'cart',
     'orders',

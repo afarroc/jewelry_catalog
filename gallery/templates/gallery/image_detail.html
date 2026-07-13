@@ -1,0 +1,187 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'products:image_list' %}">Imágenes</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ image.title }}</li>
+                </ol>
+            </nav>
+
+            <div class="row">
+                <!-- Image Display -->
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="image-container text-center">
+                                <img src="{{ image.image.url }}" alt="{{ image.title }}"
+                                     class="img-fluid rounded" style="max-width: 100%; max-height: 600px;">
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">{{ image.title }}</h5>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        Subida: {{ image.uploaded_at|date:"d/m/Y H:i" }}
+                                    </small>
+                                </div>
+                                <div>
+                                    <a href="{{ image.image.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-external-link-alt"></i> Ver Original
+                                    </a>
+                                    <a href="{% url 'products:image_delete' image.id %}" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Information -->
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-info-circle"></i> Información de la Imagen
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row">
+                                <dt class="col-sm-4">Título:</dt>
+                                <dd class="col-sm-8">{{ image.title }}</dd>
+
+                                <dt class="col-sm-4">ID:</dt>
+                                <dd class="col-sm-8">#{{ image.id }}</dd>
+
+                                <dt class="col-sm-4">Subida:</dt>
+                                <dd class="col-sm-8">{{ image.uploaded_at|date:"d/m/Y" }}</dd>
+
+                                <dt class="col-sm-4">Hora:</dt>
+                                <dd class="col-sm-8">{{ image.uploaded_at|date:"H:i" }}</dd>
+
+                                {% if image.description %}
+                                    <dt class="col-sm-4">Descripción:</dt>
+                                    <dd class="col-sm-8">{{ image.description }}</dd>
+                                {% endif %}
+                            </dl>
+
+                            <hr>
+
+                            <div class="mb-3">
+                                <label class="form-label">URL de la Imagen:</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm"
+                                           value="{{ image.image.url }}" readonly>
+                                    <button class="btn btn-outline-secondary btn-sm"
+                                            onclick="copyToClipboard('{{ image.image.url }}')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'products:image_list' %}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Volver a la Lista
+                                </a>
+                                <a href="{% url 'products:image_upload' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Subir Nueva Imagen
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        // Show success message
+        const button = event.target.closest('button');
+        const originalIcon = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i>';
+        button.classList.remove('btn-outline-secondary');
+        button.classList.add('btn-success');
+
+        setTimeout(function() {
+            button.innerHTML = originalIcon;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-secondary');
+        }, 2000);
+    });
+}
+</script>
+
+<style>
+.image-container {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+dl.row dt {
+    font-weight: 600;
+    color: #495057;
+}
+
+dl.row dd {
+    color: #6c757d;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.breadcrumb {
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .image-container {
+        padding: 1rem;
+        min-height: 300px;
+    }
+
+    .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}
