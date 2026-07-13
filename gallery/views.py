@@ -159,8 +159,7 @@ def image_list(request):
     if view_mode == 'folder':
         try:
             subfolders = get_cloudinary_folders(folder_path)
-            if folder_path:
-                cloudinary_resources = get_cloudinary_resources(folder_path, max_results=30)
+            cloudinary_resources = get_cloudinary_resources(folder_path, max_results=30)
         except Exception as e:
             image_logger.warning(f"[CLOUDINARY] Could not load folder data: {e}")
 

@@ -1,6 +1,10 @@
 import pytest
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 from gallery.models import ImageUpload
+from partners.models import Partner, PartnerUser
+
+User = get_user_model()
 
 
 @pytest.mark.django_db
@@ -64,9 +68,11 @@ def test_bulk_delete_requires_post(client, user):
 
 @pytest.mark.django_db
 def test_bulk_delete_removes_selected_images(client, user):
-    img1 = ImageUpload.objects.create(title='A', image='https://example.com/a.jpg')
-    img2 = ImageUpload.objects.create(title='B', image='https://example.com/b.jpg')
-    img3 = ImageUpload.objects.create(title='C', image='https://example.com/c.jpg')
+    partner = Partner.objects.create(name='Test Partner', slug='test-partner')
+    PartnerUser.objects.create(user=user, partner=partner, role='editor', can_manage_images=True)
+    img1 = ImageUpload.objects.create(title='A', image='https://example.com/a.jpg', partner=partner)
+    img2 = ImageUpload.objects.create(title='B', image='https://example.com/b.jpg', partner=partner)
+    img3 = ImageUpload.objects.create(title='C', image='https://example.com/c.jpg', partner=partner)
 
     client.force_login(user)
     url = reverse('gallery:image_bulk_delete')
