@@ -1,0 +1,44 @@
+{% extends 'gallery/base_admin.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_title %}Confirmar eliminación{% endblock %}
+{% block admin_subtitle %}
+{{ image.title }}
+{% endblock %}
+
+{% block admin_content %}
+<section class="auth-page">
+  <div class="auth-page-inner">
+    <header class="auth-header">
+      <p class="auth-eyebrow">Imágenes</p>
+      <h1 class="auth-title">Confirmar eliminación</h1>
+    </header>
+
+    <div class="auth-card admin-card--danger">
+      <p>¿Estás seguro de que deseas eliminar la siguiente imagen?</p>
+
+      <div class="order-card">
+        <h2 class="section-title">{{ image.title }}</h2>
+        <img src="{{ image.image.url }}" alt="{{ image.title }}" class="admin-confirm-img">
+        <p class="admin-muted">{{ image.description|default:"Sin descripción" }}</p>
+      </div>
+
+      <div class="django-messages">
+        <div class="alert alert-warning">
+          <strong>Advertencia:</strong> Esta acción no se puede deshacer. La imagen será eliminada permanentemente.
+        </div>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="profile-form-actions">
+          <a class="btn btn-secondary" href="{% url 'gallery:image_detail' image.id %}">Cancelar</a>
+          <button type="submit" class="btn btn-ghost admin-btn-danger">Eliminar imagen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

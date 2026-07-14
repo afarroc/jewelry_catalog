@@ -1,0 +1,297 @@
+/* gallery/components.css — @layer components
+ * Componentes visuales del shell de administración de galería.
+ * Colores, tipografía, bordes, sombras y estados hover/focus.
+ * La estructura/posicionamiento vive en gallery/layout.css.
+ * Vanilla CSS (prohibido Bootstrap). Variables en tokens.css.
+ */
+@layer components {
+  /* Iconos SVG inline (sin dependencias, themeable con currentColor) */
+  .icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Sidebar de navegación (shell) */
+  .d-sidebar,
+  .admin-sidebar {
+    background: var(--ink);
+    color: #fff;
+  }
+
+  .admin-sidebar-brand {
+    padding: 20px 18px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .admin-sidebar-brand span {
+    color: var(--accent);
+  }
+
+  .admin-sidebar-nav {
+    padding: 14px 0;
+  }
+
+  .admin-sidebar-section {
+    padding: 10px 18px 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .admin-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.15s ease, color 0.15s ease;
+    border-left: 3px solid transparent;
+  }
+
+  .admin-sidebar-item:hover,
+  .admin-sidebar-item:focus-visible {
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    outline: none;
+  }
+
+  .admin-sidebar-item.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-left-color: var(--accent);
+    font-weight: 600;
+  }
+
+  .admin-sidebar-item .icon {
+    opacity: 0.9;
+  }
+
+  /* Menú de usuario (dropdown) — bloque autocontenido en la sidebar */
+  .admin-sidebar-user {
+    background: var(--ink);
+  }
+
+  .admin-user-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 14px;
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.85);
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .admin-user-trigger:hover,
+  .admin-user-trigger:focus-visible,
+  .admin-user-trigger[aria-expanded="true"] {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    outline: none;
+  }
+
+  .admin-user-trigger:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+
+  .admin-user-avatar {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .admin-user-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Caret con triángulo CSS (sin dependencia de iconos) */
+  .admin-user-caret {
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid currentColor;
+    transition: transform 0.2s ease;
+  }
+
+  .admin-user-trigger[aria-expanded="true"] .admin-user-caret {
+    transform: rotate(180deg);
+  }
+
+  .admin-user-guest {
+    display: block;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  /* Panel del dropdown */
+  .admin-user-menu {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 14px 35px color-mix(in srgb, var(--ink) 18%, transparent);
+    overflow: hidden;
+  }
+
+  .admin-user-menu-head {
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .admin-user-menu-item {
+    display: block;
+    width: 100%;
+    padding: 11px 14px;
+    font: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    text-align: left;
+    text-decoration: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .admin-user-menu-item:hover,
+  .admin-user-menu-item:focus-visible {
+    background: color-mix(in srgb, var(--ink) 6%, transparent);
+    outline: none;
+  }
+
+  .admin-user-menu-form {
+    margin: 0;
+  }
+
+  /* Topbar / header del admin */
+  .d-topbar,
+  .admin-header {
+    background: rgba(247, 245, 242, 0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .d-topbar .admin-header-inner,
+  .admin-header .admin-header-inner,
+  .d-topbar .header-inner.admin-header-inner,
+  .admin-header .header-inner.admin-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 10px 28px 10px !important;
+    width: 100%;
+  }
+
+  .admin-header-title-area {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .admin-header-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .admin-header-subtitle {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .admin-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+
+  .admin-header-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: background 160ms ease;
+  }
+
+  .admin-header-btn:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  /* Tamaños de icono por contexto */
+  .admin-menu-toggle .icon,
+  .admin-sidebar-close .icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .admin-header-btn .icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  @media (max-width: 860px) {
+    .admin-header-inner {
+      gap: 8px;
+    }
+
+    .admin-header-title {
+      font-size: 18px;
+    }
+
+    .admin-header-subtitle {
+      font-size: 12px;
+    }
+
+    .admin-header-right {
+      gap: 6px;
+    }
+
+    .admin-header-btn span {
+      display: none;
+    }
+  }
+}

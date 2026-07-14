@@ -1,0 +1,143 @@
+/* gallery/layout.css — @layer layout
+ * Estructura del shell de administración de galería (Objects/Layout en ITCSS).
+ * Solo layout: display, grid/flex, position, sizing, spacing, z-index, overflow y
+ * responsive. Basado en el patrón de Adminator v4 (MIT): shell grid, sidebar
+ * sticky, topbar sticky y mobile drawer con body.has-drawer-open.
+ */
+@layer layout {
+  /* Shell grid: sidebar + área de contenido */
+  .shell {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+
+  .main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 100vh;
+  }
+
+  /* Sidebar sticky (desktop) */
+  .d-sidebar,
+  .admin-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* Topbar sticky */
+  .d-topbar,
+  .admin-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  /* Content scrolleable */
+  .content,
+  .admin-content {
+    flex: 1;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 28px 40px;
+  }
+
+  /* Footer del admin */
+  .d-footer,
+  .admin-footer {
+    flex-shrink: 0;
+  }
+
+  /* Mobile drawer backdrop */
+  .drawer-backdrop,
+  .admin-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgb(15 23 42 / 0.5);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 240ms ease, visibility 240ms;
+  }
+
+  body.has-drawer-open .drawer-backdrop,
+  body.has-drawer-open .admin-sidebar-overlay {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Mobile: hamburguesa oculta por defecto */
+  .hamburger,
+  .admin-menu-toggle {
+    display: none;
+  }
+
+  /* Mobile: close button oculto por defecto */
+  .admin-sidebar .admin-sidebar-close {
+    display: none;
+  }
+
+  /* Responsive: drawer mobile */
+  @media (max-width: 860px) {
+    .shell {
+      display: block;
+    }
+
+    .d-sidebar,
+    .admin-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 260px;
+      height: 100vh;
+      z-index: 100;
+      transform: translateX(-100%);
+      transition: transform 240ms cubic-bezier(0.2, 0.7, 0.2, 1);
+      box-shadow: 0 12px 40px -8px rgb(0 0 0 / 0.4);
+    }
+
+    .admin-sidebar .admin-sidebar-close {
+      display: block;
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 110;
+    }
+
+    .admin-sidebar-brand {
+      padding-right: 48px;
+    }
+
+    .d-sidebar.is-open,
+    body.has-drawer-open .admin-sidebar {
+      transform: translateX(0);
+    }
+
+    body.has-drawer-open {
+      overflow: hidden;
+    }
+
+    .hamburger,
+    .admin-menu-toggle {
+      display: inline-flex;
+    }
+
+    .admin-sidebar-close {
+      display: block;
+    }
+  }
+
+  @media (min-width: 861px) {
+    .admin-sidebar .admin-sidebar-close {
+      display: none;
+    }
+  }
+}

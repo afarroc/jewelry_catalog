@@ -1,0 +1,63 @@
+{% extends 'gallery/base_admin.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_title %}{{ title }}{% endblock %}
+{% block admin_subtitle %}
+Subir imagen a la galería
+{% endblock %}
+
+{% block admin_content %}
+<section class="auth-page">
+  <div class="auth-page-inner">
+    <header class="auth-header">
+      <p class="auth-eyebrow">Imágenes</p>
+      <h1 class="auth-title">{{ title }}</h1>
+    </header>
+
+    <div class="auth-card">
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <div class="auth-form">
+          <div class="auth-field">
+            <label class="auth-label" for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+              <p class="auth-field-error">{{ form.title.errors.0 }}</p>
+            {% endif %}
+            {% if form.title.help_text %}
+              <p class="auth-field-help">{{ form.title.help_text }}</p>
+            {% endif %}
+          </div>
+
+          <div class="auth-field">
+            <label class="auth-label" for="{{ form.image.id_for_label }}">{{ form.image.label }} <span class="admin-required">*</span></label>
+            {{ form.image }}
+            {% if form.image.errors %}
+              <p class="auth-field-error">{{ form.image.errors.0 }}</p>
+            {% endif %}
+            {% if form.image.help_text %}
+              <p class="auth-field-help">{{ form.image.help_text }}</p>
+            {% endif %}
+          </div>
+
+          <div class="auth-field">
+            <label class="auth-label" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+              <p class="auth-field-error">{{ form.description.errors.0 }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="profile-form-actions">
+          <a class="btn btn-secondary" href="{% url 'gallery:image_list' %}">Ver Imágenes</a>
+          <button type="submit" class="btn btn-primary">{{ button_text }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

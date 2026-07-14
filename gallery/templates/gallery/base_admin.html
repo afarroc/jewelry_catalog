@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="description" content="Panel de administración de imágenes Miluxious">
+    <title>{% block title %}Panel Admin{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="page">
+{% comment %}
+Sprite de iconos SVG inline (sin dependencias, licencia original/MIT-friendly).
+Reemplaza a Font Awesome. Themeable vía currentColor.
+{% endcomment %}
+<svg width="0" height="0" class="svg-sprite" aria-hidden="true" focusable="false" style="position:absolute">
+  <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="icon-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="icon-image" viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 16l-5-4-4 3-2.5-2L3 19"/></symbol>
+  <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M12 16V4M8 8l4-4 4 4M5 20h14"/></symbol>
+  <symbol id="icon-crop" viewBox="0 0 24 24"><path d="M6 2v16h16M18 22V6H2"/></symbol>
+  <symbol id="icon-stack" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+  <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="1"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1"/></symbol>
+  <symbol id="icon-folder" viewBox="0 0 24 24"><path d="M3 6h6l2 2h10v11H3z"/></symbol>
+  <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></symbol>
+  <symbol id="icon-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></symbol>
+  <symbol id="icon-store" viewBox="0 0 24 24"><path d="M4 9h16l-1 11H5L4 9z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></symbol>
+  <symbol id="icon-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M19 13v6H5V6h6"/></symbol>
+</svg>
+{% block admin_layout %}
+<div class="shell">
+  {% include 'gallery/components/_admin_sidebar.html' %}
+
+  <div class="main">
+    {% include 'gallery/components/_admin_header.html' %}
+
+    <main class="content">
+      {% block admin_content %}{% endblock %}
+    </main>
+
+    {% include 'gallery/components/_admin_footer.html' %}
+  </div>
+</div>
+{% endblock %}
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/gallery_admin.js' %}"></script>
+    <script src="{% static 'js/gallery_sidebar.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

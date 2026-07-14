@@ -1,0 +1,86 @@
+{% load static %}
+<aside class="d-sidebar admin-sidebar" id="adminSidebar" aria-label="Panel de administración de imágenes">
+  <div class="admin-sidebar-brand">
+    Miluxious<span>admin</span>
+  </div>
+
+  <button class="admin-sidebar-close" id="adminSidebarClose" aria-label="Cerrar menú">
+    <svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg>
+  </button>
+
+  <nav class="admin-sidebar-nav" aria-label="Navegación principal">
+    <div class="admin-sidebar-section">Panel</div>
+    <a class="admin-sidebar-item {% if request.resolver_match.url_name == 'image_list' and not request.GET.folder %}active{% endif %}"
+       href="{% url 'gallery:image_list' %}">
+      <svg class="icon" aria-hidden="true"><use href="#icon-image"></use></svg>
+      <span>Imágenes</span>
+    </a>
+
+    <div class="admin-sidebar-section">Gestión</div>
+    <a class="admin-sidebar-item {% if request.resolver_match.url_name == 'product_create' %}active{% endif %}"
+       href="{% url 'products:product_create' %}">
+      <svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg>
+      <span>Crear producto</span>
+    </a>
+    <a class="admin-sidebar-item {% if request.resolver_match.url_name == 'image_upload' %}active{% endif %}"
+       href="{% url 'gallery:image_upload' %}">
+      <svg class="icon" aria-hidden="true"><use href="#icon-upload"></use></svg>
+      <span>Subir imagen</span>
+    </a>
+    <a class="admin-sidebar-item {% if request.resolver_match.url_name == 'image_editor' %}active{% endif %}"
+       href="{% url 'gallery:image_editor' %}">
+      <svg class="icon" aria-hidden="true"><use href="#icon-crop"></use></svg>
+      <span>Editor de imagen</span>
+    </a>
+
+    <div class="admin-sidebar-section">Vistas</div>
+    <a class="admin-sidebar-item {% if request.GET.view == 'all' %}active{% endif %}"
+       href="{% url 'gallery:image_list' %}?view=all">
+      <svg class="icon" aria-hidden="true"><use href="#icon-stack"></use></svg>
+      <span>Todos los assets</span>
+    </a>
+    <a class="admin-sidebar-item {% if request.resolver_match.url_name == 'image_detail' %}active{% endif %}"
+       href="{% url 'gallery:image_list' %}">
+      <svg class="icon" aria-hidden="true"><use href="#icon-grid"></use></svg>
+      <span>Galería</span>
+    </a>
+
+    {% if request.GET.folder %}
+    <div class="admin-sidebar-section">Carpeta actual</div>
+    <a class="admin-sidebar-item"
+       href="{% url 'gallery:image_list' %}?folder={{ request.GET.folder }}">
+      <svg class="icon" aria-hidden="true"><use href="#icon-folder"></use></svg>
+      <span class="admin-sidebar-folder-name">{{ request.GET.folder }}</span>
+    </a>
+    {% endif %}
+
+    <div class="admin-sidebar-section">Sistema</div>
+    <a class="admin-sidebar-item"
+       href="{% url 'admin:index' %}"
+       target="_blank" rel="noopener">
+      <svg class="icon" aria-hidden="true"><use href="#icon-settings"></use></svg>
+      <span>Django Admin</span>
+    </a>
+  </nav>
+
+  <div class="admin-sidebar-user">
+    {% if user.is_authenticated %}
+    <button class="admin-user-trigger" id="adminUserTrigger" type="button"
+            aria-haspopup="true" aria-expanded="false" aria-controls="adminUserMenu">
+      <span class="admin-user-avatar">{{ user.get_username|default:user.username|default:"?"|first|upper }}</span>
+      <span class="admin-user-name">{{ user.get_username|default:user.username }}</span>
+      <span class="admin-user-caret" aria-hidden="true"></span>
+    </button>
+    <div class="admin-user-menu" id="adminUserMenu" role="menu" aria-labelledby="adminUserTrigger" hidden>
+      <div class="admin-user-menu-head">{{ user.get_username|default:user.username }}</div>
+      <a class="admin-user-menu-item" href="{% url 'admin:index' %}" target="_blank" rel="noopener" role="menuitem">Django Admin</a>
+      <form method="post" action="{% url 'accounts:logout' %}" class="admin-user-menu-form">
+        {% csrf_token %}
+        <button type="submit" class="admin-user-menu-item" role="menuitem">Cerrar sesión</button>
+      </form>
+    </div>
+    {% else %}
+    <span class="admin-user-guest">Sin autenticar</span>
+    {% endif %}
+  </div>
+</aside>

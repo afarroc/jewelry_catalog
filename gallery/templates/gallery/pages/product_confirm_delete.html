@@ -1,0 +1,88 @@
+{% extends 'gallery/base_admin.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">¿Estás seguro de que deseas eliminar el siguiente producto?</p>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            {% if product.image %}
+                                <img src="{{ product.get_image_url }}" alt="{{ product.name }}"
+                                     class="img-fluid mb-2" style="max-height: 200px;">
+                            {% endif %}
+                            <p class="card-text mb-1"><strong>Precio:</strong> {{ product.display_price }}</p>
+                            <p class="card-text mb-1"><strong>Tipo:</strong> {{ product.get_jewelry_type_display }}</p>
+                            <p class="card-text mb-1"><strong>Material:</strong> {{ product.get_material_display }}</p>
+                            <p class="card-text mb-1"><strong>Stock:</strong> {{ product.stock }}</p>
+                            <p class="card-text mb-0">
+                                <strong>Estado:</strong>
+                                <span class="badge {% if product.available %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {% if product.available %}Disponible{% else %}No disponible{% endif %}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+                        El producto será eliminado permanentemente.
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'products:product_detail' product.slug %}"
+                               class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Sí, Eliminar Producto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card.border-danger {
+    border-color: #dc3545 !important;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'gallery/base_admin.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+  <div class="auth-page-inner">
+    <header class="auth-header">
+      <p class="auth-eyebrow">Productos</p>
+      <h1 class="auth-title">Confirmar eliminación</h1>
+    </header>
+
+    <div class="auth-card" style="border-color:#f5c6cb;">
+      <p>¿Estás seguro de que deseas eliminar el siguiente producto?</p>
+
+      <div class="order-card">
+        <h2 class="section-title">{{ product.name }}</h2>
+        {% if product.image %}
+        <img src="{{ product.get_image_url }}" alt="{{ product.name }}" style="max-height:200px; border-radius:12px; border:1px solid var(--line);">
+        {% endif %}
+        <div class="order-body">
+          <div><strong>Precio:</strong> {{ product.display_price }}</div>
+          <div><strong>Tipo:</strong> {{ product.get_jewelry_type_display }}</div>
+          <div><strong>Material:</strong> {{ product.get_material_display }}</div>
+          <div><strong>Stock:</strong> {{ product.stock }}</div>
+          <div>
+            <strong>Estado:</strong>
+            <span class="status-badge {% if product.available %}status-processing{% else %}status-cancelled{% endif %}">
+              {% if product.available %}Disponible{% else %}No disponible{% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="django-messages">
+        <div class="alert alert-warning">
+          <strong>Advertencia:</strong> Esta acción no se puede deshacer. El producto será eliminado permanentemente.
+        </div>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="profile-form-actions">
+          <a class="btn btn-secondary" href="{% url 'products:product_detail' product.slug %}">Cancelar</a>
+          <button type="submit" class="btn btn-ghost" style="color:#b00020; border-color:#f5c6cb;">Eliminar producto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+<header class="site-header admin-header d-topbar">
+  <div class="header-inner admin-header-inner">
+    <button class="admin-menu-toggle hamburger" id="adminMenuToggle" aria-label="Abrir menú" aria-expanded="false">
+      <svg class="icon" aria-hidden="true"><use href="#icon-menu"></use></svg>
+    </button>
+    <div class="admin-header-title-area">
+      <h1 class="admin-header-title">
+        {{ admin_header_title|default:"Imágenes" }}
+      </h1>
+      <div class="admin-header-subtitle">
+        {{ admin_header_subtitle|default:"Panel de administración de imágenes" }}
+      </div>
+    </div>
+    <div class="admin-header-right">
+      {% if request.GET.view == 'all' or request.GET.folder %}
+      <a class="admin-header-btn" href="{% url 'gallery:image_list' %}">
+        <svg class="icon" aria-hidden="true"><use href="#icon-home"></use></svg>
+        <span>Raíz</span>
+      </a>
+      {% endif %}
+
+      <a class="admin-header-btn" href="{% url 'products:product_list' %}" target="_blank" rel="noopener">
+        <svg class="icon" aria-hidden="true"><use href="#icon-store"></use></svg>
+        <span>Ver tienda</span>
+      </a>
+
+      <a class="admin-header-btn" href="{% url 'home:index' %}" target="_blank" rel="noopener">
+        <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg>
+        <span>Sitio</span>
+      </a>
+    </div>
+  </div>
+</header>
