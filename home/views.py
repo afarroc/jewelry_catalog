@@ -6,6 +6,7 @@ from products.grid_packer import pack_products
 from products.grid_items import GenericSlot
 from partners.models import Partner
 from .models import Banner, SocialMedia
+from .hero_utils import build_hero_from_banners, HOME_HERO_DEFAULTS
 import logging
 
 logger = logging.getLogger(__name__)
@@ -31,26 +32,8 @@ def index(request):
         partners = Partner.objects.filter(is_active=True)
 
         # Hero admin-managed: prioriza SiteConfiguration/HomeConfig, fallback a primer banner
-        hero = {
-            'eyebrow': 'Colección 2026',
-            'title': 'Luz eternizada en metal',
-            'subtitle': 'Piezas creadas para perdurar: diseño atemporal, materiales nobles y acabados a mano.',
-            'primary_cta_text': 'Explorar colección',
-            'primary_cta_url': '/products/',
-            'secondary_cta_text': 'Nuestras tiendas',
-            'secondary_cta_url': '/tiendas/',
-            'background_image_url': '/static/images/placeholder-banner.jpg',
-        }
-        if active_banners.exists():
-            b = active_banners[0]
-            hero.update({
-                'eyebrow': b.subtitle or hero['eyebrow'],
-                'title': b.title or hero['title'],
-                'subtitle': b.description or hero['subtitle'],
-                'primary_cta_text': b.button_text or hero['primary_cta_text'],
-                'primary_cta_url': b.button_url or hero['primary_cta_url'],
-                'background_image_url': b.get_image_url,
-            })
+        active_home_banners = active_banners.filter(page='home')
+        hero = build_hero_from_banners(active_home_banners, HOME_HERO_DEFAULTS)
 
         # Best-sellers globales (Miluxious)
         best_sellers = Product.objects.filter(available=True, partner__isnull=True).order_by('-review_count', '-average_rating')[:8]

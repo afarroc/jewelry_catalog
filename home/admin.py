@@ -15,17 +15,18 @@ class BannerAdmin(admin.ModelAdmin):
     # Campos que se muestran en la lista
     list_display = (
         'title',
-        'image_filename',
+        'page',
+        'preview_image',
         'is_active',
         'order',
         'has_button',
         'button_info',
         'created_at',
-        'preview_image'
     )
 
     # Campos por los que se puede filtrar
     list_filter = (
+        'page',
         'is_active',
         'created_at',
         'updated_at',
@@ -37,7 +38,6 @@ class BannerAdmin(admin.ModelAdmin):
         'title',
         'subtitle',
         'description',
-        'image_filename'
     )
 
     # Campos de solo lectura
@@ -53,11 +53,11 @@ class BannerAdmin(admin.ModelAdmin):
     # Configuración de los campos en el formulario
     fieldsets = (
         (None, {
-            'fields': ('title', 'subtitle', 'description')
+            'fields': ('page', 'title', 'subtitle', 'description')
         }),
         ('Imagen', {
-            'fields': ('image_filename', 'preview_image_large'),
-            'description': 'Puede ser ruta estática (ej: banner1.jpg), ruta Cloudinary relativa (ej: v1783035210/banner.jpg) o URL completa.'
+            'fields': ('image', 'preview_image_large'),
+            'description': 'Subí la imagen del banner. Se guarda directamente en Cloudinary.'
         }),
         ('Configuración', {
             'fields': ('is_active', 'order'),
@@ -83,23 +83,29 @@ class BannerAdmin(admin.ModelAdmin):
 
     def preview_image(self, obj):
         """Mostrar miniatura de la imagen en la lista"""
-        if obj.image_filename:
-            return format_html(
-                '<img src="{}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;" alt="{}">',
-                obj.get_image_url,
-                obj.title
-            )
-        return "Sin imagen"
+        if obj.image:
+            try:
+                return format_html(
+                    '<img src="{}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;" alt="{}">',
+                    obj.get_image_url,
+                    obj.title
+                )
+            except Exception:
+                return format_html('<span style="color: #dc3545;">Error</span>')
+        return format_html('<span style="color: #6c757d;">Sin imagen</span>')
     preview_image.short_description = "Vista Previa"
 
     def preview_image_large(self, obj):
         """Mostrar imagen grande en el formulario de edición"""
-        if obj.image_filename:
-            return format_html(
-                '<img src="{}" style="max-width: 400px; max-height: 200px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px;" alt="{}">',
-                obj.get_image_url,
-                obj.title
-            )
+        if obj.image:
+            try:
+                return format_html(
+                    '<img src="{}" style="max-width: 400px; max-height: 200px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px;" alt="{}">',
+                    obj.get_image_url,
+                    obj.title
+                )
+            except Exception:
+                return format_html('<span style="color: #dc3545;">Error loading image</span>')
         return format_html('<p style="color: #666; font-style: italic;">No hay imagen configurada</p>')
     preview_image_large.short_description = "Vista Previa de Imagen"
 

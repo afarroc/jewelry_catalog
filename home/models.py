@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
+from cloudinary.models import CloudinaryField
 import os
 
 
@@ -14,8 +15,21 @@ def validate_image_extension(value):
 
 class Banner(models.Model):
     """
-    Modelo para banners de la página principal
+    Modelo para banners por página.
     """
+    PAGE_CHOICES = [
+        ('home', 'Home'),
+        ('tiendas', 'Tiendas'),
+    ]
+
+    page = models.CharField(
+        max_length=20,
+        choices=PAGE_CHOICES,
+        default='home',
+        verbose_name="Página",
+        help_text="Página en la que se mostrará este banner"
+    )
+
     title = models.CharField(
         max_length=200,
         verbose_name="Título del Banner",
@@ -36,11 +50,13 @@ class Banner(models.Model):
     )
 
     # Campo para la imagen del banner
-    image_filename = models.CharField(
+    image = CloudinaryField(
+        'image',
+        folder='banners',
+        blank=True,
+        null=True,
+        help_text='Imagen del banner. Se sube directamente a Cloudinary.',
         max_length=255,
-        verbose_name="Ruta/URL de la Imagen",
-        help_text="Ruta relativa o URL absoluta del banner. Puede ser ruta estática (ej: banner1.jpg), ruta Cloudinary relativa (ej: v1783035210/banner.jpg) o URL completa de Cloudinary.",
-        unique=True
     )
 
     # Campos de control
@@ -85,27 +101,15 @@ class Banner(models.Model):
 
     @property
     def get_image_url(self):
-        """Obtener la URL completa de la imagen desde Cloudinary, S3/media o ruta local."""
-        if not self.image_filename:
-            return '/static/images/placeholder-banner.jpg'
-
-        filename = self.image_filename.strip()
-
-        if not filename:
-            return '/static/images/placeholder-banner.jpg'
-
-        # Ya es URL absoluta
-        if filename.startswith('http://') or filename.startswith('https://'):
-            return filename
-
-        # Si parece ruta Cloudinary, devolverla directamente
-        if filename.startswith('v') and '/' in filename:
+        """Return image URL for display - supports CloudinaryField resources."""
+        img = self.image
+        if not img or not getattr(img, 'public_id', None):
             cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME', 'dwidzc3k')
-            return f"https://res.cloudinary.com/{cloud_name}/image/upload/{filename}"
-
-        # Construir URL de Cloudinary para nombres de archivo simples
-        cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME', 'dwidzc3k')
-        return f"https://res.cloudinary.com/{cloud_name}/image/upload/{filename}"
+            return f"https://res.cloudinary.com/{cloud_name}/image/upload/placeholder-banner.jpg"
+        try:
+            return img.url or ''
+        except Exception:
+            return ''
 
     def clean(self):
         """Validaciones personalizadas"""
