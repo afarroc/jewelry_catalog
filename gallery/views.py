@@ -105,7 +105,7 @@ def image_upload(request):
         'admin_header_title': 'Subir imagen',
         'admin_header_subtitle': 'Subir imagen a la galería',
     }
-    return render(request, 'gallery/image_upload_editorial.html', context)
+    return render(request, 'gallery/pages/image_upload_editorial.html', context)
 
 
 @login_required
@@ -138,7 +138,7 @@ def gallery_home(request):
         'subfolders': subfolders,
         'recent_images': recent_images,
     }
-    return render(request, 'gallery/gallery_home.html', context)
+    return render(request, 'gallery/pages/gallery_home.html', context)
 
 
 @login_required
@@ -252,7 +252,7 @@ def image_list(request):
         'admin_header_title': 'Imágenes',
         'admin_header_subtitle': 'Panel de administración de imágenes' if not folder_path else f'Carpeta: {folder_path}',
     }
-    return render(request, 'gallery/image_list_editorial.html', context)
+    return render(request, 'gallery/pages/image_list_editorial.html', context)
 
 
 @login_required
@@ -274,7 +274,7 @@ def image_detail(request, image_id):
             'admin_header_title': image.title,
             'admin_header_subtitle': f'Detalle de imagen · {image.asset_folder or "Sin carpeta"}',
         }
-        return render(request, 'gallery/image_detail_editorial.html', context)
+        return render(request, 'gallery/pages/image_detail_editorial.html', context)
 
     except ImageUpload.DoesNotExist:
         image_logger.error(f"[ERROR] Image not found: ID={image_id}, User={user}")
@@ -311,7 +311,7 @@ def image_delete(request, image_id):
             'admin_header_title': 'Confirmar eliminación',
             'admin_header_subtitle': image.title,
         }
-        return render(request, 'gallery/image_confirm_delete_editorial.html', context)
+        return render(request, 'gallery/pages/image_confirm_delete_editorial.html', context)
 
     except ImageUpload.DoesNotExist:
         image_logger.error(f"[ERROR] Image not found: ID={image_id}, User={user}")
@@ -440,7 +440,7 @@ def product_image_editor(request):
         'admin_header_title': 'Editor de imagen' + (f' — {product.name}' if product else ''),
         'admin_header_subtitle': 'Galería general' if gallery_mode else (f'Producto: {product.name}' if product else 'Selecciona un producto para asignar la imagen'),
     }
-    return render(request, 'gallery/image_editor_editorial.html', context)
+    return render(request, 'gallery/pages/image_editor_editorial.html', context)
 
 
 @login_required
@@ -685,7 +685,7 @@ def s3_diagnostic(request):
             'title': 'Diagnóstico S3'
         }
 
-        return render(request, 'gallery/s3_diagnostic.html', context)
+        return render(request, 'gallery/pages/s3_diagnostic.html', context)
 
     except Exception as e:
         error_time = timezone.now()
@@ -710,4 +710,4 @@ def s3_diagnostic(request):
             },
             'title': 'Diagnóstico S3 - Error'
         }
-        return render(request, 'gallery/s3_diagnostic.html', context)
+        return render(request, 'gallery/pages/s3_diagnostic.html', context)

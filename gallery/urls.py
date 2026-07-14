@@ -1,3 +1,4 @@
+from django.shortcuts import redirect
 from django.urls import path
 from . import views
 
@@ -12,4 +13,5 @@ urlpatterns = [
     path('images/<int:image_id>/delete/', views.image_delete, name='image_delete'),
     path('images/bulk-delete/', views.image_bulk_delete, name='image_bulk_delete'),
     path('images/diagnostic/', views.s3_diagnostic, name='s3_diagnostic'),
+    path('products/create/', lambda req: redirect('products:product_create'), name='product_create'),
 ]

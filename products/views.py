@@ -210,7 +210,7 @@ def product_create(request):
         'admin_header_title': 'Crear Nuevo Producto',
         'admin_header_subtitle': 'Crear nuevo producto',
     }
-    return render(request, 'products/product_form_editorial.html', context)
+    return render(request, 'gallery/pages/product_form_editorial.html', context)
 
 
 @login_required
@@ -272,7 +272,7 @@ def product_update(request, product_id):
         'admin_header_title': f'Editar Producto: {product.name}',
         'admin_header_subtitle': f'Producto: {product.name}',
     }
-    return render(request, 'products/product_form_editorial.html', context)
+    return render(request, 'gallery/pages/product_form_editorial.html', context)
 
 
 @login_required
@@ -311,7 +311,7 @@ def product_delete(request, product_id):
             'product': product,
             'title': f'Eliminar Producto: {product.name}'
         }
-        return render(request, 'products/product_confirm_delete_editorial.html', context)
+        return render(request, 'gallery/pages/product_confirm_delete_editorial.html', context)
 
     except Product.DoesNotExist:
         logger.error(f"[ERROR] Attempted to delete non-existent product: ID={product_id}, User={user}")

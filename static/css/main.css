@@ -4,9 +4,9 @@
  @import "header.css";
  @import "footer.css";
   @import "home.css";
-  @import "partners.css";
-  @import "gallery.css";
-  @import "components/bento.css";
+   @import "partners.css";
+   @import "gallery/layout.css";
+    @import "components/bento.css";
  @import "components/product-card.css";
  @import "components/image-editor.css";
  @import "components/product-detail.css";
@@ -14,8 +14,8 @@
  @import "components/checkout.css";
  @import "components/auth.css";
  @import "components/profile.css";
- @import "components/orders.css";
- @import "admin.css";
- @import "utilities.css";
+  @import "components/orders.css";
+   @import "gallery/components.css";
+   @import "utilities.css";
 
  @layer tokens, base, layout, components, utilities;
