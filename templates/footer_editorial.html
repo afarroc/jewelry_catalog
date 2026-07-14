@@ -7,6 +7,9 @@
           <li><a href="{% url 'home:index' %}">Inicio</a></li>
           <li><a href="{% url 'products:product_list' %}">Catálogo</a></li>
           <li><a href="{% url 'orders:order_history' %}">Mis Pedidos</a></li>
+          {% if user.is_staff or user.is_superuser %}
+          <li><a href="{% url 'gallery:home' %}">Panel de administración</a></li>
+          {% endif %}
         </ul>
       </div>
       <div class="footer-section">

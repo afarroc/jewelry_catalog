@@ -9,6 +9,11 @@
     </nav>
     <div class="header-actions">
       {% if user.is_authenticated %}
+        {% if user.is_staff or user.is_superuser %}
+        <a href="{% url 'gallery:home' %}" title="Panel de administración">
+          <span class="nav-text">Admin</span><i class="fas fa-grip nav-icon"></i>
+        </a>
+        {% endif %}
         <a href="{% url 'accounts:profile' %}"><span class="nav-text">Perfil</span><i class="fas fa-user nav-icon"></i></a>
         <a href="{% url 'accounts:logout' %}"><span class="nav-text">Salir</span><i class="fas fa-right-from-bracket nav-icon"></i></a>
       {% else %}
