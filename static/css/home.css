@@ -629,8 +629,21 @@
     .object-item i { font-size: 14px; }
     .quick-access-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .banner-secondary-inner { min-height: 220px; }
-    .newsletter-form { flex-direction: column; align-items: center; }
-    .newsletter-form input[type="email"] { width: 100%; }
+    .newsletter-form { 
+      flex-direction: column; 
+      align-items: center; 
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 16px;
+      box-sizing: border-box;
+    }
+    .newsletter-form input[type="email"] { 
+      width: 100%; 
+      max-width: 100%;
+      flex: 1 1 auto;
+      box-sizing: border-box;
+    }
     .newsletter-form .btn { width: 100%; max-width: 320px; justify-content: center; }
   }
 
