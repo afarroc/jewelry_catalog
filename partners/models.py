@@ -1,8 +1,13 @@
 # partners/models.py
 import uuid
+import logging
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from cloudinary.models import CloudinaryField
+
+
+logger = logging.getLogger(__name__)
 
 
 class Partner(models.Model):
@@ -15,8 +20,9 @@ class Partner(models.Model):
     name = models.CharField(max_length=200, help_text='Nombre público de la tienda del socio')
     slug = models.SlugField(max_length=200, unique=True, help_text='URL: /tiendas/<slug>/')
     description = models.TextField(blank=True, help_text='Descripción de la tienda del socio')
-    hero_image = models.ImageField(
-        upload_to='partners/hero/',
+    hero_image = CloudinaryField(
+        'image',
+        folder='partners/hero',
         blank=True,
         null=True,
         help_text='Banner/imagen hero de la tienda del socio'
@@ -48,6 +54,17 @@ class Partner(models.Model):
             from django.utils.text import slugify
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+
+    @property
+    def get_hero_image_url(self):
+        """Return image URL for display - aligned with Product.get_image_url."""
+        img = self.hero_image
+        if not img or not getattr(img, 'public_id', None):
+            return ''
+        try:
+            return img.url or ''
+        except Exception:
+            return ''
 
 
 class PartnerUser(models.Model):

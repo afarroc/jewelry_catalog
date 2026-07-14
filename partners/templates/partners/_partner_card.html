@@ -1,10 +1,8 @@
 {% load static %}
 <article class="partner-card">
   <div class="partner-card-media">
-    {% if partner.hero_image %}
-      <img src="{{ partner.hero_image.url }}" alt="{{ partner.name }}">
-    {% else %}
-      <div class="partner-card-placeholder">Tienda</div>
+    {% if partner.get_hero_image_url %}
+      <img src="{{ partner.get_hero_image_url }}" alt="{{ partner.name }}">
     {% endif %}
   </div>
   <div class="partner-card-body">

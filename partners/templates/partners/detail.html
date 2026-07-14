@@ -6,8 +6,8 @@
 {% block content %}
 <section class="partner-shop">
   <div class="partner-hero">
-    {% if partner.hero_image %}
-      <img class="partner-hero-img" src="{{ partner.hero_image.url }}" alt="{{ partner.name }}">
+    {% if partner.get_hero_image_url %}
+      <img class="partner-hero-img" src="{{ partner.get_hero_image_url }}" alt="{{ partner.name }}">
     {% endif %}
     <div class="partner-hero-overlay"></div>
     <div class="partner-hero-inner">

@@ -1,6 +1,8 @@
 # partners/views.py
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView
+from home.models import Banner
+from home.hero_utils import build_hero_from_banners, TIENDAS_HERO_DEFAULTS
 from .models import Partner
 
 
@@ -19,6 +21,12 @@ class PartnerListView(ListView):
 
     def get_queryset(self):
         return Partner.objects.filter(is_active=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        active_tiendas_banners = Banner.objects.filter(is_active=True, page='tiendas').order_by('order', '-created_at')
+        context['hero'] = build_hero_from_banners(active_tiendas_banners, TIENDAS_HERO_DEFAULTS)
+        return context
 
 
 class PartnerDetailView(DetailView):
