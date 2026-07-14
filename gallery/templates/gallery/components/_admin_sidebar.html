@@ -55,12 +55,14 @@
     {% endif %}
 
     <div class="admin-sidebar-section">Sistema</div>
+    {% if user.is_staff or user.is_superuser %}
     <a class="admin-sidebar-item"
        href="{% url 'admin:index' %}"
        target="_blank" rel="noopener">
       <svg class="icon" aria-hidden="true"><use href="#icon-settings"></use></svg>
       <span>Django Admin</span>
     </a>
+    {% endif %}
   </nav>
 
   <div class="admin-sidebar-user">
@@ -73,7 +75,9 @@
     </button>
     <div class="admin-user-menu" id="adminUserMenu" role="menu" aria-labelledby="adminUserTrigger" hidden>
       <div class="admin-user-menu-head">{{ user.get_username|default:user.username }}</div>
+      {% if user.is_staff or user.is_superuser %}
       <a class="admin-user-menu-item" href="{% url 'admin:index' %}" target="_blank" rel="noopener" role="menuitem">Django Admin</a>
+      {% endif %}
       <form method="post" action="{% url 'accounts:logout' %}" class="admin-user-menu-form">
         {% csrf_token %}
         <button type="submit" class="admin-user-menu-item" role="menuitem">Cerrar sesión</button>

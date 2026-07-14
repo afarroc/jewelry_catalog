@@ -43,6 +43,13 @@
     font-size: 12px;
     color: var(--muted);
   }
+  .gallery-home-card--admin {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  }
+  .gallery-home-card--admin i {
+    color: var(--accent);
+  }
   .gallery-home-section {
     max-width: var(--max-width);
     margin: 0 auto;
@@ -81,6 +88,14 @@
 
 {% block admin_content %}
 <section class="gallery-home">
+  {% if user.is_staff or user.is_superuser %}
+  <a class="gallery-home-card gallery-home-card--admin" href="{% url 'admin:index' %}" target="_blank" rel="noopener">
+    <i class="fa-solid fa-user-shield"></i>
+    <div class="label">Administración</div>
+    <div class="meta">Acceso al panel de administración</div>
+  </a>
+  {% endif %}
+
   <a class="gallery-home-card" href="{% url 'gallery:image_list' %}">
     <i class="fa-solid fa-images"></i>
     <div class="label">Todas las imágenes</div>

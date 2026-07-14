@@ -28,6 +28,13 @@
         <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg>
         <span>Sitio</span>
       </a>
+
+      {% if user.is_staff or user.is_superuser %}
+      <a class="admin-header-btn admin-header-btn--accent" href="{% url 'admin:index' %}" target="_blank" rel="noopener">
+        <svg class="icon" aria-hidden="true"><use href="#icon-settings"></use></svg>
+        <span>Admin</span>
+      </a>
+      {% endif %}
     </div>
   </div>
 </header>
