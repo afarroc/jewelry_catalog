@@ -6,6 +6,7 @@ from django.urls import path
 from django.shortcuts import redirect
 from adminsortable2.admin import SortableAdminMixin
 from .models import Category, Product
+from partners.models import Partner
 import logging
 
 logger = logging.getLogger(__name__)
@@ -64,17 +65,29 @@ class ProductAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at', 'image_preview_large')
     ordering = ('-created_at',)
     list_per_page = 25
-    autocomplete_fields = ['partner']
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         user = getattr(request, 'user', None)
         if user and user.is_authenticated and not user.is_superuser:
-            allowed_partners = getattr(user, 'user_partners', set())
+            allowed_partners = getattr(request, 'user_partners', set())
             if allowed_partners:
                 return qs.filter(partner__in=allowed_partners)
             return qs.none()
         return qs
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """Limit partner choices for non-superusers to their assigned partners."""
+        if db_field.name == 'partner':
+            user = getattr(request, 'user', None)
+            if user and user.is_authenticated and not user.is_superuser:
+                allowed_partners = getattr(request, 'user_partners', set())
+                if allowed_partners:
+                    partner_pks = {p.pk for p in allowed_partners if hasattr(p, 'pk')}
+                    kwargs['queryset'] = Partner.objects.filter(pk__in=partner_pks)
+                else:
+                    kwargs['queryset'] = Partner.objects.none()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     # Actions en lote
     actions = ['make_available', 'make_unavailable', 'export_csv', 'assign_partner']
