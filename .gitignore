@@ -125,3 +125,4 @@ build_tiendas_banner.py
 upload_tiendas_banner.py
 static/images/banners/tiendas/
 scripts/dev/simulate/
+analyze_colors.py
