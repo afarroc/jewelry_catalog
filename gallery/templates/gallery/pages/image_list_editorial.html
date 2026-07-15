@@ -138,9 +138,9 @@
 </style>
 {% if request.GET.select %}
 <style>
-  .gallery-select-mode .bento-item { cursor: pointer; }
-  .gallery-select-mode .bento-item:hover { outline: 3px solid var(--ink); }
-  .gallery-select-mode .bento-item:hover .bento-media img { transform: none; }
+  .gallery-select-mode .admin-gallery-item { cursor: pointer; }
+  .gallery-select-mode .admin-gallery-item:hover { outline: 3px solid var(--ink); }
+  .gallery-select-mode .admin-gallery-item:hover .admin-gallery-media img { transform: none; }
   .gallery-select-overlay {
     position: absolute; inset: 0; background: rgba(26,21,17,0.6);
     color: #fff; display: flex; align-items: center; justify-content: center;
@@ -182,6 +182,17 @@
       <i class="fa-solid fa-images"></i>
       <div class="toolbar-label">Assets</div>
     </a>
+    {% if request.GET.bulk_select %}
+    <a class="toolbar-item" href="?{% if request.GET.select %}select=1&{% endif %}{% if request.GET.product_id %}product_id={{ request.GET.product_id }}&{% endif %}{% if folder_path %}folder={{ folder_path }}&{% endif %}{% if view_mode == 'all' %}view=all&{% endif %}">
+      <i class="fa-solid fa-xmark"></i>
+      <div class="toolbar-label">Cancelar selección</div>
+    </a>
+    {% else %}
+    <a class="toolbar-item" href="?bulk_select=1{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}&{% endif %}{% if folder_path %}folder={{ folder_path }}&{% endif %}{% if view_mode == 'all' %}view=all&{% endif %}">
+      <i class="fa-solid fa-list-check"></i>
+      <div class="toolbar-label">Seleccionar para eliminar</div>
+    </a>
+    {% endif %}
   </div>
 
   <!-- Modos de vista -->
@@ -251,32 +262,32 @@
       {% if view_mode == 'all' %}Todos los assets{% else %}{% if folder_path %}Imágenes en {{ folder_path }}{% else %}Imágenes en raíz{% endif %}{% endif %}
     </h2>
   </div>
-  <div class="bento-grid">
+  <div class="admin-gallery-grid">
     <form method="post" action="{% url 'gallery:image_bulk_delete' %}" id="bulkDeleteForm">
       {% csrf_token %}
       {% for image in combined_images %}
-      <article class="bento-item" {% if request.GET.select %}onclick="window.location='{% if image.is_cloudinary %}{% url 'gallery:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'"{% endif %}>
-        <div class="bento-media admin-bento-media">
-          {% if not request.GET.select %}
-          <input type="checkbox" name="selected_images" value="{{ image.id }}" class="bulk-select-checkbox" style="position:absolute;top:8px;left:8px;z-index:10;width:18px;height:18px;cursor:pointer;" title="Seleccionar para eliminar">
+      <article class="admin-gallery-item" {% if request.GET.select %}onclick="event.stopPropagation(); window.location='{% if image.is_cloudinary %}{% url 'products:product_create' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'"{% endif %}>
+        <div class="admin-gallery-media">
+          {% if request.GET.bulk_select %}
+          <input type="checkbox" name="selected_images" value="{{ image.id }}" class="bulk-select-checkbox" title="Seleccionar para eliminar" {% if image.id|stringformat:"s" in selected_ids %}checked{% endif %} onclick="event.stopPropagation()">
           {% endif %}
           <img src="{{ image.image }}" alt="{{ image.title }}">
+        </div>
         {% if request.GET.select %}
           <div class="gallery-select-overlay">Seleccionar</div>
         {% endif %}
         {% if image.is_cloudinary %}
-          <div class="admin-badge-cloudinary">Cloudinary</div>
+          <div class="admin-gallery-badge-cloudinary">Cloudinary</div>
         {% endif %}
-      </div>
-      <div class="bento-info">
-        <h3 class="bento-title admin-bento-title">{{ image.title }}</h3>
-        <p class="bento-desc">{{ image.description|default:""|truncatechars:90 }}</p>
+        <div class="admin-gallery-info">
+        <h3 class="admin-gallery-title">{{ image.title }}</h3>
+        <p class="admin-gallery-desc">{{ image.description|default:""|truncatechars:90 }}</p>
         {% if image.asset_folder %}
-          <p class="admin-bento-folder">{{ image.asset_folder }}</p>
+          <p class="admin-gallery-folder">{{ image.asset_folder }}</p>
         {% endif %}
-        <div class="order-actions admin-actions">
+        <div class="admin-gallery-actions">
           {% if request.GET.select %}
-            <button type="button" class="btn btn-primary" onclick="window.location='{% if image.is_cloudinary %}{% url 'gallery:image_upload' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'">
+            <button type="button" class="btn btn-primary" onclick="window.location='{% if image.is_cloudinary %}{% url 'products:product_create' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'">
               <i class="fa-solid fa-check"></i> <span class="btn-text">Seleccionar</span>
             </button>
           {% else %}
@@ -286,39 +297,39 @@
               </a>
             {% endif %}
           {% endif %}
-          {% if not image.is_cloudinary %}
+          {% if not request.GET.select %}
+            {% if not image.is_cloudinary %}
             <form method="post" action="{% url 'gallery:image_delete' image.id %}">{% csrf_token %}
-              <button type="submit" class="btn btn-ghost">
+              <button type="submit" class="btn btn-ghost" onclick="return confirm('¿Eliminar imagen? Esta acción no se puede deshacer.');">
                 <i class="fa-solid fa-trash"></i> <span class="btn-text">Eliminar</span>
               </button>
             </form>
+            {% endif %}
           {% endif %}
         </div>
       </div>
     </article>
     {% endfor %}
   </div>
-  {% if not request.GET.select %}
+  {% if request.GET.bulk_select %}
   <div class="order-card admin-card--mt" id="bulkActions" style="display:none;">
     <button type="submit" class="btn btn-danger" form="bulkDeleteForm" onclick="return confirm('¿Eliminar las imágenes seleccionadas? Esta acción no se puede deshacer.');">
       <i class="fa-solid fa-trash"></i> Eliminar seleccionadas (<span id="selectedCount">0</span>)
     </button>
-    <button type="button" class="btn btn-secondary" onclick="document.getElementById('bulkDeleteForm').reset(); document.getElementById('bulkActions').style.display='none';">
-      Cancelar
-    </button>
+    <a class="btn btn-secondary" href="?{% if request.GET.select %}select=1&{% endif %}{% if request.GET.product_id %}product_id={{ request.GET.product_id }}&{% endif %}{% if folder_path %}folder={{ folder_path }}&{% endif %}{% if view_mode == 'all' %}view=all&{% endif %}">Cancelar</a>
   </div>
   {% endif %}
   </form>
 
   <nav class="pagination" aria-label="Paginación">
     {% if page_obj.has_previous %}
-      <a href="?page=1{% if view_mode == 'folder' %}{% if folder_path %}&folder={{ folder_path }}{% endif %}{% endif %}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">&laquo; Primero</a>
-      <a href="?page={{ page_obj.previous_page_number }}{% if view_mode == 'folder' %}{% if folder_path %}&folder={{ folder_path }}{% endif %}{% endif %}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">Anterior</a>
+      <a href="?page=1{% if view_mode == 'folder' %}{% if folder_path %}&folder={{ folder_path }}{% endif %}{% endif %}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}{% if request.GET.bulk_select %}&bulk_select=1{% endif %}{% if selected_ids %}&selected={{ selected_ids|join:',' }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">&laquo; Primero</a>
+      <a href="?page={{ page_obj.previous_page_number }}{% if view_mode == 'folder' %}{% if folder_path %}&folder={{ folder_path }}{% endif %}{% endif %}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}{% if request.GET.bulk_select %}&bulk_select=1{% endif %}{% if selected_ids %}&selected={{ selected_ids|join:',' }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">Anterior</a>
     {% endif %}
-    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    <span>Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
     {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}{% if view_mode == 'folder' %}{% if folder_path %}&folder={{ folder_path }}{% endif %}{% endif %}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">Siguiente</a>
-      <a href="?page={{ page_obj.paginator.num_pages }}{% if view_mode == 'folder' %}{% if folder_path %}&folder={{ folder_path }}{% endif %}{% endif %}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">Último &raquo;</a>
+      <a href="?page={{ page_obj.next_page_number }}{% if view_mode == 'folder' %}{% if folder_path %}&folder={{ folder_path }}{% endif %}{% endif %}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}{% if request.GET.bulk_select %}&bulk_select=1{% endif %}{% if selected_ids %}&selected={{ selected_ids|join:',' }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">Siguiente</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}{% if view_mode == 'folder' %}{% if folder_path %}&folder={{ folder_path }}{% endif %}{% endif %}{% if request.GET.select %}&select=1{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}{% if request.GET.bulk_select %}&bulk_select=1{% endif %}{% if selected_ids %}&selected={{ selected_ids|join:',' }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">Último &raquo;</a>
     {% endif %}
   </nav>
   {% else %}
@@ -346,7 +357,7 @@
   }
 
   form.addEventListener('change', updateBulkActions);
-  // On page change, preserve selected IDs via URL params
+  // On page change, preserve selected IDs and bulk_select via URL params
   const pageLinks = form.closest('section').querySelectorAll('.pagination a');
   pageLinks.forEach(function(link) {
     link.addEventListener('click', function() {
@@ -355,6 +366,7 @@
       if (ids.length === 0) return;
       const url = new URL(link.href);
       url.searchParams.set('selected', ids.join(','));
+      url.searchParams.set('bulk_select', '1');
       link.href = url.toString();
     });
   });
