@@ -302,25 +302,22 @@
         <p class="admin-gallery-folder">{{ image.asset_folder }}</p>
       {% endif %}
       <div class="admin-gallery-actions">
-        {% if request.GET.select %}
-          <button type="button" class="btn btn-primary" onclick="event.stopPropagation(); window.location='{% if image.is_cloudinary %}{% url 'products:product_create' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'">
-            <i class="fa-solid fa-check"></i> <span class="btn-text">Seleccionar</span>
-          </button>
+        <button type="button" class="admin-btn admin-btn--primary" onclick="event.stopPropagation(); window.location='{% if image.is_cloudinary %}{% url 'products:product_create' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'">
+          <i class="fa-solid fa-check"></i> <span>Seleccionar</span>
+        </button>
+        {% if image.is_cloudinary %}
+          <a class="admin-btn admin-btn--secondary" href="{{ image.image }}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+            <i class="fa-solid fa-eye"></i> <span>Abrir</span>
+          </a>
         {% else %}
-          {% if image.is_cloudinary %}
-            <a class="btn btn-secondary" href="{{ image.image }}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
-              <i class="fa-solid fa-eye"></i> <span class="btn-text">Abrir</span>
-            </a>
-          {% else %}
-            <a class="btn btn-secondary" href="{% url 'gallery:image_detail' image.id %}" onclick="event.stopPropagation()">
-              <i class="fa-solid fa-eye"></i> <span class="btn-text">Ver</span>
-            </a>
-            <form method="post" action="{% url 'gallery:image_delete' image.id %}" onclick="event.stopPropagation()">{% csrf_token %}
-              <button type="submit" class="btn btn-ghost" onclick="return confirm('¿Eliminar imagen? Esta acción no se puede deshacer.'); event.stopPropagation();">
-                <i class="fa-solid fa-trash"></i> <span class="btn-text">Eliminar</span>
-              </button>
-            </form>
-          {% endif %}
+          <a class="admin-btn admin-btn--secondary" href="{% url 'gallery:image_detail' image.id %}" onclick="event.stopPropagation()">
+            <i class="fa-solid fa-eye"></i> <span>Ver</span>
+          </a>
+          <form method="post" action="{% url 'gallery:image_delete' image.id %}" onclick="event.stopPropagation()">{% csrf_token %}
+            <button type="submit" class="admin-btn admin-btn--ghost" onclick="return confirm('¿Eliminar imagen? Esta acción no se puede deshacer.'); event.stopPropagation();">
+              <i class="fa-solid fa-trash"></i> <span>Eliminar</span>
+            </button>
+          </form>
         {% endif %}
       </div>
     </div>
@@ -358,22 +355,30 @@
   if (!form || !bulkActions || !selectedCount) return;
 
   function updateBulkActions() {
-    const checked = document.querySelectorAll('input[name="selected_images"]:checked');
+    const checked = document.querySelectorAll('input[name=\"selected_images\"]:checked');
     selectedCount.textContent = checked.length;
     bulkActions.style.display = checked.length > 0 ? 'block' : 'none';
   }
 
   form.addEventListener('change', updateBulkActions);
-  // On page change, preserve selected IDs and bulk_select via URL params
-  const pageLinks = form.closest('section').querySelectorAll('.pagination a');
+  // On page change, preserve all current GET params + selected IDs + bulk_select
+  const pageLinks = document.querySelectorAll('.pagination a');
   pageLinks.forEach(function(link) {
     link.addEventListener('click', function() {
-      const checked = document.querySelectorAll('input[name="selected_images"]:checked');
+      const checked = document.querySelectorAll('input[name=\"selected_images\"]:checked');
       const ids = Array.from(checked).map(function(c) { return c.value; });
-      if (ids.length === 0) return;
       const url = new URL(link.href);
-      url.searchParams.set('selected', ids.join(','));
-      url.searchParams.set('bulk_select', '1');
+      // Preserve all existing params from current page URL
+      const currentParams = new URLSearchParams(window.location.search);
+      currentParams.forEach(function(value, key) {
+        if (!url.searchParams.has(key)) {
+          url.searchParams.set(key, value);
+        }
+      });
+      if (ids.length > 0) {
+        url.searchParams.set('selected', ids.join(','));
+        url.searchParams.set('bulk_select', '1');
+      }
       link.href = url.toString();
     });
   });

@@ -191,14 +191,99 @@
   }
   .admin-gallery-actions {
     display: flex;
+    flex-direction: column;
     gap: 8px;
     margin-top: 4px;
-    flex-wrap: wrap;
   }
-  .admin-gallery-actions .btn {
-    flex: 1 1 auto;
-    min-width: 0;
-    white-space: nowrap;
+  .admin-gallery-actions .admin-btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+  .admin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1.5px solid transparent;
+    transition: all 160ms ease;
+  }
+  .admin-btn--primary {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .admin-btn--primary:hover {
+    background: #2c2724;
+    border-color: #2c2724;
+  }
+  .admin-btn--secondary {
+    background: #fff;
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  .admin-btn--secondary:hover {
+    border-color: var(--ink);
+  }
+  .admin-btn--ghost {
+    background: transparent;
+    color: #b91c1c;
+    border-color: #fecaca;
+  }
+  .admin-btn--ghost:hover {
+    background: #fef2f2;
+    border-color: #b91c1c;
+  }
+  .admin-gallery-actions .admin-btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+  .admin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1.5px solid transparent;
+    transition: all 160ms ease;
+  }
+  .admin-btn--primary {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .admin-btn--primary:hover {
+    background: #2c2724;
+    border-color: #2c2724;
+  }
+  .admin-btn--secondary {
+    background: #fff;
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  .admin-btn--secondary:hover {
+    border-color: var(--ink);
+  }
+  .admin-btn--ghost {
+    background: transparent;
+    color: #b91c1c;
+    border-color: #fecaca;
+  }
+  .admin-btn--ghost:hover {
+    background: #fef2f2;
+    border-color: #b91c1c;
   }
   .admin-gallery-badge-cloudinary {
     position: absolute;
