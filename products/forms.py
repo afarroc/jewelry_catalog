@@ -9,6 +9,7 @@ import cloudinary.uploader
 from django import forms
 from django.utils.text import slugify
 from .models import Category, Product
+from partners.models import Partner
 
 logger = logging.getLogger('products')
 
@@ -20,7 +21,7 @@ class ProductForm(forms.ModelForm):
         model = Product
         fields = [
             'name', 'description', 'price', 'jewelry_type', 'material',
-            'category', 'stock', 'available', 'bento_size', 'image'
+            'category', 'stock', 'available', 'bento_size', 'partner', 'image'
         ]
         widgets = {
             'name': forms.TextInput(attrs={
@@ -58,6 +59,9 @@ class ProductForm(forms.ModelForm):
             'bento_size': forms.Select(attrs={
                 'class': 'form-select'
             }),
+            'partner': forms.Select(attrs={
+                'class': 'form-select'
+            }),
             'image': forms.FileInput(attrs={
                 'class': 'form-control',
                 'accept': 'image/*'
@@ -69,10 +73,24 @@ class ProductForm(forms.ModelForm):
     cloudinary_url = forms.URLField(required=False, widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         # Add CSS classes to category field
         self.fields['category'].empty_label = "Seleccionar categoría"
         self.fields['category'].required = False
+
+        # Partner isolation: same logic as admin/middleware
+        if user and user.is_authenticated and not user.is_superuser:
+            allowed_partners = {
+                pu.partner for pu in user.partner_memberships.select_related('partner')
+            }
+            if allowed_partners:
+                partner_pks = {p.pk for p in allowed_partners if hasattr(p, 'pk')}
+                self.fields['partner'].queryset = Partner.objects.filter(pk__in=partner_pks)
+            else:
+                self.fields['partner'].queryset = Partner.objects.none()
+        else:
+            self.fields['partner'].queryset = Partner.objects.all()
 
         # Add help texts
         self.fields['image'].help_text = "Formatos permitidos: JPG, PNG, GIF. Tamaño máximo recomendado: 2MB"

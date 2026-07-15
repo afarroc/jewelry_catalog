@@ -157,7 +157,7 @@ def products_by_category_api(request, category_slug):
 def product_create(request):
     """View for creating new products with inline image crop."""
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
+        form = ProductForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             product = form.save(commit=False)
 
@@ -192,7 +192,7 @@ def product_create(request):
             logger.info(f"Product created: {product.name} by user {request.user.username}")
             return redirect('products:product_detail', slug=product.slug)
     else:
-        form = ProductForm()
+        form = ProductForm(user=request.user)
 
     # Si viene gallery_image_id o cloudinary_url en GET, preparar preview
     gallery_image_url = None
@@ -202,13 +202,13 @@ def product_create(request):
         try:
             gallery = ImageUpload.objects.get(pk=gallery_image_id)
             gallery_image_url = gallery.image
-            form = ProductForm(initial={'gallery_image_id': gallery.id})
+            form = ProductForm(initial={'gallery_image_id': gallery.id}, user=request.user)
         except ImageUpload.DoesNotExist:
             messages.warning(request, 'La imagen de galería seleccionada no existe.')
 
     cloudinary_url = request.GET.get('cloudinary_url')
     if cloudinary_url:
-        form = ProductForm(initial={'cloudinary_url': cloudinary_url})
+        form = ProductForm(initial={'cloudinary_url': cloudinary_url}, user=request.user)
 
     context = {
         'form': form,
@@ -228,7 +228,7 @@ def product_update(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES, instance=product)
+        form = ProductForm(request.POST, request.FILES, instance=product, user=request.user)
         if form.is_valid():
             product = form.save(commit=False)
 
@@ -259,7 +259,7 @@ def product_update(request, product_id):
             logger.info(f"Product updated: {product.name} by user {request.user.username}")
             return redirect('products:product_detail', slug=product.slug)
     else:
-        form = ProductForm(instance=product)
+        form = ProductForm(instance=product, user=request.user)
 
     # Si viene gallery_image_id en GET, preparar preview
     gallery_image_url = None
@@ -268,7 +268,7 @@ def product_update(request, product_id):
         try:
             gallery = ImageUpload.objects.get(pk=gallery_image_id)
             gallery_image_url = gallery.image
-            form = ProductForm(instance=product, initial={'gallery_image_id': gallery.id})
+            form = ProductForm(instance=product, initial={'gallery_image_id': gallery.id}, user=request.user)
         except ImageUpload.DoesNotExist:
             messages.warning(request, 'La imagen de galería seleccionada no existe.')
 
