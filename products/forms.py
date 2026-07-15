@@ -66,6 +66,7 @@ class ProductForm(forms.ModelForm):
 
     crop_data = forms.CharField(widget=forms.HiddenInput(), required=False)
     gallery_image_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    cloudinary_url = forms.URLField(required=False, widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

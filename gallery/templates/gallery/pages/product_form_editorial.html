@@ -95,6 +95,7 @@
 
           <div class="auth-field">
             <label class="auth-label" for="{{ form.available.id_for_label }}">{{ form.available.label }}</label>
+            <input type="hidden" name="available" value="false">
             {{ form.available }}
             {% if form.available.errors %}
               <p class="auth-field-error">{{ form.available.errors.0 }}</p>
@@ -132,10 +133,12 @@
                   <p class="admin-help-text">
                     O <a href="{% url 'gallery:image_list' %}?select=1{% if form.instance.pk %}&product_id={{ form.instance.pk }}{% endif %}" class="admin-link-accent">elegir de la galería</a>
                   </p>
-                  {% if gallery_image_url %}
-                    <img id="galleryPreview" src="{{ gallery_image_url }}" alt="Imagen de galería" data-url="{{ gallery_image_url }}" class="admin-gallery-preview">
-                    <button type="button" id="clearGallery" class="admin-btn-ghost-danger">Quitar imagen de galería</button>
-                  {% endif %}
+                   {% if gallery_image_url or cloudinary_url %}
+                     {% with preview_url=gallery_image_url|default:cloudinary_url %}
+                     <img id="galleryPreview" src="{{ preview_url }}" alt="Imagen de galería" data-url="{{ preview_url }}" class="admin-gallery-preview">
+                     <button type="button" id="clearGallery" class="admin-btn-ghost-danger">Quitar imagen de galería</button>
+                     {% endwith %}
+                   {% endif %}
                 </div>
 
                 <div class="ie-field">
@@ -180,6 +183,7 @@
         <!-- Hidden fields para crop -->
         {{ form.crop_data }}
         {{ form.gallery_image_id }}
+        {{ form.cloudinary_url }}
         {% if form.instance and form.instance.pk %}
           <input type="hidden" name="product_id" value="{{ form.instance.pk }}">
         {% endif %}
@@ -195,19 +199,40 @@
 <script src="{% static 'js/product_image_editor.js' %}"></script>
 <script>
 (function() {
-  // Si viene gallery_image_id en GET, mostrar preview y limpiar input file
+  // Si viene gallery_image_id o cloudinary_url en GET, mostrar preview y limpiar input file
   const galleryId = '{{ request.GET.gallery_image_id|default:"" }}';
+  const cloudinaryUrl = '{{ request.GET.cloudinary_url|default:"" }}';
   const galleryPreview = document.getElementById('galleryPreview');
   const clearBtn = document.getElementById('clearGallery');
   const imageInput = document.querySelector('input[name="image"]');
   
-  if (galleryId && galleryPreview) {
-    // La URL de la imagen viene del servidor en el contexto
-    // Aquí asumimos que el backend inyectó la URL en un data attribute
-    const imgUrl = galleryPreview.getAttribute('data-url');
-    if (imgUrl) {
-      galleryPreview.src = imgUrl;
-      galleryPreview.style.display = 'block';
+  const activeImageUrl = (galleryId && galleryPreview) ? (galleryPreview.getAttribute('data-url') || galleryPreview.src) : cloudinaryUrl;
+  
+  if (activeImageUrl && galleryPreview) {
+    galleryPreview.src = activeImageUrl;
+    galleryPreview.style.display = 'block';
+    
+    // Cargar imagen en el canvas del cropper para permitir recorte
+    const cropImg = document.getElementById('ieImageToCrop');
+    const placeholder = document.getElementById('iePlaceholder');
+    if (cropImg) {
+      cropImg.src = activeImageUrl;
+      cropImg.style.display = 'block';
+      if (placeholder) placeholder.style.display = 'none';
+      
+      cropImg.onload = function() {
+        console.log('[Gallery] imagen cargada en cropper');
+        if (typeof initCropper === 'function') {
+          initCropper(cropImg);
+        }
+      };
+      // Fallback por si la imagen ya está en cache
+      if (cropImg.complete && cropImg.naturalWidth > 0) {
+        console.log('[Gallery] imagen ya cargada (fallback)');
+        if (typeof initCropper === 'function') {
+          initCropper(cropImg);
+        }
+      }
     }
     if (imageInput) {
       imageInput.style.display = 'none';
@@ -224,11 +249,33 @@
         imageInput.style.display = 'block';
         imageInput.value = '';
       }
-      // Limpiar hidden field
-      const hidden = document.querySelector('input[name="gallery_image_id"]');
-      if (hidden) hidden.value = '';
+      // Limpiar hidden fields
+      const hiddenGallery = document.querySelector('input[name="gallery_image_id"]');
+      if (hiddenGallery) hiddenGallery.value = '';
+      const hiddenCloudinary = document.querySelector('input[name="cloudinary_url"]');
+      if (hiddenCloudinary) hiddenCloudinary.value = '';
       // Limpiar URL
-      window.history.replaceState({}, '', window.location.pathname + window.location.search.replace(/[?&]gallery_image_id=\d+/, ''));
+      const url = new URL(window.location);
+      url.searchParams.delete('gallery_image_id');
+      url.searchParams.delete('cloudinary_url');
+      window.history.replaceState({}, '', url);
+      
+      // Reset cropper
+      if (typeof cropper !== 'undefined' && cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+      // Reset canvas
+      const cropImg = document.getElementById('ieImageToCrop');
+      if (cropImg) {
+        cropImg.src = '';
+        cropImg.style.display = 'none';
+      }
+      const placeholder = document.getElementById('iePlaceholder');
+      if (placeholder) placeholder.style.display = 'flex';
+      // Limpiar crop data
+      const cropDataInput = document.getElementById('id_crop_data');
+      if (cropDataInput) cropDataInput.value = '';
     });
   }
 })();

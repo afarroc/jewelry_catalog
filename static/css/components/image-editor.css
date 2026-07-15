@@ -230,4 +230,14 @@
       grid-template-columns: 1fr;
     }
   }
+
+  .ie-hidden {
+    display: none !important;
+  }
+  .admin-gallery-preview {
+    max-width: 100%;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    margin-top: 8px;
+  }
 }

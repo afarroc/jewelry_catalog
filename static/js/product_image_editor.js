@@ -224,7 +224,14 @@
 
   if (form) {
     form.addEventListener('submit', function (e) {
-      if (!cropper) {
+      var hasGalleryImage = false;
+      try {
+        var galleryInput = document.querySelector('input[name="gallery_image_id"]');
+        hasGalleryImage = galleryInput && galleryInput.value;
+      } catch (err) {
+        hasGalleryImage = false;
+      }
+      if (!cropper && !hasGalleryImage) {
         e.preventDefault();
         alert('Selecciona una imagen para recortar antes de guardar.');
       }

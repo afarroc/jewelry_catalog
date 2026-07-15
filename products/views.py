@@ -165,12 +165,15 @@ def product_create(request):
             image_file = request.FILES.get('image')
             crop_data_raw = request.POST.get('crop_data')
             gallery_image_id = request.POST.get('gallery_image_id')
+            cloudinary_url = request.POST.get('cloudinary_url')
             if gallery_image_id:
                 try:
                     gallery = ImageUpload.objects.get(pk=gallery_image_id)
                     product.image = gallery.image
                 except ImageUpload.DoesNotExist:
                     messages.warning(request, 'La imagen de galería seleccionada no existe.')
+            elif cloudinary_url:
+                product.image = cloudinary_url
             elif image_file and crop_data_raw:
                 try:
                     import json
@@ -191,8 +194,9 @@ def product_create(request):
     else:
         form = ProductForm()
 
-    # Si viene gallery_image_id en GET, preparar preview
+    # Si viene gallery_image_id o cloudinary_url en GET, preparar preview
     gallery_image_url = None
+    cloudinary_url = None
     gallery_image_id = request.GET.get('gallery_image_id')
     if gallery_image_id:
         try:
@@ -202,11 +206,16 @@ def product_create(request):
         except ImageUpload.DoesNotExist:
             messages.warning(request, 'La imagen de galería seleccionada no existe.')
 
+    cloudinary_url = request.GET.get('cloudinary_url')
+    if cloudinary_url:
+        form = ProductForm(initial={'cloudinary_url': cloudinary_url})
+
     context = {
         'form': form,
         'title': 'Crear Nuevo Producto',
         'button_text': 'Crear Producto',
         'gallery_image_url': gallery_image_url,
+        'cloudinary_url': cloudinary_url,
         'admin_header_title': 'Crear Nuevo Producto',
         'admin_header_subtitle': 'Crear nuevo producto',
     }
