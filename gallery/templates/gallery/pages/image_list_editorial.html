@@ -262,64 +262,67 @@
       {% if view_mode == 'all' %}Todos los assets{% else %}{% if folder_path %}Imágenes en {{ folder_path }}{% else %}Imágenes en raíz{% endif %}{% endif %}
     </h2>
   </div>
-  <div class="admin-gallery-grid">
-    <form method="post" action="{% url 'gallery:image_bulk_delete' %}" id="bulkDeleteForm">
-      {% csrf_token %}
-      {% for image in combined_images %}
-      <article class="admin-gallery-item" {% if request.GET.select %}onclick="event.stopPropagation(); window.location='{% if image.is_cloudinary %}{% url 'products:product_create' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'"{% endif %}>
-        <div class="admin-gallery-media">
-          {% if request.GET.bulk_select %}
-          <input type="checkbox" name="selected_images" value="{{ image.id }}" class="bulk-select-checkbox" title="Seleccionar para eliminar" {% if image.id|stringformat:"s" in selected_ids %}checked{% endif %} onclick="event.stopPropagation()">
-          {% endif %}
-          <img src="{{ image.image }}" alt="{{ image.title }}">
-        </div>
-        {% if request.GET.select %}
-          <div class="gallery-select-overlay">Seleccionar</div>
-        {% endif %}
-        {% if image.is_cloudinary %}
-          <div class="admin-gallery-badge-cloudinary">Cloudinary</div>
-        {% endif %}
-        <div class="admin-gallery-info">
-        <h3 class="admin-gallery-title">{{ image.title }}</h3>
-        <p class="admin-gallery-desc">{{ image.description|default:""|truncatechars:90 }}</p>
-        {% if image.asset_folder %}
-          <p class="admin-gallery-folder">{{ image.asset_folder }}</p>
-        {% endif %}
-        <div class="admin-gallery-actions">
-          {% if request.GET.select %}
-            <button type="button" class="btn btn-primary" onclick="window.location='{% if image.is_cloudinary %}{% url 'products:product_create' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'">
-              <i class="fa-solid fa-check"></i> <span class="btn-text">Seleccionar</span>
-            </button>
-          {% else %}
-            {% if not image.is_cloudinary %}
-              <a class="btn btn-secondary" href="{% url 'gallery:image_detail' image.id %}">
-                <i class="fa-solid fa-eye"></i> <span class="btn-text">Ver</span>
-              </a>
-            {% endif %}
-          {% endif %}
-          {% if not request.GET.select %}
-            {% if not image.is_cloudinary %}
-            <form method="post" action="{% url 'gallery:image_delete' image.id %}">{% csrf_token %}
-              <button type="submit" class="btn btn-ghost" onclick="return confirm('¿Eliminar imagen? Esta acción no se puede deshacer.');">
-                <i class="fa-solid fa-trash"></i> <span class="btn-text">Eliminar</span>
-              </button>
-            </form>
-            {% endif %}
-          {% endif %}
-        </div>
-      </div>
-    </article>
-    {% endfor %}
-  </div>
+
   {% if request.GET.bulk_select %}
-  <div class="order-card admin-card--mt" id="bulkActions" style="display:none;">
-    <button type="submit" class="btn btn-danger" form="bulkDeleteForm" onclick="return confirm('¿Eliminar las imágenes seleccionadas? Esta acción no se puede deshacer.');">
-      <i class="fa-solid fa-trash"></i> Eliminar seleccionadas (<span id="selectedCount">0</span>)
-    </button>
-    <a class="btn btn-secondary" href="?{% if request.GET.select %}select=1&{% endif %}{% if request.GET.product_id %}product_id={{ request.GET.product_id }}&{% endif %}{% if folder_path %}folder={{ folder_path }}&{% endif %}{% if view_mode == 'all' %}view=all&{% endif %}">Cancelar</a>
-  </div>
-  {% endif %}
+  <form method="post" action="{% url 'gallery:image_bulk_delete' %}" id="bulkDeleteForm">
+    {% csrf_token %}
+    <div class="order-card admin-card--mt" id="bulkActions" style="display:none;">
+      <button type="submit" class="btn btn-danger" onclick="return confirm('¿Eliminar las imágenes seleccionadas? Esta acción no se puede deshacer.');">
+        <i class="fa-solid fa-trash"></i> Eliminar seleccionadas (<span id="selectedCount">0</span>)
+      </button>
+      <a class="btn btn-secondary" href="?{% if request.GET.select %}select=1&{% endif %}{% if request.GET.product_id %}product_id={{ request.GET.product_id }}&{% endif %}{% if folder_path %}folder={{ folder_path }}&{% endif %}{% if view_mode == 'all' %}view=all&{% endif %}">Cancelar</a>
+    </div>
   </form>
+  {% endif %}
+
+  <div class="admin-gallery-grid">
+    {% for image in combined_images %}
+    <article class="admin-gallery-item" 
+      {% if request.GET.select %}
+        onclick="event.stopPropagation(); window.location='{% if image.is_cloudinary %}{% url 'products:product_create' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'"
+      {% else %}
+        onclick="event.stopPropagation(); window.location='{% if image.is_cloudinary %}{{ image.image }}{% else %}{% url 'gallery:image_detail' image.id %}{% endif %}'"
+      {% endif %}>
+      <div class="admin-gallery-media">
+        {% if request.GET.bulk_select %}
+        <input type="checkbox" name="selected_images" value="{{ image.id }}" class="bulk-select-checkbox" title="Seleccionar para eliminar" {% if image.id|stringformat:"s" in selected_ids %}checked{% endif %} onclick="event.stopPropagation()" form="bulkDeleteForm">
+        {% endif %}
+        <img src="{{ image.image }}" alt="{{ image.title }}">
+      </div>
+      {% if request.GET.select %}
+        <div class="gallery-select-overlay">Seleccionar</div>
+      {% endif %}
+      {% if image.is_cloudinary %}
+        <div class="admin-gallery-badge-cloudinary">Cloudinary</div>
+      {% endif %}
+      <div class="admin-gallery-info">
+      <h3 class="admin-gallery-title">{{ image.title }}</h3>
+      <p class="admin-gallery-desc">{{ image.description|default:""|truncatechars:90 }}</p>
+      {% if image.asset_folder %}
+        <p class="admin-gallery-folder">{{ image.asset_folder }}</p>
+      {% endif %}
+      <div class="admin-gallery-actions">
+        {% if request.GET.select %}
+          <button type="button" class="btn btn-primary" onclick="event.stopPropagation(); window.location='{% if image.is_cloudinary %}{% url 'products:product_create' %}?cloudinary_url={{ image.image|urlencode }}{% else %}{% url 'products:product_create' %}?gallery_image_id={{ image.id }}{% endif %}{% if request.GET.product_id %}&product_id={{ request.GET.product_id }}{% endif %}'">
+            <i class="fa-solid fa-check"></i> <span class="btn-text">Seleccionar</span>
+          </button>
+        {% else %}
+          <a class="btn btn-secondary" href="{% if image.is_cloudinary %}{{ image.image }}{% else %}{% url 'gallery:image_detail' image.id %}{% endif %}" onclick="event.stopPropagation()" {% if image.is_cloudinary %}target="_blank" rel="noopener"{% endif %}>
+            <i class="fa-solid fa-eye"></i> <span class="btn-text">{% if image.is_cloudinary %}Abrir{% else %}Ver{% endif %}</span>
+          </a>
+          {% if not image.is_cloudinary %}
+          <form method="post" action="{% url 'gallery:image_delete' image.id %}" onclick="event.stopPropagation()">{% csrf_token %}
+            <button type="submit" class="btn btn-ghost" onclick="return confirm('¿Eliminar imagen? Esta acción no se puede deshacer.'); event.stopPropagation();">
+              <i class="fa-solid fa-trash"></i> <span class="btn-text">Eliminar</span>
+            </button>
+          </form>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </article>
+  {% endfor %}
+</div>
 
   <nav class="pagination" aria-label="Paginación">
     {% if page_obj.has_previous %}
@@ -351,7 +354,7 @@
   if (!form || !bulkActions || !selectedCount) return;
 
   function updateBulkActions() {
-    const checked = form.querySelectorAll('input[name="selected_images"]:checked');
+    const checked = document.querySelectorAll('input[name="selected_images"]:checked');
     selectedCount.textContent = checked.length;
     bulkActions.style.display = checked.length > 0 ? 'block' : 'none';
   }
@@ -361,7 +364,7 @@
   const pageLinks = form.closest('section').querySelectorAll('.pagination a');
   pageLinks.forEach(function(link) {
     link.addEventListener('click', function() {
-      const checked = form.querySelectorAll('input[name="selected_images"]:checked');
+      const checked = document.querySelectorAll('input[name="selected_images"]:checked');
       const ids = Array.from(checked).map(function(c) { return c.value; });
       if (ids.length === 0) return;
       const url = new URL(link.href);
