@@ -94,6 +94,14 @@
           </div>
 
           <div class="auth-field">
+            <label class="auth-label" for="{{ form.partner.id_for_label }}">{{ form.partner.label }}</label>
+            {{ form.partner }}
+            {% if form.partner.errors %}
+              <p class="auth-field-error">{{ form.partner.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div class="auth-field">
             <label class="auth-label" for="{{ form.available.id_for_label }}">{{ form.available.label }}</label>
             <input type="hidden" name="available" value="false">
             {{ form.available }}
