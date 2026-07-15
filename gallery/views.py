@@ -249,6 +249,8 @@ def image_list(request):
         'cloudinary_resources': cloudinary_resources,
         'breadcrumbs': breadcrumbs,
         'view_mode': view_mode,
+        'bulk_select': request.GET.get('bulk_select'),
+        'selected_ids': request.GET.get('selected', '').split(',') if request.GET.get('selected') else [],
         'admin_header_title': 'Imágenes',
         'admin_header_subtitle': 'Panel de administración de imágenes' if not folder_path else f'Carpeta: {folder_path}',
     }
