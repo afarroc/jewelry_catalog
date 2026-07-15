@@ -120,4 +120,7 @@ static/images/raw/
 # Local simulation and seeding scripts
 assign_*.py
 seed_*.py
-simulate_*.py
+simulate_*.pyanalyze_colors.py
+build_tiendas_banner.py
+upload_tiendas_banner.py
+static/images/banners/tiendas/
