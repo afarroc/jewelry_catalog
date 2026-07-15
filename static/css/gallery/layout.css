@@ -193,6 +193,12 @@
     display: flex;
     gap: 8px;
     margin-top: 4px;
+    flex-wrap: wrap;
+  }
+  .admin-gallery-actions .btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
   }
   .admin-gallery-badge-cloudinary {
     position: absolute;
